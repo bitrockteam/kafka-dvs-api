@@ -1,0 +1,16 @@
+@startuml
+title kafka-flightstream-api architecture
+
+[kafka-flightstream-api] as API
+[Client] as client
+
+interface "Schema Registry" as SchemaRegistry
+
+node Kafka {
+    database "flight_received\ntopic" as FlightTopic
+}
+
+FlightTopic --> API
+API <-- SchemaRegistry
+API ..> client : flights
+@enduml

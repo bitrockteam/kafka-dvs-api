@@ -1,0 +1,99 @@
+asyncapi: '1.2.0'
+info:
+  title: Kafka Flightstream server API
+  version: 1.0.0-SNAPSHOT
+  license:
+    name: 'MIT'
+    url: 'https://spdx.org/licenses/MIT.html'
+baseTopic: stream
+
+servers:
+  - url: flightstream-api.bitrock.it
+    description: Event streams
+    scheme: wss
+
+topics:
+  flights:
+    subscribe:
+      $ref: '#/components/messages/FlightReceived'
+
+components:
+  messages:
+    FlightReceived:
+      summary: 'Flight received'
+      tags:
+        - name: flight
+      payload:
+        type: object
+        required:
+          - geography
+          - speed
+          - airportDeparture
+          - airportArrival
+          - airline
+          - status
+        properties:
+          geography:
+            $ref: '#/components/messages/GeographyInfo'
+          speed:
+            type: number
+            format: double
+          airportDeparture:
+            $ref: '#/components/messages/AirportInfo'
+          airportArrival:
+            $ref: '#/components/messages/AirportInfo'
+          airline:
+            $ref: '#/components/messages/AirlineInfo'
+          status:
+            type: string
+
+  schemas:
+    GeographyInfo:
+      description: 'geographyInfo:'
+      type: object
+      required:
+        - latitude
+        - longitude
+        - altitude
+        - direction
+      properties:
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+        altitude:
+          type: number
+          format: double
+        direction:
+          type: number
+          format: double
+    AirportInfo:
+      description: 'airportInfo:'
+      type: object
+      required:
+        - codeAirport
+        - nameAirport
+        - nameCountry
+        - codeIso2Country
+      properties:
+        codeAirport:
+          type: string
+        nameAirport:
+          type: string
+        nameCountry:
+          type: string
+        codeIso2Country:
+          type: string
+    AirlineInfo:
+      description: 'airlineInfo:'
+      type: object
+      required:
+        - nameAirline
+        - sizeAirline
+      properties:
+        nameAirline:
+          type: string
+        sizeAirline:
+          type: string
