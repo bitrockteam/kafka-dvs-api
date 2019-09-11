@@ -31,6 +31,8 @@ password=<your-password>
 The application references the following Kafka topics:
 
 - `flight_received`
+- `top_arrival_airport`
+- `top_departure_airport`
 
 ## API documentation
 

@@ -5,6 +5,7 @@ import it.bitrock.kafkaflightstream.model._
 import it.bitrock.kafkaflightstream.api.config.KafkaConfig
 import it.bitrock.kafkaflightstream.api.definitions.DefinitionsConversions._
 import it.bitrock.kafkageostream.kafkacommons.serialization.AvroSerdes.serdeFrom
+import org.apache.avro.specific.SpecificRecord
 import org.apache.kafka.common.serialization.{Deserializer, Serdes}
 
 trait KafkaConsumerWrapperFactory {
@@ -22,5 +23,18 @@ object KafkaConsumerWrapperFactory {
         topics,
         (record: FlightEnrichedEvent) => record.toFlightReceived
       )(byteArrayDeserializer, serdeFrom[FlightEnrichedEvent](kafkaConfig.schemaRegistryUrl).deserializer)
+
+  def topsKafkaConsumerFactory(kafkaConfig: KafkaConfig): KafkaConsumerWrapperFactory =
+    (processor: ActorRef, topics: Seq[String]) =>
+      new KafkaConsumerWrapperImpl(
+        kafkaConfig,
+        processor,
+        topics,
+        (r: SpecificRecord) =>
+          r match {
+            case arrivalAirport: TopArrivalAirportList     => arrivalAirport.toTopArrivalAirportList
+            case departureAirport: TopDepartureAirportList => departureAirport.toTopDepartureAirportList
+          }
+      )(byteArrayDeserializer, serdeFrom[SpecificRecord](kafkaConfig.schemaRegistryUrl).deserializer)
 
 }

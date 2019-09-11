@@ -16,6 +16,9 @@ topics:
   flights:
     subscribe:
       $ref: '#/components/messages/FlightReceived'
+  topElementsChanged:
+    subscribe:
+      $ref: '#/components/messages/TopElementsChangedStreamEvent'
 
 components:
   messages:
@@ -46,7 +49,21 @@ components:
             $ref: '#/components/messages/AirlineInfo'
           status:
             type: string
-
+    TopElementsChangedStreamEvent:
+      tags:
+        - name: topElementsChanged
+      payload:
+        type: object
+        required:
+          - eventType
+          - eventPayload
+        properties:
+          eventType:
+            type: string
+          eventPayload:
+            oneOf:
+              - $ref: '#/components/schemas/TopArrivalAirportList'
+              - $ref: '#/components/schemas/TopDepartureAirportList'
   schemas:
     GeographyInfo:
       description: 'geographyInfo:'
@@ -97,3 +114,35 @@ components:
           type: string
         sizeAirline:
           type: string
+    TopArrivalAirportList:
+      description: 'Top arrival airport list'
+      type: object
+      required:
+        - elements
+      properties:
+        elements:
+          $ref: '#/components/schemas/AirportList'
+    TopDepartureAirportList:
+      description: 'Top departure airport list'
+      type: object
+      required:
+        - elements
+      properties:
+        elements:
+          $ref: '#/components/schemas/AirportList'
+    AirportList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Airport'
+    Airport:
+      type: object
+      required:
+        - airportCode
+        - eventCount
+      properties:
+        cityName:
+          type: string
+        eventCount:
+          type: integer
+          format: int64
+          default: 0

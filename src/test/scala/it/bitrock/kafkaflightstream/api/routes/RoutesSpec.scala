@@ -38,19 +38,29 @@ class RoutesSpec extends BaseAsyncSpec with ScalatestRouteTest {
         }
     }
 
+    "open a web-socket channel and stream messages with top countries and topics on it for WS requests on the streams path" in ResourceLoaner
+      .withFixture {
+        case Resource(routes, wsProbe, websocketConfig) =>
+          WS(Uri(path = Uri.Path./(websocketConfig.pathPrefix)./(websocketConfig.topElementsPath)), wsProbe.flow) ~> routes.streams ~> check {
+            checkWebsocketAndSendTestMessage(wsProbe)
+          }
+      }
+
   }
 
   object ResourceLoaner extends AsyncFixtureLoaner[RoutesSpec.Resource] {
     override def withFixture(body: RoutesSpec.Resource => Future[Assertion]): Future[Assertion] = {
       val wsProbe = WSProbe()
       val flowFactories = Map(
-        flightFlowFactoryKey -> new TestFlowFactory
+        flightFlowFactoryKey -> new TestFlowFactory,
+        topsFlowFactoryKey   -> new TestFlowFactory
       )
       val websocketConfig = WebsocketConfig(
         throttleDuration = 1.second,
         cleanupDelay = 0.second,
         pathPrefix = "path",
-        flightsPath = "flights"
+        flightsPath = "flights",
+        topElementsPath = "tops"
       )
       val routes = new Routes(flowFactories, websocketConfig)
 
