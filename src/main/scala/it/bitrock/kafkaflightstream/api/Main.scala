@@ -38,9 +38,15 @@ object Main extends App with LazyLogging {
     new FlightMessageProcessorFactoryImpl(config.server.websocket, config.kafka, flightKafkaConsumerWrapperFactory)
   val flightFlowFactory = new FlowFactoryImpl(flightMessageProcessorFactory)
 
+  val topsKafkaConsumerWrapperFactory = topsKafkaConsumerFactory(config.kafka)
+  val topsMessageProcessorFactory =
+    new TopsMessageProcessorFactoryImpl(config.server.websocket, config.kafka, topsKafkaConsumerWrapperFactory)
+  val topsFlowFactory = new FlowFactoryImpl(topsMessageProcessorFactory)
+
   val flowFactories: Map[FlowFactoryKey, FlowFactory] =
     Map(
-      flightFlowFactoryKey -> flightFlowFactory
+      flightFlowFactoryKey -> flightFlowFactory,
+      topsFlowFactoryKey   -> topsFlowFactory
     )
 
   val api: Route                           = new Routes(flowFactories, config.server.websocket).routes
