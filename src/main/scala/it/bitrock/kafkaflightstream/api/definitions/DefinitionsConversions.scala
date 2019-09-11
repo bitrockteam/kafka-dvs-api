@@ -2,11 +2,14 @@ package it.bitrock.kafkaflightstream.api.definitions
 
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import it.bitrock.kafkaflightstream.model.{
-  GeographyInfo => KGeographyInfo,
-  AirportInfo => KAirportInfo,
   AirlineInfo => KAirlineInfo,
   AirplaneInfo => KAirplaneInfo,
-  FlightEnrichedEvent => KFlightEnrichedEvent
+  Airport => KAirport,
+  AirportInfo => KAirportInfo,
+  FlightEnrichedEvent => KFlightEnrichedEvent,
+  GeographyInfo => KGeographyInfo,
+  TopArrivalAirportList => KTopArrivalAirportList,
+  TopDepartureAirportList => KTopDepartureAirportList
 }
 import spray.json._
 
@@ -14,7 +17,6 @@ final case class GeographyInfo(latitude: Double, longitude: Double, altitude: Do
 final case class AirportInfo(codeAirport: String, nameAirport: String, nameCountry: String, codeIso2Country: String)
 final case class AirlineInfo(nameAirline: String, sizeAirline: String)
 final case class AirplaneInfo(productionLine: String, modelCode: String)
-
 final case class FlightReceived(
     geography: GeographyInfo,
     speed: Double,
@@ -24,6 +26,12 @@ final case class FlightReceived(
     airplane: Option[AirplaneInfo],
     status: String
 )
+
+sealed trait EventPayload
+final case class Airport(airportCode: String, eventCount: Long)
+final case class TopArrivalAirportList(elements: Seq[Airport] = Nil)   extends EventPayload
+final case class TopDepartureAirportList(elements: Seq[Airport] = Nil) extends EventPayload
+final case class ApiEvent[T <: EventPayload](eventType: String, eventPayload: T)
 
 object DefinitionsConversions {
 
@@ -52,6 +60,16 @@ object DefinitionsConversions {
       )
   }
 
+  def toAirport(kAirport: KAirport) = Airport(kAirport.airportCode, kAirport.eventCount)
+
+  implicit class TopArrivalAirportListOps(kArrivalAirport: KTopArrivalAirportList) {
+    def toTopArrivalAirportList = TopArrivalAirportList(kArrivalAirport.elements.map(toAirport))
+  }
+
+  implicit class TopDepartureAirportListOps(kDepartureAirport: KTopDepartureAirportList) {
+    def toTopDepartureAirportList = TopDepartureAirportList(kDepartureAirport.elements.map(toAirport))
+  }
+
 }
 
 trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
@@ -60,4 +78,11 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
   implicit val airlineInfoJsonFormat: RootJsonFormat[AirlineInfo]       = jsonFormat2(AirlineInfo.apply)
   implicit val airplaneInfoInfoJsonFormat: RootJsonFormat[AirplaneInfo] = jsonFormat2(AirplaneInfo.apply)
   implicit val flightReceivedJsonFormat: RootJsonFormat[FlightReceived] = jsonFormat7(FlightReceived.apply)
+
+  implicit val airportJsonFormat: RootJsonFormat[Airport]                             = jsonFormat2(Airport.apply)
+  implicit val topArrivalAirportListJsonFormat: RootJsonFormat[TopArrivalAirportList] = jsonFormat1(TopArrivalAirportList.apply)
+  implicit val topDepartureAirportJsonFormat: RootJsonFormat[TopDepartureAirportList] = jsonFormat1(TopDepartureAirportList.apply)
+
+  implicit def apiEventJsonFormat[T <: EventPayload: JsonFormat]: RootJsonFormat[ApiEvent[T]] = jsonFormat2(ApiEvent.apply[T])
+
 }
