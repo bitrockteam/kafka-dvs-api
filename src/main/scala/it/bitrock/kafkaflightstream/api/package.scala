@@ -22,5 +22,6 @@ package object tags {
 
   object TaggedTypes {
     val flightFlowFactoryKey: FlowFactoryKey = tag[FlowFactoryKeyTag][String]("flight")
+    val topsFlowFactoryKey: FlowFactoryKey   = tag[FlowFactoryKeyTag][String]("tops")
   }
 }

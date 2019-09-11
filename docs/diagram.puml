@@ -8,9 +8,14 @@ interface "Schema Registry" as SchemaRegistry
 
 node Kafka {
     database "flight_received\ntopic" as FlightTopic
+    database "top_arrival_airport\ntopic" as ArrivalAirportTopic
+    database "top_departure_airport\ntopic" as DepartureAirportTopic
 }
 
 FlightTopic --> API
+ArrivalAirportTopic --> API
+DepartureAirportTopic --> API
 API <-- SchemaRegistry
 API ..> client : flights
+API ..> client : topElementsChanged
 @enduml
