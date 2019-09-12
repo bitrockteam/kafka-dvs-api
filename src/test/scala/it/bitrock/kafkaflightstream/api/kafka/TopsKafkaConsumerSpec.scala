@@ -10,8 +10,10 @@ import it.bitrock.kafkaflightstream.api.kafka.KafkaConsumerWrapper.NoMessage
 import it.bitrock.kafkaflightstream.api.{BaseSpec, TestValues}
 import it.bitrock.kafkaflightstream.model.{
   Airport => KAirport,
+  SpeedFlight => KSpeedFlight,
   TopArrivalAirportList => KTopArrivalAirportList,
-  TopDepartureAirportList => KTopDepartureAirportList
+  TopDepartureAirportList => KTopDepartureAirportList,
+  TopSpeedList => KTopSpeedList
 }
 import it.bitrock.kafkageostream.kafkacommons.serialization.ImplicitConversions._
 import it.bitrock.kafkageostream.testcommons.FixtureLoanerAnyResult
@@ -47,7 +49,6 @@ class TopsKafkaConsumerSpec
             KAirport(DefaultArrivalAirport5Name, DefaultArrivalAirport5Amount)
           )
         )
-
         val kTopDepartureAirportList = KTopDepartureAirportList(
           Seq(
             KAirport(DefaultDepartureAirport1Name, DefaultDepartureAirport1Amount),
@@ -57,11 +58,20 @@ class TopsKafkaConsumerSpec
             KAirport(DefaultDepartureAirport5Name, DefaultDepartureAirport5Amount)
           )
         )
+        val kTopSpeedList = KTopSpeedList(
+          Seq(
+            KSpeedFlight(DefaultFlightCode1, DefaultSpeed1),
+            KSpeedFlight(DefaultFlightCode2, DefaultSpeed2),
+            KSpeedFlight(DefaultFlightCode3, DefaultSpeed3),
+            KSpeedFlight(DefaultFlightCode4, DefaultSpeed4),
+            KSpeedFlight(DefaultFlightCode5, DefaultSpeed5)
+          )
+        )
 
         withRunningKafka {
           eventually {
             publishToKafka(kafkaConfig.topArrivalAirportTopic, kTopArrivalAirportList)
-            val expectedTopCitiesChanged = TopArrivalAirportList(
+            val expectedTopArrivalAirportList = TopArrivalAirportList(
               Seq(
                 Airport(DefaultArrivalAirport1Name, DefaultArrivalAirport1Amount),
                 Airport(DefaultArrivalAirport2Name, DefaultArrivalAirport2Amount),
@@ -71,11 +81,11 @@ class TopsKafkaConsumerSpec
               )
             )
             pollMessages()
-            processorProbe.expectMsg(expectedTopCitiesChanged)
+            processorProbe.expectMsg(expectedTopArrivalAirportList)
           }
           eventually {
             publishToKafka(kafkaConfig.topDepartureAirportTopic, kTopDepartureAirportList)
-            val expectedTopCountriesChanged = TopDepartureAirportList(
+            val expectedTopDepartureAirportList = TopDepartureAirportList(
               Seq(
                 Airport(DefaultDepartureAirport1Name, DefaultDepartureAirport1Amount),
                 Airport(DefaultDepartureAirport2Name, DefaultDepartureAirport2Amount),
@@ -85,7 +95,21 @@ class TopsKafkaConsumerSpec
               )
             )
             pollMessages()
-            processorProbe.expectMsg(expectedTopCountriesChanged)
+            processorProbe.expectMsg(expectedTopDepartureAirportList)
+          }
+          eventually {
+            publishToKafka(kafkaConfig.topSpeedTopic, kTopSpeedList)
+            val expectedTopSpeedList = TopSpeedList(
+              Seq(
+                SpeedFlight(DefaultFlightCode1, DefaultSpeed1),
+                SpeedFlight(DefaultFlightCode2, DefaultSpeed2),
+                SpeedFlight(DefaultFlightCode3, DefaultSpeed3),
+                SpeedFlight(DefaultFlightCode4, DefaultSpeed4),
+                SpeedFlight(DefaultFlightCode5, DefaultSpeed5)
+              )
+            )
+            pollMessages()
+            processorProbe.expectMsg(expectedTopSpeedList)
           }
         }
 
@@ -105,7 +129,6 @@ class TopsKafkaConsumerSpec
             KAirport(DefaultArrivalAirport5Name, DefaultArrivalAirport5Amount)
           )
         )
-
         val kTopDepartureAirportList = KTopDepartureAirportList(
           Seq(
             KAirport(DefaultDepartureAirport1Name, DefaultDepartureAirport1Amount),
@@ -115,11 +138,21 @@ class TopsKafkaConsumerSpec
             KAirport(DefaultDepartureAirport5Name, DefaultDepartureAirport5Amount)
           )
         )
+        val kTopSpeedList = KTopSpeedList(
+          Seq(
+            KSpeedFlight(DefaultFlightCode1, DefaultSpeed1),
+            KSpeedFlight(DefaultFlightCode2, DefaultSpeed2),
+            KSpeedFlight(DefaultFlightCode3, DefaultSpeed3),
+            KSpeedFlight(DefaultFlightCode4, DefaultSpeed4),
+            KSpeedFlight(DefaultFlightCode5, DefaultSpeed5)
+          )
+        )
 
         withRunningKafka {
           // Publish to a topic before consumer is started
           publishToKafka(kafkaConfig.topArrivalAirportTopic, kTopArrivalAirportList)
           publishToKafka(kafkaConfig.topDepartureAirportTopic, kTopDepartureAirportList)
+          publishToKafka(kafkaConfig.topSpeedTopic, kTopSpeedList)
 
           val deadline = patienceConfig.interval.fromNow
 
@@ -128,14 +161,18 @@ class TopsKafkaConsumerSpec
             processorProbe.expectMsg(NoMessage)
           }
 
-          val (_, responseArrivalAirport) = consumeFirstKeyedMessageFrom[String, KTopArrivalAirportList](kafkaConfig.topArrivalAirportTopic)
-
+          val (_, responseArrivalAirport) =
+            consumeFirstKeyedMessageFrom[String, KTopArrivalAirportList](kafkaConfig.topArrivalAirportTopic)
           responseArrivalAirport shouldBe kTopArrivalAirportList
 
           val (_, responseDepartureAirport) =
             consumeFirstKeyedMessageFrom[String, KTopDepartureAirportList](kafkaConfig.topDepartureAirportTopic)
-
           responseDepartureAirport shouldBe kTopDepartureAirportList
+
+          val (_, responseSpeed) =
+            consumeFirstKeyedMessageFrom[String, KTopSpeedList](kafkaConfig.topSpeedTopic)
+          responseSpeed shouldBe kTopSpeedList
+
         }
     }
 
@@ -156,7 +193,7 @@ class TopsKafkaConsumerSpec
         .topsKafkaConsumerFactory(kafkaConfig)
         .build(
           processor.ref,
-          List(kafkaConfig.topArrivalAirportTopic, kafkaConfig.topDepartureAirportTopic)
+          List(kafkaConfig.topArrivalAirportTopic, kafkaConfig.topDepartureAirportTopic, kafkaConfig.topSpeedTopic)
         )
 
       try {

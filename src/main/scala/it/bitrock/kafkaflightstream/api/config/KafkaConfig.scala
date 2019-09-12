@@ -11,6 +11,7 @@ final case class KafkaConfig(
     flightReceivedTopic: String,
     topArrivalAirportTopic: String,
     topDepartureAirportTopic: String,
+    topSpeedTopic: String,
     consumer: ConsumerConfig
 )
 

@@ -49,4 +49,15 @@ trait TestValues {
   final val DefaultDepartureAirport5Name   = Random.nextString(10)
   final val DefaultDepartureAirport5Amount = Random.nextLong
 
+  final val DefaultFlightCode1 = Random.nextString(10)
+  final val DefaultSpeed1      = Random.nextDouble
+  final val DefaultFlightCode2 = Random.nextString(10)
+  final val DefaultSpeed2      = Random.nextDouble
+  final val DefaultFlightCode3 = Random.nextString(10)
+  final val DefaultSpeed3      = Random.nextDouble
+  final val DefaultFlightCode4 = Random.nextString(10)
+  final val DefaultSpeed4      = Random.nextDouble
+  final val DefaultFlightCode5 = Random.nextString(10)
+  final val DefaultSpeed5      = Random.nextDouble
+
 }

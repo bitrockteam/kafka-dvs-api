@@ -64,6 +64,7 @@ components:
             oneOf:
               - $ref: '#/components/schemas/TopArrivalAirportList'
               - $ref: '#/components/schemas/TopDepartureAirportList'
+              - $ref: '#/components/schemas/TopSpeedList'
   schemas:
     GeographyInfo:
       description: 'geographyInfo:'
@@ -130,6 +131,14 @@ components:
       properties:
         elements:
           $ref: '#/components/schemas/AirportList'
+    TopSpeedList:
+      description: 'Top speed list'
+      type: object
+      required:
+        - elements
+      properties:
+        elements:
+          $ref: '#/components/schemas/SpeedList'
     AirportList:
       type: array
       items:
@@ -140,9 +149,24 @@ components:
         - airportCode
         - eventCount
       properties:
-        cityName:
+        airportCode:
           type: string
         eventCount:
           type: integer
           format: int64
           default: 0
+    SpeedList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Speed'
+    Speed:
+      type: object
+      required:
+        - flightCode
+        - speed
+      properties:
+        flightCode:
+          type: string
+        speed:
+          type: number
+          format: double
