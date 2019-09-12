@@ -66,3 +66,4 @@ sbt docker:publish
 ## Architectural diagram
 
 Architectural diagram is available [here](docs/diagram.puml). It can be rendered using [PlantText](https://www.planttext.com).
+
