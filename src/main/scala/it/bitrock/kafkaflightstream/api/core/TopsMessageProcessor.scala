@@ -29,7 +29,7 @@ class TopsMessageProcessor(
   override val kafkaConsumerWrapper: KafkaConsumerWrapper =
     kafkaConsumerWrapperFactory.build(
       self,
-      List(kafkaConfig.topArrivalAirportTopic, kafkaConfig.topDepartureAirportTopic)
+      List(kafkaConfig.topArrivalAirportTopic, kafkaConfig.topDepartureAirportTopic, kafkaConfig.topSpeedTopic)
     )
 
   override def receive: Receive = {
@@ -50,6 +50,13 @@ class TopsMessageProcessor(
 
       throttle(kafkaConsumerWrapper.pollMessages())
 
+    case top: TopSpeedList =>
+      logger.debug(s"Got a $top from Kafka Consumer")
+      forwardMessage(ApiEvent(top.getClass.getSimpleName, top).toJson.toString)
+
+      throttle(kafkaConsumerWrapper.pollMessages())
+
     case Terminated => self ! PoisonPill
   }
+
 }

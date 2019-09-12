@@ -8,6 +8,8 @@ import it.bitrock.kafkaflightstream.model.{
   AirportInfo => KAirportInfo,
   FlightEnrichedEvent => KFlightEnrichedEvent,
   GeographyInfo => KGeographyInfo,
+  SpeedFlight => KSpeedFlight,
+  TopSpeedList => KTopSpeedList,
   TopArrivalAirportList => KTopArrivalAirportList,
   TopDepartureAirportList => KTopDepartureAirportList
 }
@@ -28,9 +30,14 @@ final case class FlightReceived(
 )
 
 sealed trait EventPayload
+
 final case class Airport(airportCode: String, eventCount: Long)
 final case class TopArrivalAirportList(elements: Seq[Airport] = Nil)   extends EventPayload
 final case class TopDepartureAirportList(elements: Seq[Airport] = Nil) extends EventPayload
+
+final case class SpeedFlight(flightCode: String, speed: Double)
+final case class TopSpeedList(elements: Seq[SpeedFlight] = Nil) extends EventPayload
+
 final case class ApiEvent[T <: EventPayload](eventType: String, eventPayload: T)
 
 object DefinitionsConversions {
@@ -60,19 +67,26 @@ object DefinitionsConversions {
       )
   }
 
-  def toAirport(kAirport: KAirport) = Airport(kAirport.airportCode, kAirport.eventCount)
+  def toAirport(x: KAirport) = Airport(x.airportCode, x.eventCount)
 
-  implicit class TopArrivalAirportListOps(kArrivalAirport: KTopArrivalAirportList) {
-    def toTopArrivalAirportList = TopArrivalAirportList(kArrivalAirport.elements.map(toAirport))
+  implicit class TopArrivalAirportListOps(x: KTopArrivalAirportList) {
+    def toTopArrivalAirportList = TopArrivalAirportList(x.elements.map(toAirport))
   }
 
-  implicit class TopDepartureAirportListOps(kDepartureAirport: KTopDepartureAirportList) {
-    def toTopDepartureAirportList = TopDepartureAirportList(kDepartureAirport.elements.map(toAirport))
+  implicit class TopDepartureAirportListOps(x: KTopDepartureAirportList) {
+    def toTopDepartureAirportList = TopDepartureAirportList(x.elements.map(toAirport))
+  }
+
+  def toSpeedFlight(x: KSpeedFlight) = SpeedFlight(x.flightCode, x.speed)
+
+  implicit class TopSpeedListOps(x: KTopSpeedList) {
+    def toTopSpeedList = TopSpeedList(x.elements.map(toSpeedFlight))
   }
 
 }
 
 trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
+
   implicit val geographyInfoJsonFormat: RootJsonFormat[GeographyInfo]   = jsonFormat4(GeographyInfo.apply)
   implicit val airportInfoJsonFormat: RootJsonFormat[AirportInfo]       = jsonFormat4(AirportInfo.apply)
   implicit val airlineInfoJsonFormat: RootJsonFormat[AirlineInfo]       = jsonFormat2(AirlineInfo.apply)
@@ -82,6 +96,9 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
   implicit val airportJsonFormat: RootJsonFormat[Airport]                             = jsonFormat2(Airport.apply)
   implicit val topArrivalAirportListJsonFormat: RootJsonFormat[TopArrivalAirportList] = jsonFormat1(TopArrivalAirportList.apply)
   implicit val topDepartureAirportJsonFormat: RootJsonFormat[TopDepartureAirportList] = jsonFormat1(TopDepartureAirportList.apply)
+
+  implicit val speedFlghtJsonFormat: RootJsonFormat[SpeedFlight]    = jsonFormat2(SpeedFlight.apply)
+  implicit val topSpeedListJsonFormat: RootJsonFormat[TopSpeedList] = jsonFormat1(TopSpeedList.apply)
 
   implicit def apiEventJsonFormat[T <: EventPayload: JsonFormat]: RootJsonFormat[ApiEvent[T]] = jsonFormat2(ApiEvent.apply[T])
 
