@@ -42,22 +42,26 @@ class FlightKafkaConsumerSpec
         implicit val longSerde: Serde[String]            = flightReceivedKeySerde
 
         val kFlightEnrichedEvent = KFlightEnrichedEvent(
+          DefaultIataNumber,
           KGeographyInfo(DefaultLatitude, DefaultLongitude, DefaultAltitude, DefaultDirection),
           DefaultSpeed,
           KAirportInfo(DefaultCodeAirport1, DefaultNameAirport1, DefaultNameCountry1, DefaultCodeIso2Country1),
           KAirportInfo(DefaultCodeAirport2, DefaultNameAirport2, DefaultNameCountry2, DefaultCodeIso2Country2),
           KAirlineInfo(DefaultNameAirline, DefaultSizeAirline),
           Some(KAirplaneInfo(DefaultProductionLine, DefaultModelCode)),
-          DefaultStatus
+          DefaultStatus,
+          DefaultUpdated
         )
         val expectedFlightReceived = FlightReceived(
+          DefaultIataNumber,
           GeographyInfo(DefaultLatitude, DefaultLongitude, DefaultAltitude, DefaultDirection),
           DefaultSpeed,
           AirportInfo(DefaultCodeAirport1, DefaultNameAirport1, DefaultNameCountry1, DefaultCodeIso2Country1),
           AirportInfo(DefaultCodeAirport2, DefaultNameAirport2, DefaultNameCountry2, DefaultCodeIso2Country2),
           AirlineInfo(DefaultNameAirline, DefaultSizeAirline),
           Some(AirplaneInfo(DefaultProductionLine, DefaultModelCode)),
-          DefaultStatus
+          DefaultStatus,
+          DefaultUpdated
         )
 
         withRunningKafka {
@@ -78,13 +82,15 @@ class FlightKafkaConsumerSpec
         implicit val longSerde: Serde[String]            = flightReceivedKeySerde
 
         val kFlightEnrichedEvent = KFlightEnrichedEvent(
+          DefaultIataNumber,
           KGeographyInfo(DefaultLatitude, DefaultLongitude, DefaultAltitude, DefaultDirection),
           DefaultSpeed,
           KAirportInfo(DefaultCodeAirport1, DefaultNameAirport1, DefaultNameCountry1, DefaultCodeIso2Country1),
           KAirportInfo(DefaultCodeAirport2, DefaultNameAirport2, DefaultNameCountry2, DefaultCodeIso2Country2),
           KAirlineInfo(DefaultNameAirline, DefaultSizeAirline),
           Some(KAirplaneInfo(DefaultProductionLine, DefaultModelCode)),
-          DefaultStatus
+          DefaultStatus,
+          DefaultUpdated
         )
 
         withRunningKafka {

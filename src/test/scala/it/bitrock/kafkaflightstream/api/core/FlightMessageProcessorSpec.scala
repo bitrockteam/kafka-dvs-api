@@ -44,13 +44,15 @@ class FlightMessageProcessorSpec
           pollProbe.expectMsg(PollingTriggered)
 
           messageProcessor ! FlightReceived(
+            DefaultIataNumber,
             GeographyInfo(DefaultLatitude, DefaultLongitude, DefaultAltitude, DefaultDirection),
             DefaultSpeed,
             AirportInfo(DefaultCodeAirport1, DefaultNameAirport1, DefaultNameCountry1, DefaultCodeIso2Country1),
             AirportInfo(DefaultCodeAirport2, DefaultNameAirport2, DefaultNameCountry2, DefaultCodeIso2Country2),
             AirlineInfo(DefaultNameAirline, DefaultSizeAirline),
             Some(AirplaneInfo(DefaultProductionLine, DefaultModelCode)),
-            DefaultStatus
+            DefaultStatus,
+            DefaultUpdated
           )
 
           pollProbe.expectNoMessage(websocketConfig.throttleDuration)
@@ -66,13 +68,15 @@ class FlightMessageProcessorSpec
           val messageProcessor =
             new FlightMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
           val msg = FlightReceived(
-            GeographyInfo(1L, 1L, 1L, 1L),
-            1L,
-            AirportInfo("", "", "", ""),
-            AirportInfo("", "", "", ""),
-            AirlineInfo("", ""),
-            Some(AirplaneInfo("", "")),
-            ""
+            DefaultIataNumber,
+            GeographyInfo(DefaultLatitude, DefaultLongitude, DefaultAltitude, DefaultDirection),
+            DefaultSpeed,
+            AirportInfo(DefaultCodeAirport1, DefaultNameAirport1, DefaultNameCountry1, DefaultCodeIso2Country1),
+            AirportInfo(DefaultCodeAirport2, DefaultNameAirport2, DefaultNameCountry2, DefaultCodeIso2Country2),
+            AirlineInfo(DefaultNameAirline, DefaultSizeAirline),
+            Some(AirplaneInfo(DefaultProductionLine, DefaultModelCode)),
+            DefaultStatus,
+            DefaultUpdated
           )
 
           messageProcessor ! msg
