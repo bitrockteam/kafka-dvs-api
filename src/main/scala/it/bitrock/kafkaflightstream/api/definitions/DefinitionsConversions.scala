@@ -20,13 +20,15 @@ final case class AirportInfo(codeAirport: String, nameAirport: String, nameCount
 final case class AirlineInfo(nameAirline: String, sizeAirline: String)
 final case class AirplaneInfo(productionLine: String, modelCode: String)
 final case class FlightReceived(
+    iataNumber: String,
     geography: GeographyInfo,
     speed: Double,
     airportDeparture: AirportInfo,
     airportArrival: AirportInfo,
     airline: AirlineInfo,
     airplane: Option[AirplaneInfo],
-    status: String
+    status: String,
+    updated: String
 )
 
 sealed trait EventPayload
@@ -57,13 +59,15 @@ object DefinitionsConversions {
   implicit class FlightReceivedOps(x: KFlightEnrichedEvent) {
     def toFlightReceived: FlightReceived =
       FlightReceived(
+        x.iataNumber,
         toGeographyInfo(x.geography),
         x.speed,
         toAirportInfo(x.airportDeparture),
         toAirportInfo(x.airportArrival),
         toAirlineInfo(x.airline),
         x.airplane.map(toAirplaneInfo),
-        x.status
+        x.status,
+        x.updated
       )
   }
 
@@ -91,7 +95,7 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
   implicit val airportInfoJsonFormat: RootJsonFormat[AirportInfo]       = jsonFormat4(AirportInfo.apply)
   implicit val airlineInfoJsonFormat: RootJsonFormat[AirlineInfo]       = jsonFormat2(AirlineInfo.apply)
   implicit val airplaneInfoInfoJsonFormat: RootJsonFormat[AirplaneInfo] = jsonFormat2(AirplaneInfo.apply)
-  implicit val flightReceivedJsonFormat: RootJsonFormat[FlightReceived] = jsonFormat7(FlightReceived.apply)
+  implicit val flightReceivedJsonFormat: RootJsonFormat[FlightReceived] = jsonFormat9(FlightReceived.apply)
 
   implicit val airportJsonFormat: RootJsonFormat[Airport]                             = jsonFormat2(Airport.apply)
   implicit val topArrivalAirportListJsonFormat: RootJsonFormat[TopArrivalAirportList] = jsonFormat1(TopArrivalAirportList.apply)

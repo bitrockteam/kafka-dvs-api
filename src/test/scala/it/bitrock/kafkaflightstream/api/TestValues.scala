@@ -25,8 +25,10 @@ trait TestValues {
   final val DefaultProductionLine = Random.nextString(10)
   final val DefaultModelCode      = Random.nextString(10)
 
-  final val DefaultSpeed  = Random.nextDouble
-  final val DefaultStatus = Random.nextString(10)
+  final val DefaultIataNumber = Random.nextString(10)
+  final val DefaultSpeed      = Random.nextDouble
+  final val DefaultStatus     = Random.nextString(10)
+  final val DefaultUpdated    = Random.nextString(10)
 
   final val DefaultArrivalAirport1Name     = Random.nextString(10)
   final val DefaultArrivalAirport1Amount   = Random.nextLong

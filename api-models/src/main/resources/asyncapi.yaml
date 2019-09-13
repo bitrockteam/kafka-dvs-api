@@ -29,13 +29,17 @@ components:
       payload:
         type: object
         required:
+          - iataNumber
           - geography
           - speed
           - airportDeparture
           - airportArrival
           - airline
           - status
+          - updated
         properties:
+          iataNumber:
+            type: string
           geography:
             $ref: '#/components/messages/GeographyInfo'
           speed:
@@ -48,6 +52,8 @@ components:
           airline:
             $ref: '#/components/messages/AirlineInfo'
           status:
+            type: string
+          updated:
             type: string
     TopElementsChangedStreamEvent:
       tags:
