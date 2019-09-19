@@ -71,6 +71,7 @@ components:
               - $ref: '#/components/schemas/TopArrivalAirportList'
               - $ref: '#/components/schemas/TopDepartureAirportList'
               - $ref: '#/components/schemas/TopSpeedList'
+              - $ref: '#/components/schemas/TopAirlineList'
   schemas:
     GeographyInfo:
       description: 'geographyInfo:'
@@ -145,6 +146,14 @@ components:
       properties:
         elements:
           $ref: '#/components/schemas/SpeedList'
+    TopAirlineList:
+      description: 'Top airline list'
+      type: object
+      required:
+        - elements
+      properties:
+        elements:
+          $ref: '#/components/schemas/AirlineList'
     AirportList:
       type: array
       items:
@@ -176,3 +185,19 @@ components:
         speed:
           type: number
           format: double
+    AirlineList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Airline'
+    Airline:
+      type: object
+      required:
+        - airlineName
+        - eventCount
+      properties:
+        airlineName:
+          type: string
+        eventCount:
+          type: integer
+          format: int64
+          default: 0

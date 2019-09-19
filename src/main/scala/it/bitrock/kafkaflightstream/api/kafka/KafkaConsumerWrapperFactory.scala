@@ -35,6 +35,7 @@ object KafkaConsumerWrapperFactory {
             case arrivalAirport: TopArrivalAirportList     => arrivalAirport.toTopArrivalAirportList
             case departureAirport: TopDepartureAirportList => departureAirport.toTopDepartureAirportList
             case speed: TopSpeedList                       => speed.toTopSpeedList
+            case airline: TopAirlineList                   => airline.toTopAirlineList
           }
       )(byteArrayDeserializer, serdeFrom[SpecificRecord](kafkaConfig.schemaRegistryUrl).deserializer)
 

@@ -102,6 +102,7 @@ class FlightMessageProcessorSpec
           "",
           "",
           "",
+          "",
           ConsumerConfig(1.second, Duration.Zero)
         )
       val pollProbe                                    = TestProbe(s"poll-probe-${Random.nextInt()}")

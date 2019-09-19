@@ -11,12 +11,14 @@ node Kafka {
     database "top_arrival_airport\ntopic" as ArrivalAirportTopic
     database "top_departure_airport\ntopic" as DepartureAirportTopic
     database "top_speed\ntopic" as SpeedTopic
+    database "top_airline\ntopic" as AirlineTopic
 }
 
 FlightTopic --> API
 ArrivalAirportTopic --> API
 DepartureAirportTopic --> API
 SpeedTopic --> API
+AirlineTopic --> API
 API <-- SchemaRegistry
 API ..> client : flights
 API ..> client : topElementsChanged

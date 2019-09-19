@@ -34,6 +34,7 @@ The application references the following Kafka topics:
 - `top_arrival_airport`
 - `top_departure_airport`
 - `top_speed`
+- `top_airline`
 
 ## API documentation
 

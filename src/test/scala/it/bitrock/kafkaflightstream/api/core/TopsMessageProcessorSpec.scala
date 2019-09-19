@@ -72,6 +72,19 @@ class TopsMessageProcessorSpec
           pollProbe.expectNoMessage(websocketConfig.throttleDuration)
           pollProbe.expectMsg(PollingTriggered)
       }
+      "a TopAirlineList is received, but only after a delay" in ResourceLoaner.withFixture {
+        case Resource(websocketConfig, kafkaConfig, consumerFactory, pollProbe, sourceProbe) =>
+          val messageProcessor =
+            new TopsMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
+
+          // First message is sent when processor starts up
+          pollProbe.expectMsg(PollingTriggered)
+
+          messageProcessor ! TopAirlineList()
+
+          pollProbe.expectNoMessage(websocketConfig.throttleDuration)
+          pollProbe.expectMsg(PollingTriggered)
+      }
     }
 
     "forward a JSON-formatted ApiEvent to source actor" when {
@@ -111,6 +124,18 @@ class TopsMessageProcessorSpec
 
           sourceProbe.expectMsg(expectedResult)
       }
+      "a TopAirlineList is received" in ResourceLoaner.withFixture {
+        case Resource(websocketConfig, kafkaConfig, consumerFactory, _, sourceProbe) =>
+          val messageProcessor =
+            new TopsMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
+          val msg = TopAirlineList()
+
+          messageProcessor ! msg
+
+          val expectedResult = ApiEvent(msg.getClass.getSimpleName, msg).toJson.toString
+
+          sourceProbe.expectMsg(expectedResult)
+      }
     }
 
   }
@@ -122,6 +147,7 @@ class TopsMessageProcessorSpec
         KafkaConfig(
           "",
           URI.create("http://localhost:8080"),
+          "",
           "",
           "",
           "",

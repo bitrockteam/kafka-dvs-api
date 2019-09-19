@@ -29,31 +29,32 @@ class TopsMessageProcessor(
   override val kafkaConsumerWrapper: KafkaConsumerWrapper =
     kafkaConsumerWrapperFactory.build(
       self,
-      List(kafkaConfig.topArrivalAirportTopic, kafkaConfig.topDepartureAirportTopic, kafkaConfig.topSpeedTopic)
+      List(kafkaConfig.topArrivalAirportTopic, kafkaConfig.topDepartureAirportTopic, kafkaConfig.topSpeedTopic, kafkaConfig.topAirlineTopic)
     )
 
   override def receive: Receive = {
     case NoMessage =>
       logger.debug("Got no-message notice from Kafka Consumer, going to poll again")
-
       kafkaConsumerWrapper.pollMessages()
 
     case top: TopArrivalAirportList =>
       logger.debug(s"Got a $top from Kafka Consumer")
       forwardMessage(ApiEvent(top.getClass.getSimpleName, top).toJson.toString)
-
       throttle(kafkaConsumerWrapper.pollMessages())
 
     case top: TopDepartureAirportList =>
       logger.debug(s"Got a $top from Kafka Consumer")
       forwardMessage(ApiEvent(top.getClass.getSimpleName, top).toJson.toString)
-
       throttle(kafkaConsumerWrapper.pollMessages())
 
     case top: TopSpeedList =>
       logger.debug(s"Got a $top from Kafka Consumer")
       forwardMessage(ApiEvent(top.getClass.getSimpleName, top).toJson.toString)
+      throttle(kafkaConsumerWrapper.pollMessages())
 
+    case top: TopAirlineList =>
+      logger.debug(s"Got a $top from Kafka Consumer")
+      forwardMessage(ApiEvent(top.getClass.getSimpleName, top).toJson.toString)
       throttle(kafkaConsumerWrapper.pollMessages())
 
     case Terminated => self ! PoisonPill
