@@ -47,6 +47,14 @@ class RoutesSpec extends BaseAsyncSpec with ScalatestRouteTest {
           }
       }
 
+    "open a web-socket channel and stream messages with total events on it for WS requests on the streams path" in ResourceLoaner
+      .withFixture {
+        case Resource(routes, wsProbe, websocketConfig) =>
+          WS(Uri(path = Uri.Path./(websocketConfig.pathPrefix)./(websocketConfig.totalElementsPath)), wsProbe.flow) ~> routes.streams ~> check {
+            checkWebsocketAndSendTestMessage(wsProbe)
+          }
+      }
+
   }
 
   object ResourceLoaner extends AsyncFixtureLoaner[RoutesSpec.Resource] {
@@ -54,14 +62,16 @@ class RoutesSpec extends BaseAsyncSpec with ScalatestRouteTest {
       val wsProbe = WSProbe()
       val flowFactories = Map(
         flightFlowFactoryKey -> new TestFlowFactory,
-        topsFlowFactoryKey   -> new TestFlowFactory
+        topsFlowFactoryKey   -> new TestFlowFactory,
+        totalsFlowFactoryKey -> new TestFlowFactory
       )
       val websocketConfig = WebsocketConfig(
         throttleDuration = 1.second,
         cleanupDelay = 0.second,
         pathPrefix = "path",
         flightsPath = "flights",
-        topElementsPath = "tops"
+        topElementsPath = "tops",
+        totalElementsPath = "totals"
       )
       val routes = new Routes(flowFactories, websocketConfig)
 

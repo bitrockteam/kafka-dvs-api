@@ -15,77 +15,45 @@ import spray.json._
 import scala.concurrent.duration._
 import scala.util.Random
 
-class FlightMessageProcessorSpec
-    extends TestKit(ActorSystem("FlightMessageProcessorSpec"))
+class TotalsMessageProcessorSpec
+    extends TestKit(ActorSystem("TotalsMessageProcessorSpec"))
     with BaseSpec
     with ImplicitSender
     with BeforeAndAfterAll
     with JsonSupport
     with TestValues {
+  import TotalsMessageProcessorSpec._
 
-  import FlightMessageProcessorSpec._
+  "Totals Message Processor" should {
 
-  "Flight Message Processor" should {
     "trigger Kafka Consumer polling" when {
-
       "it starts" in ResourceLoaner.withFixture {
         case Resource(websocketConfig, kafkaConfig, consumerFactory, pollProbe, sourceProbe) =>
-          new FlightMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
-
+          new TotalsMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
           pollProbe.expectMsg(PollingTriggered)
       }
-
-      "a FlightReceived message is received, but only after a delay" in ResourceLoaner.withFixture {
+      "a CountFlightStatus is received, but only after a delay" in ResourceLoaner.withFixture {
         case Resource(websocketConfig, kafkaConfig, consumerFactory, pollProbe, sourceProbe) =>
           val messageProcessor =
-            new FlightMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
-
+            new TotalsMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
           // First message is sent when processor starts up
           pollProbe.expectMsg(PollingTriggered)
-
-          messageProcessor ! FlightReceived(
-            DefaultIataNumber,
-            GeographyInfo(DefaultLatitude, DefaultLongitude, DefaultAltitude, DefaultDirection),
-            DefaultSpeed,
-            AirportInfo(DefaultCodeAirport1, DefaultNameAirport1, DefaultNameCountry1, DefaultCodeIso2Country1),
-            AirportInfo(DefaultCodeAirport2, DefaultNameAirport2, DefaultNameCountry2, DefaultCodeIso2Country2),
-            AirlineInfo(DefaultNameAirline, DefaultSizeAirline),
-            Some(AirplaneInfo(DefaultProductionLine, DefaultModelCode)),
-            DefaultStatus,
-            DefaultUpdated
-          )
-
+          messageProcessor ! CountFlightStatus(DefaultCountFlightStatus, DefaultCountFlightAmount)
           pollProbe.expectNoMessage(websocketConfig.throttleDuration)
           pollProbe.expectMsg(PollingTriggered)
       }
-
     }
 
-    "forward a JSON to source actor" when {
-
-      "a FlightReceived message is received" in ResourceLoaner.withFixture {
+    "forward a JSON-formatted ApiEvent to source actor" when {
+      "a CountFlightStatus is received" in ResourceLoaner.withFixture {
         case Resource(websocketConfig, kafkaConfig, consumerFactory, _, sourceProbe) =>
           val messageProcessor =
-            new FlightMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
-          val msg = FlightReceived(
-            DefaultIataNumber,
-            GeographyInfo(DefaultLatitude, DefaultLongitude, DefaultAltitude, DefaultDirection),
-            DefaultSpeed,
-            AirportInfo(DefaultCodeAirport1, DefaultNameAirport1, DefaultNameCountry1, DefaultCodeIso2Country1),
-            AirportInfo(DefaultCodeAirport2, DefaultNameAirport2, DefaultNameCountry2, DefaultCodeIso2Country2),
-            AirlineInfo(DefaultNameAirline, DefaultSizeAirline),
-            Some(AirplaneInfo(DefaultProductionLine, DefaultModelCode)),
-            DefaultStatus,
-            DefaultUpdated
-          )
-
+            new TotalsMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
+          val msg = CountFlightStatus(DefaultCountFlightStatus, DefaultCountFlightAmount)
           messageProcessor ! msg
-
-          val expectedResult = msg.toJson.toString
-
+          val expectedResult = ApiEvent(msg.getClass.getSimpleName, msg).toJson.toString
           sourceProbe.expectMsg(expectedResult)
       }
-
     }
 
   }
@@ -129,7 +97,7 @@ class FlightMessageProcessorSpec
 
 }
 
-object FlightMessageProcessorSpec {
+object TotalsMessageProcessorSpec {
 
   final case class Resource(
       websocketConfig: WebsocketConfig,

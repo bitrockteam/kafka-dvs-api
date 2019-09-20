@@ -13,7 +13,8 @@ import it.bitrock.kafkaflightstream.model.{
   TopArrivalAirportList => KTopArrivalAirportList,
   TopDepartureAirportList => KTopDepartureAirportList,
   Airline => KAirline,
-  TopAirlineList => KTopAirlineList
+  TopAirlineList => KTopAirlineList,
+  CountFlightStatus => KCountFlightStatus
 }
 import spray.json._
 
@@ -44,6 +45,8 @@ final case class TopSpeedList(elements: Seq[SpeedFlight] = Nil) extends EventPay
 
 final case class Airline(airlineName: String, eventCount: Long)
 final case class TopAirlineList(elements: Seq[Airline] = Nil) extends EventPayload
+
+final case class CountFlightStatus(flightStatus: String, eventCount: Long) extends EventPayload
 
 final case class ApiEvent[T <: EventPayload](eventType: String, eventPayload: T)
 
@@ -98,6 +101,10 @@ object DefinitionsConversions {
     def toTopAirlineList = TopAirlineList(x.elements.map(toAirline))
   }
 
+  implicit class CountFlightStatusOps(x: KCountFlightStatus) {
+    def toCountFlightStatus = CountFlightStatus(x.flightStatus, x.eventCount)
+  }
+
 }
 
 trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
@@ -117,6 +124,8 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
 
   implicit val airlineJsonFormat: RootJsonFormat[Airline]               = jsonFormat2(Airline.apply)
   implicit val topAirlineListJsonFormat: RootJsonFormat[TopAirlineList] = jsonFormat1(TopAirlineList.apply)
+
+  implicit val countFlightStatusJsonFormat: RootJsonFormat[CountFlightStatus] = jsonFormat2(CountFlightStatus.apply)
 
   implicit def apiEventJsonFormat[T <: EventPayload: JsonFormat]: RootJsonFormat[ApiEvent[T]] = jsonFormat2(ApiEvent.apply[T])
 

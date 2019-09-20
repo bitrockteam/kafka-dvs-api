@@ -73,4 +73,7 @@ trait TestValues {
   final val DefaultAirline5Name   = Random.nextString(10)
   final val DefaultAirline5Amount = Random.nextLong
 
+  final val DefaultCountFlightStatus = Random.nextString(10)
+  final val DefaultCountFlightAmount = Random.nextLong
+
 }

@@ -39,4 +39,16 @@ object KafkaConsumerWrapperFactory {
           }
       )(byteArrayDeserializer, serdeFrom[SpecificRecord](kafkaConfig.schemaRegistryUrl).deserializer)
 
+  def totalsKafkaConsumerFactory(kafkaConfig: KafkaConfig): KafkaConsumerWrapperFactory =
+    (processor: ActorRef, topics: Seq[String]) =>
+      new KafkaConsumerWrapperImpl(
+        kafkaConfig,
+        processor,
+        topics,
+        (r: SpecificRecord) =>
+          r match {
+            case countFlight: CountFlightStatus => countFlight.toCountFlightStatus
+          }
+      )(byteArrayDeserializer, serdeFrom[SpecificRecord](kafkaConfig.schemaRegistryUrl).deserializer)
+
 }
