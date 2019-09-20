@@ -22,6 +22,9 @@ class Routes(
       } ~
         path(websocketConfig.topElementsPath) {
           handleWebSocketMessages(flowFactories(topsFlowFactoryKey).flow)
+        } ~
+        path(websocketConfig.totalElementsPath) {
+          handleWebSocketMessages(flowFactories(totalsFlowFactoryKey).flow)
         }
     }
   }

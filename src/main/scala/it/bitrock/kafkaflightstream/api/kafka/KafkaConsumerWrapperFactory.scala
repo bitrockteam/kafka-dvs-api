@@ -35,6 +35,19 @@ object KafkaConsumerWrapperFactory {
             case arrivalAirport: TopArrivalAirportList     => arrivalAirport.toTopArrivalAirportList
             case departureAirport: TopDepartureAirportList => departureAirport.toTopDepartureAirportList
             case speed: TopSpeedList                       => speed.toTopSpeedList
+            case airline: TopAirlineList                   => airline.toTopAirlineList
+          }
+      )(byteArrayDeserializer, serdeFrom[SpecificRecord](kafkaConfig.schemaRegistryUrl).deserializer)
+
+  def totalsKafkaConsumerFactory(kafkaConfig: KafkaConfig): KafkaConsumerWrapperFactory =
+    (processor: ActorRef, topics: Seq[String]) =>
+      new KafkaConsumerWrapperImpl(
+        kafkaConfig,
+        processor,
+        topics,
+        (r: SpecificRecord) =>
+          r match {
+            case countFlight: CountFlightStatus => countFlight.toCountFlightStatus
           }
       )(byteArrayDeserializer, serdeFrom[SpecificRecord](kafkaConfig.schemaRegistryUrl).deserializer)
 

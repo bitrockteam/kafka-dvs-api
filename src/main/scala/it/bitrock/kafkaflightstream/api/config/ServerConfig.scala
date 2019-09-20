@@ -13,5 +13,6 @@ final case class WebsocketConfig(
     cleanupDelay: FiniteDuration,
     pathPrefix: String,
     flightsPath: String,
-    topElementsPath: String
+    topElementsPath: String,
+    totalElementsPath: String
 )

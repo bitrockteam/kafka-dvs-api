@@ -19,6 +19,9 @@ topics:
   topElementsChanged:
     subscribe:
       $ref: '#/components/messages/TopElementsChangedStreamEvent'
+  totalElementsChanged:
+    subscribe:
+      $ref: '#/components/messages/TotalElementsChangedStreamEvent'
 
 components:
   messages:
@@ -71,6 +74,21 @@ components:
               - $ref: '#/components/schemas/TopArrivalAirportList'
               - $ref: '#/components/schemas/TopDepartureAirportList'
               - $ref: '#/components/schemas/TopSpeedList'
+              - $ref: '#/components/schemas/TopAirlineList'
+    TotalElementsChangedStreamEvent:
+      tags:
+        - name: totalElementsChanged
+      payload:
+        type: object
+        required:
+          - eventType
+          - eventPayload
+        properties:
+          eventType:
+            type: string
+          eventPayload:
+            oneOf:
+              - $ref: '#/components/schemas/TotalFlights'
   schemas:
     GeographyInfo:
       description: 'geographyInfo:'
@@ -145,6 +163,14 @@ components:
       properties:
         elements:
           $ref: '#/components/schemas/SpeedList'
+    TopAirlineList:
+      description: 'Top airline list'
+      type: object
+      required:
+        - elements
+      properties:
+        elements:
+          $ref: '#/components/schemas/AirlineList'
     AirportList:
       type: array
       items:
@@ -176,3 +202,31 @@ components:
         speed:
           type: number
           format: double
+    AirlineList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Airline'
+    Airline:
+      type: object
+      required:
+        - airlineName
+        - eventCount
+      properties:
+        airlineName:
+          type: string
+        eventCount:
+          type: integer
+          format: int64
+          default: 0
+    TotalFlights:
+      type: object
+      required:
+        - flightStatus
+        - eventCount
+      properties:
+        flightStatus:
+          type: string
+        eventCount:
+          type: integer
+          format: int64
+          default: 0
