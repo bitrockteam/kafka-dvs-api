@@ -45,12 +45,13 @@ class FlightMessageProcessorSpec
 
           messageProcessor ! FlightReceived(
             DefaultIataNumber,
+            DefaultIcaoNumber,
             GeographyInfo(DefaultLatitude, DefaultLongitude, DefaultAltitude, DefaultDirection),
             DefaultSpeed,
             AirportInfo(DefaultCodeAirport1, DefaultNameAirport1, DefaultNameCountry1, DefaultCodeIso2Country1),
             AirportInfo(DefaultCodeAirport2, DefaultNameAirport2, DefaultNameCountry2, DefaultCodeIso2Country2),
-            AirlineInfo(DefaultNameAirline, DefaultSizeAirline),
-            Some(AirplaneInfo(DefaultProductionLine, DefaultModelCode)),
+            AirlineInfo(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
+            Some(AirplaneInfo(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode)),
             DefaultStatus,
             DefaultUpdated
           )
@@ -69,12 +70,13 @@ class FlightMessageProcessorSpec
             new FlightMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
           val msg = FlightReceived(
             DefaultIataNumber,
+            DefaultIcaoNumber,
             GeographyInfo(DefaultLatitude, DefaultLongitude, DefaultAltitude, DefaultDirection),
             DefaultSpeed,
             AirportInfo(DefaultCodeAirport1, DefaultNameAirport1, DefaultNameCountry1, DefaultCodeIso2Country1),
             AirportInfo(DefaultCodeAirport2, DefaultNameAirport2, DefaultNameCountry2, DefaultCodeIso2Country2),
-            AirlineInfo(DefaultNameAirline, DefaultSizeAirline),
-            Some(AirplaneInfo(DefaultProductionLine, DefaultModelCode)),
+            AirlineInfo(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
+            Some(AirplaneInfo(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode)),
             DefaultStatus,
             DefaultUpdated
           )

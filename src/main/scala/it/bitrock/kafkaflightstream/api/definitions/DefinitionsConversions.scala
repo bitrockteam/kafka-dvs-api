@@ -20,10 +20,11 @@ import spray.json._
 
 final case class GeographyInfo(latitude: Double, longitude: Double, altitude: Double, direction: Double)
 final case class AirportInfo(codeAirport: String, nameAirport: String, nameCountry: String, codeIso2Country: String)
-final case class AirlineInfo(nameAirline: String, sizeAirline: String)
-final case class AirplaneInfo(productionLine: String, modelCode: String)
+final case class AirlineInfo(codeAirline: String, nameAirline: String, sizeAirline: String)
+final case class AirplaneInfo(numberRegistration: String, productionLine: String, modelCode: String)
 final case class FlightReceived(
     iataNumber: String,
+    icaoNumber: String,
     geography: GeographyInfo,
     speed: Double,
     airportDeparture: AirportInfo,
@@ -59,15 +60,16 @@ object DefinitionsConversions {
     AirportInfo(x.codeAirport, x.nameAirport, x.nameCountry, x.codeIso2Country)
 
   def toAirlineInfo(x: KAirlineInfo): AirlineInfo =
-    AirlineInfo(x.nameAirline, x.sizeAirline)
+    AirlineInfo(x.codeAirline, x.nameAirline, x.sizeAirline)
 
   def toAirplaneInfo(x: KAirplaneInfo): AirplaneInfo =
-    AirplaneInfo(x.productionLine, x.modelCode)
+    AirplaneInfo(x.numberRegistration, x.productionLine, x.modelCode)
 
   implicit class FlightReceivedOps(x: KFlightEnrichedEvent) {
     def toFlightReceived: FlightReceived =
       FlightReceived(
         x.iataNumber,
+        x.icaoNumber,
         toGeographyInfo(x.geography),
         x.speed,
         toAirportInfo(x.airportDeparture),
@@ -111,9 +113,9 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
 
   implicit val geographyInfoJsonFormat: RootJsonFormat[GeographyInfo]   = jsonFormat4(GeographyInfo.apply)
   implicit val airportInfoJsonFormat: RootJsonFormat[AirportInfo]       = jsonFormat4(AirportInfo.apply)
-  implicit val airlineInfoJsonFormat: RootJsonFormat[AirlineInfo]       = jsonFormat2(AirlineInfo.apply)
-  implicit val airplaneInfoInfoJsonFormat: RootJsonFormat[AirplaneInfo] = jsonFormat2(AirplaneInfo.apply)
-  implicit val flightReceivedJsonFormat: RootJsonFormat[FlightReceived] = jsonFormat9(FlightReceived.apply)
+  implicit val airlineInfoJsonFormat: RootJsonFormat[AirlineInfo]       = jsonFormat3(AirlineInfo.apply)
+  implicit val airplaneInfoInfoJsonFormat: RootJsonFormat[AirplaneInfo] = jsonFormat3(AirplaneInfo.apply)
+  implicit val flightReceivedJsonFormat: RootJsonFormat[FlightReceived] = jsonFormat10(FlightReceived.apply)
 
   implicit val airportJsonFormat: RootJsonFormat[Airport]                             = jsonFormat2(Airport.apply)
   implicit val topArrivalAirportListJsonFormat: RootJsonFormat[TopArrivalAirportList] = jsonFormat1(TopArrivalAirportList.apply)

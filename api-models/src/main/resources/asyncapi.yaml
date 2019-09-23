@@ -33,6 +33,7 @@ components:
         type: object
         required:
           - iataNumber
+          - icaoNumber
           - geography
           - speed
           - airportDeparture
@@ -42,6 +43,8 @@ components:
           - updated
         properties:
           iataNumber:
+            type: string
+          icaoNumber:
             type: string
           geography:
             $ref: '#/components/messages/GeographyInfo'
@@ -132,9 +135,12 @@ components:
       description: 'airlineInfo:'
       type: object
       required:
+        - codeAirline
         - nameAirline
         - sizeAirline
       properties:
+        codeAirline:
+          type: string
         nameAirline:
           type: string
         sizeAirline:

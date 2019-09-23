@@ -19,13 +19,16 @@ trait TestValues {
   final val DefaultNameCountry2     = Random.nextString(10)
   final val DefaultCodeIso2Country2 = Random.nextString(10)
 
+  final val DefaultCodeAirline = Random.nextString(10)
   final val DefaultNameAirline = Random.nextString(10)
   final val DefaultSizeAirline = Random.nextString(10)
 
-  final val DefaultProductionLine = Random.nextString(10)
-  final val DefaultModelCode      = Random.nextString(10)
+  final val DefaultNumberRegistration = Random.nextString(10)
+  final val DefaultProductionLine     = Random.nextString(10)
+  final val DefaultModelCode          = Random.nextString(10)
 
   final val DefaultIataNumber = Random.nextString(10)
+  final val DefaultIcaoNumber = Random.nextString(10)
   final val DefaultSpeed      = Random.nextDouble
   final val DefaultStatus     = Random.nextString(10)
   final val DefaultUpdated    = Random.nextString(10)
