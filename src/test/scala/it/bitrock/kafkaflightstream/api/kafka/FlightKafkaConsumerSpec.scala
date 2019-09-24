@@ -43,23 +43,25 @@ class FlightKafkaConsumerSpec
 
         val kFlightEnrichedEvent = KFlightEnrichedEvent(
           DefaultIataNumber,
+          DefaultIcaoNumber,
           KGeographyInfo(DefaultLatitude, DefaultLongitude, DefaultAltitude, DefaultDirection),
           DefaultSpeed,
           KAirportInfo(DefaultCodeAirport1, DefaultNameAirport1, DefaultNameCountry1, DefaultCodeIso2Country1),
           KAirportInfo(DefaultCodeAirport2, DefaultNameAirport2, DefaultNameCountry2, DefaultCodeIso2Country2),
-          KAirlineInfo(DefaultNameAirline, DefaultSizeAirline),
-          Some(KAirplaneInfo(DefaultProductionLine, DefaultModelCode)),
+          KAirlineInfo(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
+          Some(KAirplaneInfo(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode)),
           DefaultStatus,
           DefaultUpdated
         )
         val expectedFlightReceived = FlightReceived(
           DefaultIataNumber,
+          DefaultIcaoNumber,
           GeographyInfo(DefaultLatitude, DefaultLongitude, DefaultAltitude, DefaultDirection),
           DefaultSpeed,
           AirportInfo(DefaultCodeAirport1, DefaultNameAirport1, DefaultNameCountry1, DefaultCodeIso2Country1),
           AirportInfo(DefaultCodeAirport2, DefaultNameAirport2, DefaultNameCountry2, DefaultCodeIso2Country2),
-          AirlineInfo(DefaultNameAirline, DefaultSizeAirline),
-          Some(AirplaneInfo(DefaultProductionLine, DefaultModelCode)),
+          AirlineInfo(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
+          Some(AirplaneInfo(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode)),
           DefaultStatus,
           DefaultUpdated
         )
@@ -83,12 +85,13 @@ class FlightKafkaConsumerSpec
 
         val kFlightEnrichedEvent = KFlightEnrichedEvent(
           DefaultIataNumber,
+          DefaultIcaoNumber,
           KGeographyInfo(DefaultLatitude, DefaultLongitude, DefaultAltitude, DefaultDirection),
           DefaultSpeed,
           KAirportInfo(DefaultCodeAirport1, DefaultNameAirport1, DefaultNameCountry1, DefaultCodeIso2Country1),
           KAirportInfo(DefaultCodeAirport2, DefaultNameAirport2, DefaultNameCountry2, DefaultCodeIso2Country2),
-          KAirlineInfo(DefaultNameAirline, DefaultSizeAirline),
-          Some(KAirplaneInfo(DefaultProductionLine, DefaultModelCode)),
+          KAirlineInfo(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
+          Some(KAirplaneInfo(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode)),
           DefaultStatus,
           DefaultUpdated
         )
