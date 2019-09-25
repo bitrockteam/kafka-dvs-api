@@ -14,6 +14,7 @@ final case class KafkaConfig(
     topSpeedTopic: String,
     topAirlineTopic: String,
     totalFlightTopic: String,
+    totalAirlineTopic: String,
     consumer: ConsumerConfig
 )
 

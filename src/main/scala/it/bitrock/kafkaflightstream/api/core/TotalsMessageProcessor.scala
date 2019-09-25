@@ -29,7 +29,7 @@ class TotalsMessageProcessor(
   override val kafkaConsumerWrapper: KafkaConsumerWrapper =
     kafkaConsumerWrapperFactory.build(
       self,
-      List(kafkaConfig.totalFlightTopic)
+      List(kafkaConfig.totalFlightTopic, kafkaConfig.totalAirlineTopic)
     )
 
   override def receive: Receive = {
