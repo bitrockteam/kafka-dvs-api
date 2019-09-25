@@ -1,21 +1,7 @@
 package it.bitrock.kafkaflightstream.api.definitions
 
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
-import it.bitrock.kafkaflightstream.model.{
-  AirlineInfo => KAirlineInfo,
-  AirplaneInfo => KAirplaneInfo,
-  Airport => KAirport,
-  AirportInfo => KAirportInfo,
-  FlightEnrichedEvent => KFlightEnrichedEvent,
-  GeographyInfo => KGeographyInfo,
-  SpeedFlight => KSpeedFlight,
-  TopSpeedList => KTopSpeedList,
-  TopArrivalAirportList => KTopArrivalAirportList,
-  TopDepartureAirportList => KTopDepartureAirportList,
-  Airline => KAirline,
-  TopAirlineList => KTopAirlineList,
-  CountFlightStatus => KCountFlightStatus
-}
+import it.bitrock.kafkaflightstream.model.{CountAirline => KCountAirline, Airline => KAirline, AirlineInfo => KAirlineInfo, AirplaneInfo => KAirplaneInfo, Airport => KAirport, AirportInfo => KAirportInfo, CountFlightStatus => KCountFlightStatus, FlightEnrichedEvent => KFlightEnrichedEvent, GeographyInfo => KGeographyInfo, SpeedFlight => KSpeedFlight, TopAirlineList => KTopAirlineList, TopArrivalAirportList => KTopArrivalAirportList, TopDepartureAirportList => KTopDepartureAirportList, TopSpeedList => KTopSpeedList}
 import spray.json._
 
 final case class GeographyInfo(latitude: Double, longitude: Double, altitude: Double, direction: Double)
@@ -48,6 +34,8 @@ final case class Airline(airlineName: String, eventCount: Long)
 final case class TopAirlineList(elements: Seq[Airline] = Nil) extends EventPayload
 
 final case class CountFlightStatus(flightStatus: String, eventCount: Long) extends EventPayload
+
+final case class CountAirline(ecentCount: Long) extends EventPayload
 
 final case class ApiEvent[T <: EventPayload](eventType: String, eventPayload: T)
 
@@ -107,6 +95,10 @@ object DefinitionsConversions {
     def toCountFlightStatus = CountFlightStatus(x.flightStatus, x.eventCount)
   }
 
+  implicit class CountAirlineOps(x: KCountAirline) {
+    def toCountAirline = CountAirline(x.eventCount)
+  }
+
 }
 
 trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
@@ -128,6 +120,8 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
   implicit val topAirlineListJsonFormat: RootJsonFormat[TopAirlineList] = jsonFormat1(TopAirlineList.apply)
 
   implicit val countFlightStatusJsonFormat: RootJsonFormat[CountFlightStatus] = jsonFormat2(CountFlightStatus.apply)
+
+  implicit val countAirlineJsonFormat: RootJsonFormat[CountAirline] = jsonFormat1(CountAirline.apply)
 
   implicit def apiEventJsonFormat[T <: EventPayload: JsonFormat]: RootJsonFormat[ApiEvent[T]] = jsonFormat2(ApiEvent.apply[T])
 

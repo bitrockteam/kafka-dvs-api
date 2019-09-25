@@ -48,6 +48,7 @@ object KafkaConsumerWrapperFactory {
         (r: SpecificRecord) =>
           r match {
             case countFlight: CountFlightStatus => countFlight.toCountFlightStatus
+            case countAirline: CountAirline => countAirline.toCountAirline
           }
       )(byteArrayDeserializer, serdeFrom[SpecificRecord](kafkaConfig.schemaRegistryUrl).deserializer)
 
