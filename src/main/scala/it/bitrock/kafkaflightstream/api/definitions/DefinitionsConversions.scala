@@ -1,7 +1,22 @@
 package it.bitrock.kafkaflightstream.api.definitions
 
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
-import it.bitrock.kafkaflightstream.model.{CountAirline => KCountAirline, Airline => KAirline, AirlineInfo => KAirlineInfo, AirplaneInfo => KAirplaneInfo, Airport => KAirport, AirportInfo => KAirportInfo, CountFlightStatus => KCountFlightStatus, FlightEnrichedEvent => KFlightEnrichedEvent, GeographyInfo => KGeographyInfo, SpeedFlight => KSpeedFlight, TopAirlineList => KTopAirlineList, TopArrivalAirportList => KTopArrivalAirportList, TopDepartureAirportList => KTopDepartureAirportList, TopSpeedList => KTopSpeedList}
+import it.bitrock.kafkaflightstream.model.{
+  CountAirline => KCountAirline,
+  Airline => KAirline,
+  AirlineInfo => KAirlineInfo,
+  AirplaneInfo => KAirplaneInfo,
+  Airport => KAirport,
+  AirportInfo => KAirportInfo,
+  CountFlightStatus => KCountFlightStatus,
+  FlightEnrichedEvent => KFlightEnrichedEvent,
+  GeographyInfo => KGeographyInfo,
+  SpeedFlight => KSpeedFlight,
+  TopAirlineList => KTopAirlineList,
+  TopArrivalAirportList => KTopArrivalAirportList,
+  TopDepartureAirportList => KTopDepartureAirportList,
+  TopSpeedList => KTopSpeedList
+}
 import spray.json._
 
 final case class GeographyInfo(latitude: Double, longitude: Double, altitude: Double, direction: Double)

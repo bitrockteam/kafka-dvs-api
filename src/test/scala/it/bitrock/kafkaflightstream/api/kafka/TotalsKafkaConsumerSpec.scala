@@ -53,7 +53,7 @@ class TotalsKafkaConsumerSpec
         implicit val stringSerde: Serde[String]          = totalKeySerde
         withRunningKafka {
           val kCountFlightStatus = KCountFlightStatus(DefaultCountFlightStatus, DefaultCountFlightAmount)
-          val kCountAirline = KCountAirline(DefaultCountAirlineAmount)
+          val kCountAirline      = KCountAirline(DefaultCountAirlineAmount)
           // Publish to a topic before consumer is started
           publishToKafka(kafkaConfig.totalFlightTopic, kCountFlightStatus)
           publishToKafka(kafkaConfig.totalAirlineTopic, kCountAirline)
