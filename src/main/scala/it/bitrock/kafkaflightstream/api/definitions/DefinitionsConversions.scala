@@ -35,7 +35,7 @@ final case class TopAirlineList(elements: Seq[Airline] = Nil) extends EventPaylo
 
 final case class CountFlightStatus(flightStatus: String, eventCount: Long) extends EventPayload
 
-final case class CountAirline(ecentCount: Long) extends EventPayload
+final case class CountAirline(eventCount: Long) extends EventPayload
 
 final case class ApiEvent[T <: EventPayload](eventType: String, eventPayload: T)
 

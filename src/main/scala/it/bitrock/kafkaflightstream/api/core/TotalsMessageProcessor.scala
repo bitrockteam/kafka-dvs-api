@@ -42,6 +42,11 @@ class TotalsMessageProcessor(
       forwardMessage(ApiEvent(total.getClass.getSimpleName, total).toJson.toString)
       throttle(kafkaConsumerWrapper.pollMessages())
 
+    case total: CountAirline =>
+      logger.debug(s"Got a $total from Kafka Consumer")
+      forwardMessage(ApiEvent(total.getClass.getSimpleName, total).toJson.toString)
+      throttle(kafkaConsumerWrapper.pollMessages())
+
     case Terminated => self ! PoisonPill
   }
 
