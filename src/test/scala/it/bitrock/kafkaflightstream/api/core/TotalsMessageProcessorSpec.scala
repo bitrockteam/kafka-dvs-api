@@ -42,6 +42,16 @@ class TotalsMessageProcessorSpec
           pollProbe.expectNoMessage(websocketConfig.throttleDuration)
           pollProbe.expectMsg(PollingTriggered)
       }
+      "a CountAirline is received, but only after a delay" in ResourceLoaner.withFixture {
+        case Resource(websocketConfig, kafkaConfig, consumerFactory, pollProbe, sourceProbe) =>
+          val messageProcessor =
+            new TotalsMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
+          // First message is sent when processor starts up
+          pollProbe.expectMsg(PollingTriggered)
+          messageProcessor ! CountAirline(DefaultCountAirlineAmount)
+          pollProbe.expectNoMessage(websocketConfig.throttleDuration)
+          pollProbe.expectMsg(PollingTriggered)
+      }
     }
 
     "forward a JSON-formatted ApiEvent to source actor" when {
@@ -50,6 +60,15 @@ class TotalsMessageProcessorSpec
           val messageProcessor =
             new TotalsMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
           val msg = CountFlightStatus(DefaultCountFlightStatus, DefaultCountFlightAmount)
+          messageProcessor ! msg
+          val expectedResult = ApiEvent(msg.getClass.getSimpleName, msg).toJson.toString
+          sourceProbe.expectMsg(expectedResult)
+      }
+      "a CountAirline is received" in ResourceLoaner.withFixture {
+        case Resource(websocketConfig, kafkaConfig, consumerFactory, _, sourceProbe) =>
+          val messageProcessor =
+            new TotalsMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
+          val msg = CountAirline(DefaultCountAirlineAmount)
           messageProcessor ! msg
           val expectedResult = ApiEvent(msg.getClass.getSimpleName, msg).toJson.toString
           sourceProbe.expectMsg(expectedResult)
@@ -65,6 +84,7 @@ class TotalsMessageProcessorSpec
         KafkaConfig(
           "",
           URI.create("http://localhost:8080"),
+          "",
           "",
           "",
           "",

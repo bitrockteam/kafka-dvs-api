@@ -92,6 +92,7 @@ components:
           eventPayload:
             oneOf:
               - $ref: '#/components/schemas/TotalFlights'
+              - $ref: '#/components/schemas/TotalAirline'
   schemas:
     GeographyInfo:
       description: 'geographyInfo:'
@@ -232,6 +233,15 @@ components:
       properties:
         flightStatus:
           type: string
+        eventCount:
+          type: integer
+          format: int64
+          default: 0
+    TotalAirline:
+      type: object
+      required:
+        - eventCount
+      properties:
         eventCount:
           type: integer
           format: int64

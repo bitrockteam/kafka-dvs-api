@@ -29,7 +29,7 @@ class TotalsMessageProcessor(
   override val kafkaConsumerWrapper: KafkaConsumerWrapper =
     kafkaConsumerWrapperFactory.build(
       self,
-      List(kafkaConfig.totalFlightTopic)
+      List(kafkaConfig.totalFlightTopic, kafkaConfig.totalAirlineTopic)
     )
 
   override def receive: Receive = {
@@ -38,6 +38,11 @@ class TotalsMessageProcessor(
       kafkaConsumerWrapper.pollMessages()
 
     case total: CountFlightStatus =>
+      logger.debug(s"Got a $total from Kafka Consumer")
+      forwardMessage(ApiEvent(total.getClass.getSimpleName, total).toJson.toString)
+      throttle(kafkaConsumerWrapper.pollMessages())
+
+    case total: CountAirline =>
       logger.debug(s"Got a $total from Kafka Consumer")
       forwardMessage(ApiEvent(total.getClass.getSimpleName, total).toJson.toString)
       throttle(kafkaConsumerWrapper.pollMessages())
