@@ -70,6 +70,7 @@ class RoutesSpec extends BaseAsyncSpec with ScalatestRouteTest {
         cleanupDelay = 0.second,
         pathPrefix = "path",
         flightsPath = "flights",
+        flightListPath = "flight-list",
         topElementsPath = "tops",
         totalElementsPath = "totals"
       )

@@ -8,7 +8,7 @@ import it.bitrock.kafkaflightstream.api.config.{AppConfig, KafkaConfig}
 import it.bitrock.kafkaflightstream.api.definitions._
 import it.bitrock.kafkaflightstream.api.kafka.KafkaConsumerWrapper.NoMessage
 import it.bitrock.kafkaflightstream.api.{BaseSpec, TestValues}
-import it.bitrock.kafkaflightstream.model.{CountFlightStatus => KCountFlightStatus, CountAirline => KCountAirline}
+import it.bitrock.kafkaflightstream.model.{CountFlight => KCountFlight, CountAirline => KCountAirline}
 import it.bitrock.kafkageostream.kafkacommons.serialization.ImplicitConversions._
 import it.bitrock.kafkageostream.testcommons.FixtureLoanerAnyResult
 import net.manub.embeddedkafka.schemaregistry.{EmbeddedKafka, EmbeddedKafkaConfig, _}
@@ -35,9 +35,9 @@ class TotalsKafkaConsumerSpec
         implicit val embKafkaConfig: EmbeddedKafkaConfig = embeddedKafkaConfig
         withRunningKafka {
           eventually {
-            publishToKafka(kafkaConfig.totalFlightTopic, KCountFlightStatus(DefaultCountFlightStatus, DefaultCountFlightAmount))
+            publishToKafka(kafkaConfig.totalFlightTopic, KCountFlight(DefaultCountFlightAmount))
             pollMessages()
-            processorProbe.expectMsg(CountFlightStatus(DefaultCountFlightStatus, DefaultCountFlightAmount))
+            processorProbe.expectMsg(CountFlight(DefaultCountFlightAmount))
           }
           eventually {
             publishToKafka(kafkaConfig.totalAirlineTopic, KCountAirline(DefaultCountAirlineAmount))
@@ -52,7 +52,7 @@ class TotalsKafkaConsumerSpec
         implicit val embKafkaConfig: EmbeddedKafkaConfig = embeddedKafkaConfig
         implicit val stringSerde: Serde[String]          = totalKeySerde
         withRunningKafka {
-          val kCountFlightStatus = KCountFlightStatus(DefaultCountFlightStatus, DefaultCountFlightAmount)
+          val kCountFlightStatus = KCountFlight(DefaultCountFlightAmount)
           val kCountAirline      = KCountAirline(DefaultCountAirlineAmount)
           // Publish to a topic before consumer is started
           publishToKafka(kafkaConfig.totalFlightTopic, kCountFlightStatus)
@@ -64,7 +64,7 @@ class TotalsKafkaConsumerSpec
             processorProbe.expectMsg(NoMessage)
           }
 
-          val (_, expectedValue) = consumeFirstKeyedMessageFrom[String, KCountFlightStatus](kafkaConfig.totalFlightTopic)
+          val (_, expectedValue) = consumeFirstKeyedMessageFrom[String, KCountFlight](kafkaConfig.totalFlightTopic)
           expectedValue shouldBe kCountFlightStatus
 
           val (_, expectedAirlineCountValue) = consumeFirstKeyedMessageFrom[String, KCountAirline](kafkaConfig.totalAirlineTopic)

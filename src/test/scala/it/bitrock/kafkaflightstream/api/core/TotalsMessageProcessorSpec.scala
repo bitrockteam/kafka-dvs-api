@@ -38,7 +38,7 @@ class TotalsMessageProcessorSpec
             new TotalsMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
           // First message is sent when processor starts up
           pollProbe.expectMsg(PollingTriggered)
-          messageProcessor ! CountFlightStatus(DefaultCountFlightStatus, DefaultCountFlightAmount)
+          messageProcessor ! CountFlight(DefaultCountFlightAmount)
           pollProbe.expectNoMessage(websocketConfig.throttleDuration)
           pollProbe.expectMsg(PollingTriggered)
       }
@@ -59,7 +59,7 @@ class TotalsMessageProcessorSpec
         case Resource(websocketConfig, kafkaConfig, consumerFactory, _, sourceProbe) =>
           val messageProcessor =
             new TotalsMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
-          val msg = CountFlightStatus(DefaultCountFlightStatus, DefaultCountFlightAmount)
+          val msg = CountFlight(DefaultCountFlightAmount)
           messageProcessor ! msg
           val expectedResult = ApiEvent(msg.getClass.getSimpleName, msg).toJson.toString
           sourceProbe.expectMsg(expectedResult)
@@ -79,11 +79,12 @@ class TotalsMessageProcessorSpec
 
   object ResourceLoaner extends FixtureLoanerAnyResult[Resource] {
     override def withFixture(body: Resource => Any): Any = {
-      val websocketConfig = WebsocketConfig(1.second, 0.second, "not-used", "not-used", "not-used", "not-used")
+      val websocketConfig = WebsocketConfig(1.second, 0.second, "not-used", "not-used", "not-used", "not-used", "not-used")
       val kafkaConfig =
         KafkaConfig(
           "",
           URI.create("http://localhost:8080"),
+          "",
           "",
           "",
           "",

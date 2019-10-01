@@ -13,7 +13,7 @@ import it.bitrock.kafkaflightstream.model.{
   AirlineInfo => KAirlineInfo,
   AirplaneInfo => KAirplaneInfo,
   AirportInfo => KAirportInfo,
-  FlightEnrichedEvent => KFlightEnrichedEvent,
+  FlightReceived => KFlightReceived,
   GeographyInfo => KGeographyInfo
 }
 import it.bitrock.kafkageostream.testcommons.FixtureLoanerAnyResult
@@ -41,7 +41,7 @@ class FlightKafkaConsumerSpec
         implicit val embKafkaConfig: EmbeddedKafkaConfig = embeddedKafkaConfig
         implicit val longSerde: Serde[String]            = flightReceivedKeySerde
 
-        val kFlightEnrichedEvent = KFlightEnrichedEvent(
+        val kFlightReceivedEvent = KFlightReceived(
           DefaultIataNumber,
           DefaultIcaoNumber,
           KGeographyInfo(DefaultLatitude, DefaultLongitude, DefaultAltitude, DefaultDirection),
@@ -49,7 +49,7 @@ class FlightKafkaConsumerSpec
           KAirportInfo(DefaultCodeAirport1, DefaultNameAirport1, DefaultNameCountry1, DefaultCodeIso2Country1),
           KAirportInfo(DefaultCodeAirport2, DefaultNameAirport2, DefaultNameCountry2, DefaultCodeIso2Country2),
           KAirlineInfo(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
-          Some(KAirplaneInfo(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode)),
+          KAirplaneInfo(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
           DefaultStatus,
           DefaultUpdated
         )
@@ -61,7 +61,7 @@ class FlightKafkaConsumerSpec
           AirportInfo(DefaultCodeAirport1, DefaultNameAirport1, DefaultNameCountry1, DefaultCodeIso2Country1),
           AirportInfo(DefaultCodeAirport2, DefaultNameAirport2, DefaultNameCountry2, DefaultCodeIso2Country2),
           AirlineInfo(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
-          Some(AirplaneInfo(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode)),
+          AirplaneInfo(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
           DefaultStatus,
           DefaultUpdated
         )
@@ -70,7 +70,7 @@ class FlightKafkaConsumerSpec
 
           // Using eventually to ignore any warm up time Kafka could have
           eventually {
-            publishToKafka(kafkaConfig.flightReceivedTopic, "key", kFlightEnrichedEvent)
+            publishToKafka(kafkaConfig.flightReceivedTopic, "key", kFlightReceivedEvent)
             pollMessages()
 
             processorProbe.expectMsg(expectedFlightReceived)
@@ -83,7 +83,7 @@ class FlightKafkaConsumerSpec
         implicit val embKafkaConfig: EmbeddedKafkaConfig = embeddedKafkaConfig
         implicit val longSerde: Serde[String]            = flightReceivedKeySerde
 
-        val kFlightEnrichedEvent = KFlightEnrichedEvent(
+        val kFlightReceivedEvent = KFlightReceived(
           DefaultIataNumber,
           DefaultIcaoNumber,
           KGeographyInfo(DefaultLatitude, DefaultLongitude, DefaultAltitude, DefaultDirection),
@@ -91,14 +91,14 @@ class FlightKafkaConsumerSpec
           KAirportInfo(DefaultCodeAirport1, DefaultNameAirport1, DefaultNameCountry1, DefaultCodeIso2Country1),
           KAirportInfo(DefaultCodeAirport2, DefaultNameAirport2, DefaultNameCountry2, DefaultCodeIso2Country2),
           KAirlineInfo(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
-          Some(KAirplaneInfo(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode)),
+          KAirplaneInfo(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
           DefaultStatus,
           DefaultUpdated
         )
 
         withRunningKafka {
           // Publish to a topic before consumer is started
-          publishToKafka(kafkaConfig.flightReceivedTopic, kFlightEnrichedEvent)
+          publishToKafka(kafkaConfig.flightReceivedTopic, kFlightReceivedEvent)
 
           val deadline = patienceConfig.interval.fromNow
 
@@ -107,9 +107,9 @@ class FlightKafkaConsumerSpec
             processorProbe.expectMsg(NoMessage)
           }
 
-          val (_, response) = consumeFirstKeyedMessageFrom[String, KFlightEnrichedEvent](kafkaConfig.flightReceivedTopic)
+          val (_, response) = consumeFirstKeyedMessageFrom[String, KFlightReceived](kafkaConfig.flightReceivedTopic)
 
-          response shouldBe kFlightEnrichedEvent
+          response shouldBe kFlightReceivedEvent
         }
     }
   }
