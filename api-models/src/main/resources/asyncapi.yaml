@@ -1,248 +1,248 @@
-asyncapi: '1.2.0'
-info:
-  title: Kafka Flightstream server API
-  version: 1.0.0-SNAPSHOT
-  license:
-    name: 'MIT'
-    url: 'https://spdx.org/licenses/MIT.html'
-baseTopic: stream
-
-servers:
-  - url: flightstream-api.bitrock.it
-    description: Event streams
-    scheme: wss
-
-topics:
-  flights:
-    subscribe:
-      $ref: '#/components/messages/FlightReceived'
-  topElementsChanged:
-    subscribe:
-      $ref: '#/components/messages/TopElementsChangedStreamEvent'
-  totalElementsChanged:
-    subscribe:
-      $ref: '#/components/messages/TotalElementsChangedStreamEvent'
-
-components:
-  messages:
-    FlightReceived:
-      summary: 'Flight received'
-      tags:
-        - name: flight
-      payload:
-        type: object
-        required:
-          - iataNumber
-          - icaoNumber
-          - geography
-          - speed
-          - airportDeparture
-          - airportArrival
-          - airline
-          - status
-          - updated
-        properties:
-          iataNumber:
-            type: string
-          icaoNumber:
-            type: string
-          geography:
-            $ref: '#/components/messages/GeographyInfo'
-          speed:
-            type: number
-            format: double
-          airportDeparture:
-            $ref: '#/components/messages/AirportInfo'
-          airportArrival:
-            $ref: '#/components/messages/AirportInfo'
-          airline:
-            $ref: '#/components/messages/AirlineInfo'
-          status:
-            type: string
-          updated:
-            type: string
-    TopElementsChangedStreamEvent:
-      tags:
-        - name: topElementsChanged
-      payload:
-        type: object
-        required:
-          - eventType
-          - eventPayload
-        properties:
-          eventType:
-            type: string
-          eventPayload:
-            oneOf:
-              - $ref: '#/components/schemas/TopArrivalAirportList'
-              - $ref: '#/components/schemas/TopDepartureAirportList'
-              - $ref: '#/components/schemas/TopSpeedList'
-              - $ref: '#/components/schemas/TopAirlineList'
-    TotalElementsChangedStreamEvent:
-      tags:
-        - name: totalElementsChanged
-      payload:
-        type: object
-        required:
-          - eventType
-          - eventPayload
-        properties:
-          eventType:
-            type: string
-          eventPayload:
-            oneOf:
-              - $ref: '#/components/schemas/TotalFlights'
-              - $ref: '#/components/schemas/TotalAirline'
-  schemas:
-    GeographyInfo:
-      description: 'geographyInfo:'
-      type: object
-      required:
-        - latitude
-        - longitude
-        - altitude
-        - direction
-      properties:
-        latitude:
-          type: number
-          format: double
-        longitude:
-          type: number
-          format: double
-        altitude:
-          type: number
-          format: double
-        direction:
-          type: number
-          format: double
-    AirportInfo:
-      description: 'airportInfo:'
-      type: object
-      required:
-        - codeAirport
-        - nameAirport
-        - nameCountry
-        - codeIso2Country
-      properties:
-        codeAirport:
-          type: string
-        nameAirport:
-          type: string
-        nameCountry:
-          type: string
-        codeIso2Country:
-          type: string
-    AirlineInfo:
-      description: 'airlineInfo:'
-      type: object
-      required:
-        - codeAirline
-        - nameAirline
-        - sizeAirline
-      properties:
-        codeAirline:
-          type: string
-        nameAirline:
-          type: string
-        sizeAirline:
-          type: string
-    TopArrivalAirportList:
-      description: 'Top arrival airport list'
-      type: object
-      required:
-        - elements
-      properties:
-        elements:
-          $ref: '#/components/schemas/AirportList'
-    TopDepartureAirportList:
-      description: 'Top departure airport list'
-      type: object
-      required:
-        - elements
-      properties:
-        elements:
-          $ref: '#/components/schemas/AirportList'
-    TopSpeedList:
-      description: 'Top speed list'
-      type: object
-      required:
-        - elements
-      properties:
-        elements:
-          $ref: '#/components/schemas/SpeedList'
-    TopAirlineList:
-      description: 'Top airline list'
-      type: object
-      required:
-        - elements
-      properties:
-        elements:
-          $ref: '#/components/schemas/AirlineList'
-    AirportList:
-      type: array
-      items:
-        $ref: '#/components/schemas/Airport'
-    Airport:
-      type: object
-      required:
-        - airportCode
-        - eventCount
-      properties:
-        airportCode:
-          type: string
-        eventCount:
-          type: integer
-          format: int64
-          default: 0
-    SpeedList:
-      type: array
-      items:
-        $ref: '#/components/schemas/Speed'
-    Speed:
-      type: object
-      required:
-        - flightCode
-        - speed
-      properties:
-        flightCode:
-          type: string
-        speed:
-          type: number
-          format: double
-    AirlineList:
-      type: array
-      items:
-        $ref: '#/components/schemas/Airline'
-    Airline:
-      type: object
-      required:
-        - airlineName
-        - eventCount
-      properties:
-        airlineName:
-          type: string
-        eventCount:
-          type: integer
-          format: int64
-          default: 0
-    TotalFlights:
-      type: object
-      required:
-        - flightStatus
-        - eventCount
-      properties:
-        flightStatus:
-          type: string
-        eventCount:
-          type: integer
-          format: int64
-          default: 0
-    TotalAirline:
-      type: object
-      required:
-        - eventCount
-      properties:
-        eventCount:
-          type: integer
-          format: int64
-          default: 0
+#asyncapi: '1.2.0'
+#info:
+#  title: Kafka Flightstream server API
+#  version: 1.0.0-SNAPSHOT
+#  license:
+#    name: 'MIT'
+#    url: 'https://spdx.org/licenses/MIT.html'
+#baseTopic: stream
+#
+#servers:
+#  - url: flightstream-api.bitrock.it
+#    description: Event streams
+#    scheme: wss
+#
+#topics:
+#  flights:
+#    subscribe:
+#      $ref: '#/components/messages/FlightReceived'
+#  topElementsChanged:
+#    subscribe:
+#      $ref: '#/components/messages/TopElementsChangedStreamEvent'
+#  totalElementsChanged:
+#    subscribe:
+#      $ref: '#/components/messages/TotalElementsChangedStreamEvent'
+#
+#components:
+#  messages:
+#    FlightReceived:
+#      summary: 'Flight received'
+#      tags:
+#        - name: flight
+#      payload:
+#        type: object
+#        required:
+#          - iataNumber
+#          - icaoNumber
+#          - geography
+#          - speed
+#          - airportDeparture
+#          - airportArrival
+#          - airline
+#          - status
+#          - updated
+#        properties:
+#          iataNumber:
+#            type: string
+#          icaoNumber:
+#            type: string
+#          geography:
+#            $ref: '#/components/messages/GeographyInfo'
+#          speed:
+#            type: number
+#            format: double
+#          airportDeparture:
+#            $ref: '#/components/messages/AirportInfo'
+#          airportArrival:
+#            $ref: '#/components/messages/AirportInfo'
+#          airline:
+#            $ref: '#/components/messages/AirlineInfo'
+#          status:
+#            type: string
+#          updated:
+#            type: string
+#    TopElementsChangedStreamEvent:
+#      tags:
+#        - name: topElementsChanged
+#      payload:
+#        type: object
+#        required:
+#          - eventType
+#          - eventPayload
+#        properties:
+#          eventType:
+#            type: string
+#          eventPayload:
+#            oneOf:
+#              - $ref: '#/components/schemas/TopArrivalAirportList'
+#              - $ref: '#/components/schemas/TopDepartureAirportList'
+#              - $ref: '#/components/schemas/TopSpeedList'
+#              - $ref: '#/components/schemas/TopAirlineList'
+#    TotalElementsChangedStreamEvent:
+#      tags:
+#        - name: totalElementsChanged
+#      payload:
+#        type: object
+#        required:
+#          - eventType
+#          - eventPayload
+#        properties:
+#          eventType:
+#            type: string
+#          eventPayload:
+#            oneOf:
+#              - $ref: '#/components/schemas/TotalFlights'
+#              - $ref: '#/components/schemas/TotalAirline'
+#  schemas:
+#    GeographyInfo:
+#      description: 'geographyInfo:'
+#      type: object
+#      required:
+#        - latitude
+#        - longitude
+#        - altitude
+#        - direction
+#      properties:
+#        latitude:
+#          type: number
+#          format: double
+#        longitude:
+#          type: number
+#          format: double
+#        altitude:
+#          type: number
+#          format: double
+#        direction:
+#          type: number
+#          format: double
+#    AirportInfo:
+#      description: 'airportInfo:'
+#      type: object
+#      required:
+#        - codeAirport
+#        - nameAirport
+#        - nameCountry
+#        - codeIso2Country
+#      properties:
+#        codeAirport:
+#          type: string
+#        nameAirport:
+#          type: string
+#        nameCountry:
+#          type: string
+#        codeIso2Country:
+#          type: string
+#    AirlineInfo:
+#      description: 'airlineInfo:'
+#      type: object
+#      required:
+#        - codeAirline
+#        - nameAirline
+#        - sizeAirline
+#      properties:
+#        codeAirline:
+#          type: string
+#        nameAirline:
+#          type: string
+#        sizeAirline:
+#          type: string
+#    TopArrivalAirportList:
+#      description: 'Top arrival airport list'
+#      type: object
+#      required:
+#        - elements
+#      properties:
+#        elements:
+#          $ref: '#/components/schemas/AirportList'
+#    TopDepartureAirportList:
+#      description: 'Top departure airport list'
+#      type: object
+#      required:
+#        - elements
+#      properties:
+#        elements:
+#          $ref: '#/components/schemas/AirportList'
+#    TopSpeedList:
+#      description: 'Top speed list'
+#      type: object
+#      required:
+#        - elements
+#      properties:
+#        elements:
+#          $ref: '#/components/schemas/SpeedList'
+#    TopAirlineList:
+#      description: 'Top airline list'
+#      type: object
+#      required:
+#        - elements
+#      properties:
+#        elements:
+#          $ref: '#/components/schemas/AirlineList'
+#    AirportList:
+#      type: array
+#      items:
+#        $ref: '#/components/schemas/Airport'
+#    Airport:
+#      type: object
+#      required:
+#        - airportCode
+#        - eventCount
+#      properties:
+#        airportCode:
+#          type: string
+#        eventCount:
+#          type: integer
+#          format: int64
+#          default: 0
+#    SpeedList:
+#      type: array
+#      items:
+#        $ref: '#/components/schemas/Speed'
+#    Speed:
+#      type: object
+#      required:
+#        - flightCode
+#        - speed
+#      properties:
+#        flightCode:
+#          type: string
+#        speed:
+#          type: number
+#          format: double
+#    AirlineList:
+#      type: array
+#      items:
+#        $ref: '#/components/schemas/Airline'
+#    Airline:
+#      type: object
+#      required:
+#        - airlineName
+#        - eventCount
+#      properties:
+#        airlineName:
+#          type: string
+#        eventCount:
+#          type: integer
+#          format: int64
+#          default: 0
+#    TotalFlights:
+#      type: object
+#      required:
+#        - flightStatus
+#        - eventCount
+#      properties:
+#        flightStatus:
+#          type: string
+#        eventCount:
+#          type: integer
+#          format: int64
+#          default: 0
+#    TotalAirline:
+#      type: object
+#      required:
+#        - eventCount
+#      properties:
+#        eventCount:
+#          type: integer
+#          format: int64
+#          default: 0
