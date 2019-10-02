@@ -170,6 +170,8 @@ pipeline {
                     sh "docker pull ${DOCKER_REPOSITORY}/${GITHUB_REPO}:${tagBefore}"
                     sh "docker tag ${DOCKER_REPOSITORY}/${GITHUB_REPO}:${tagBefore} ${DOCKER_REPOSITORY}/${GITHUB_REPO}:latest"
                     sh "docker push ${DOCKER_REPOSITORY}/${GITHUB_REPO}:latest"
+                    sh "docker rmi ${DOCKER_REPOSITORY}/${GITHUB_REPO}:latest"
+                    sh "docker rmi ${DOCKER_REPOSITORY}/${GITHUB_REPO}:${tagBefore}"
                     sh "aws ecr batch-delete-image --repository-name ${DOCKER_REPOSITORY}/${GITHUB_REPO} --image-ids imageTag=${tagAfter} --region ${AWS_region} || true"
                 }
             }
