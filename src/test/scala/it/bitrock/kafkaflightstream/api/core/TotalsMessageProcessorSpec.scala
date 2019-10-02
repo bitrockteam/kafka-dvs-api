@@ -38,7 +38,7 @@ class TotalsMessageProcessorSpec
             new TotalsMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
           // First message is sent when processor starts up
           pollProbe.expectMsg(PollingTriggered)
-          messageProcessor ! CountFlight(DefaultCountFlightAmount)
+          messageProcessor ! CountFlight(DefaultStartTimeWindow, DefaultCountFlightAmount)
           pollProbe.expectNoMessage(websocketConfig.throttleDuration)
           pollProbe.expectMsg(PollingTriggered)
       }
@@ -48,7 +48,7 @@ class TotalsMessageProcessorSpec
             new TotalsMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
           // First message is sent when processor starts up
           pollProbe.expectMsg(PollingTriggered)
-          messageProcessor ! CountAirline(DefaultCountAirlineAmount)
+          messageProcessor ! CountAirline(DefaultStartTimeWindow, DefaultCountAirlineAmount)
           pollProbe.expectNoMessage(websocketConfig.throttleDuration)
           pollProbe.expectMsg(PollingTriggered)
       }
@@ -59,7 +59,7 @@ class TotalsMessageProcessorSpec
         case Resource(websocketConfig, kafkaConfig, consumerFactory, _, sourceProbe) =>
           val messageProcessor =
             new TotalsMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
-          val msg = CountFlight(DefaultCountFlightAmount)
+          val msg = CountFlight(DefaultStartTimeWindow, DefaultCountFlightAmount)
           messageProcessor ! msg
           val expectedResult = ApiEvent(msg.getClass.getSimpleName, msg).toJson.toString
           sourceProbe.expectMsg(expectedResult)
@@ -68,7 +68,7 @@ class TotalsMessageProcessorSpec
         case Resource(websocketConfig, kafkaConfig, consumerFactory, _, sourceProbe) =>
           val messageProcessor =
             new TotalsMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
-          val msg = CountAirline(DefaultCountAirlineAmount)
+          val msg = CountAirline(DefaultStartTimeWindow, DefaultCountAirlineAmount)
           messageProcessor ! msg
           val expectedResult = ApiEvent(msg.getClass.getSimpleName, msg).toJson.toString
           sourceProbe.expectMsg(expectedResult)
