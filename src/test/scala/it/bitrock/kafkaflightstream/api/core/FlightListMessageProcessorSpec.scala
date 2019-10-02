@@ -50,8 +50,22 @@ class FlightListMessageProcessorSpec
                 DefaultIcaoNumber,
                 GeographyInfo(DefaultLatitude, DefaultLongitude, DefaultAltitude, DefaultDirection),
                 DefaultSpeed,
-                AirportInfo(DefaultCodeAirport1, DefaultNameAirport1, DefaultNameCountry1, DefaultCodeIso2Country1),
-                AirportInfo(DefaultCodeAirport2, DefaultNameAirport2, DefaultNameCountry2, DefaultCodeIso2Country2),
+                AirportInfo(
+                  DefaultCodeAirport1,
+                  DefaultNameAirport1,
+                  DefaultNameCountry1,
+                  DefaultCodeIso2Country1,
+                  DefaultTimezone1,
+                  DefaultGmt1
+                ),
+                AirportInfo(
+                  DefaultCodeAirport2,
+                  DefaultNameAirport2,
+                  DefaultNameCountry2,
+                  DefaultCodeIso2Country2,
+                  DefaultTimezone2,
+                  DefaultGmt2
+                ),
                 AirlineInfo(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
                 AirplaneInfo(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
                 DefaultStatus,
@@ -80,8 +94,22 @@ class FlightListMessageProcessorSpec
                 DefaultIcaoNumber,
                 GeographyInfo(DefaultLatitude, DefaultLongitude, DefaultAltitude, DefaultDirection),
                 DefaultSpeed,
-                AirportInfo(DefaultCodeAirport1, DefaultNameAirport1, DefaultNameCountry1, DefaultCodeIso2Country1),
-                AirportInfo(DefaultCodeAirport2, DefaultNameAirport2, DefaultNameCountry2, DefaultCodeIso2Country2),
+                AirportInfo(
+                  DefaultCodeAirport1,
+                  DefaultNameAirport1,
+                  DefaultNameCountry1,
+                  DefaultCodeIso2Country1,
+                  DefaultTimezone1,
+                  DefaultGmt1
+                ),
+                AirportInfo(
+                  DefaultCodeAirport2,
+                  DefaultNameAirport2,
+                  DefaultNameCountry2,
+                  DefaultCodeIso2Country2,
+                  DefaultTimezone2,
+                  DefaultGmt2
+                ),
                 AirlineInfo(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
                 AirplaneInfo(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
                 DefaultStatus,

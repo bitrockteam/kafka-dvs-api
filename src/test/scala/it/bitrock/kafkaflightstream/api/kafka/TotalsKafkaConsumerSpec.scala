@@ -35,14 +35,14 @@ class TotalsKafkaConsumerSpec
         implicit val embKafkaConfig: EmbeddedKafkaConfig = embeddedKafkaConfig
         withRunningKafka {
           eventually {
-            publishToKafka(kafkaConfig.totalFlightTopic, KCountFlight(DefaultCountFlightAmount))
+            publishToKafka(kafkaConfig.totalFlightTopic, KCountFlight(DefaultStartTimeWindow, DefaultCountFlightAmount))
             pollMessages()
-            processorProbe.expectMsg(CountFlight(DefaultCountFlightAmount))
+            processorProbe.expectMsg(CountFlight(DefaultStartTimeWindow, DefaultCountFlightAmount))
           }
           eventually {
-            publishToKafka(kafkaConfig.totalAirlineTopic, KCountAirline(DefaultCountAirlineAmount))
+            publishToKafka(kafkaConfig.totalAirlineTopic, KCountAirline(DefaultStartTimeWindow, DefaultCountAirlineAmount))
             pollMessages()
-            processorProbe.expectMsg(CountAirline(DefaultCountAirlineAmount))
+            processorProbe.expectMsg(CountAirline(DefaultStartTimeWindow, DefaultCountAirlineAmount))
           }
         }
     }
@@ -52,8 +52,8 @@ class TotalsKafkaConsumerSpec
         implicit val embKafkaConfig: EmbeddedKafkaConfig = embeddedKafkaConfig
         implicit val stringSerde: Serde[String]          = totalKeySerde
         withRunningKafka {
-          val kCountFlightStatus = KCountFlight(DefaultCountFlightAmount)
-          val kCountAirline      = KCountAirline(DefaultCountAirlineAmount)
+          val kCountFlightStatus = KCountFlight(DefaultStartTimeWindow, DefaultCountFlightAmount)
+          val kCountAirline      = KCountAirline(DefaultStartTimeWindow, DefaultCountAirlineAmount)
           // Publish to a topic before consumer is started
           publishToKafka(kafkaConfig.totalFlightTopic, kCountFlightStatus)
           publishToKafka(kafkaConfig.totalAirlineTopic, kCountAirline)

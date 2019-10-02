@@ -21,7 +21,14 @@ import it.bitrock.kafkaflightstream.model.{
 import spray.json._
 
 final case class GeographyInfo(latitude: Double, longitude: Double, altitude: Double, direction: Double)
-final case class AirportInfo(codeAirport: String, nameAirport: String, nameCountry: String, codeIso2Country: String)
+final case class AirportInfo(
+    codeAirport: String,
+    nameAirport: String,
+    nameCountry: String,
+    codeIso2Country: String,
+    timezone: String,
+    gmt: String
+)
 final case class AirlineInfo(codeAirline: String, nameAirline: String, sizeAirline: String)
 final case class AirplaneInfo(numberRegistration: String, productionLine: String, modelCode: String)
 final case class FlightReceived(
@@ -50,9 +57,8 @@ final case class TopSpeedList(elements: Seq[SpeedFlight] = Nil) extends EventPay
 final case class Airline(airlineName: String, eventCount: Long)
 final case class TopAirlineList(elements: Seq[Airline] = Nil) extends EventPayload
 
-final case class CountFlight(eventCount: Long) extends EventPayload
-
-final case class CountAirline(eventCount: Long) extends EventPayload
+final case class CountFlight(windowStartTime: String, eventCount: Long)  extends EventPayload
+final case class CountAirline(windowStartTime: String, eventCount: Long) extends EventPayload
 
 final case class ApiEvent[T <: EventPayload](eventType: String, eventPayload: T)
 
@@ -62,7 +68,7 @@ object DefinitionsConversions {
     GeographyInfo(x.latitude, x.longitude, x.altitude, x.direction)
 
   def toAirportInfo(x: KAirportInfo): AirportInfo =
-    AirportInfo(x.codeAirport, x.nameAirport, x.nameCountry, x.codeIso2Country)
+    AirportInfo(x.codeAirport, x.nameAirport, x.nameCountry, x.codeIso2Country, x.timezone, x.gmt)
 
   def toAirlineInfo(x: KAirlineInfo): AirlineInfo =
     AirlineInfo(x.codeAirline, x.nameAirline, x.sizeAirline)
@@ -114,11 +120,11 @@ object DefinitionsConversions {
   }
 
   implicit class CountFlightOps(x: KCountFlight) {
-    def toCountFlight = CountFlight(x.eventCount)
+    def toCountFlight = CountFlight(x.windowStartTime, x.eventCount)
   }
 
   implicit class CountAirlineOps(x: KCountAirline) {
-    def toCountAirline = CountAirline(x.eventCount)
+    def toCountAirline = CountAirline(x.windowStartTime, x.eventCount)
   }
 
 }
@@ -126,7 +132,7 @@ object DefinitionsConversions {
 trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
 
   implicit val geographyInfoJsonFormat: RootJsonFormat[GeographyInfo]           = jsonFormat4(GeographyInfo.apply)
-  implicit val airportInfoJsonFormat: RootJsonFormat[AirportInfo]               = jsonFormat4(AirportInfo.apply)
+  implicit val airportInfoJsonFormat: RootJsonFormat[AirportInfo]               = jsonFormat6(AirportInfo.apply)
   implicit val airlineInfoJsonFormat: RootJsonFormat[AirlineInfo]               = jsonFormat3(AirlineInfo.apply)
   implicit val airplaneInfoInfoJsonFormat: RootJsonFormat[AirplaneInfo]         = jsonFormat3(AirplaneInfo.apply)
   implicit val flightReceivedJsonFormat: RootJsonFormat[FlightReceived]         = jsonFormat10(FlightReceived.apply)
@@ -142,9 +148,9 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
   implicit val airlineJsonFormat: RootJsonFormat[Airline]               = jsonFormat2(Airline.apply)
   implicit val topAirlineListJsonFormat: RootJsonFormat[TopAirlineList] = jsonFormat1(TopAirlineList.apply)
 
-  implicit val countFlightStatusJsonFormat: RootJsonFormat[CountFlight] = jsonFormat1(CountFlight.apply)
+  implicit val countFlightStatusJsonFormat: RootJsonFormat[CountFlight] = jsonFormat2(CountFlight.apply)
 
-  implicit val countAirlineJsonFormat: RootJsonFormat[CountAirline] = jsonFormat1(CountAirline.apply)
+  implicit val countAirlineJsonFormat: RootJsonFormat[CountAirline] = jsonFormat2(CountAirline.apply)
 
   implicit def apiEventJsonFormat[T <: EventPayload: JsonFormat]: RootJsonFormat[ApiEvent[T]] = jsonFormat2(ApiEvent.apply[T])
 
