@@ -2,14 +2,15 @@ package it.bitrock.kafkaflightstream.api.definitions
 
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import it.bitrock.kafkaflightstream.model.{
-  CountAirline => KCountAirline,
   Airline => KAirline,
   AirlineInfo => KAirlineInfo,
   AirplaneInfo => KAirplaneInfo,
   Airport => KAirport,
   AirportInfo => KAirportInfo,
-  CountFlightStatus => KCountFlightStatus,
-  FlightEnrichedEvent => KFlightEnrichedEvent,
+  CountAirline => KCountAirline,
+  CountFlight => KCountFlight,
+  FlightReceived => KFlightReceivedEvent,
+  FlightReceivedList => KFlightReceivedListEvent,
   GeographyInfo => KGeographyInfo,
   SpeedFlight => KSpeedFlight,
   TopAirlineList => KTopAirlineList,
@@ -31,10 +32,11 @@ final case class FlightReceived(
     airportDeparture: AirportInfo,
     airportArrival: AirportInfo,
     airline: AirlineInfo,
-    airplane: Option[AirplaneInfo],
+    airplane: AirplaneInfo,
     status: String,
     updated: String
 )
+final case class FlightReceivedList(elements: Seq[FlightReceived])
 
 sealed trait EventPayload
 
@@ -48,7 +50,7 @@ final case class TopSpeedList(elements: Seq[SpeedFlight] = Nil) extends EventPay
 final case class Airline(airlineName: String, eventCount: Long)
 final case class TopAirlineList(elements: Seq[Airline] = Nil) extends EventPayload
 
-final case class CountFlightStatus(flightStatus: String, eventCount: Long) extends EventPayload
+final case class CountFlight(eventCount: Long) extends EventPayload
 
 final case class CountAirline(eventCount: Long) extends EventPayload
 
@@ -68,7 +70,7 @@ object DefinitionsConversions {
   def toAirplaneInfo(x: KAirplaneInfo): AirplaneInfo =
     AirplaneInfo(x.numberRegistration, x.productionLine, x.modelCode)
 
-  implicit class FlightReceivedOps(x: KFlightEnrichedEvent) {
+  implicit class FlightReceivedOps(x: KFlightReceivedEvent) {
     def toFlightReceived: FlightReceived =
       FlightReceived(
         x.iataNumber,
@@ -78,10 +80,15 @@ object DefinitionsConversions {
         toAirportInfo(x.airportDeparture),
         toAirportInfo(x.airportArrival),
         toAirlineInfo(x.airline),
-        x.airplane.map(toAirplaneInfo),
+        toAirplaneInfo(x.airplane),
         x.status,
         x.updated
       )
+  }
+
+  implicit class FlightReceivedListOps(x: KFlightReceivedListEvent) {
+    def toFlightReceivedList: FlightReceivedList =
+      FlightReceivedList(x.elements.map(_.toFlightReceived))
   }
 
   def toAirport(x: KAirport) = Airport(x.airportCode, x.eventCount)
@@ -106,8 +113,8 @@ object DefinitionsConversions {
     def toTopAirlineList = TopAirlineList(x.elements.map(toAirline))
   }
 
-  implicit class CountFlightStatusOps(x: KCountFlightStatus) {
-    def toCountFlightStatus = CountFlightStatus(x.flightStatus, x.eventCount)
+  implicit class CountFlightOps(x: KCountFlight) {
+    def toCountFlight = CountFlight(x.eventCount)
   }
 
   implicit class CountAirlineOps(x: KCountAirline) {
@@ -118,11 +125,12 @@ object DefinitionsConversions {
 
 trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
 
-  implicit val geographyInfoJsonFormat: RootJsonFormat[GeographyInfo]   = jsonFormat4(GeographyInfo.apply)
-  implicit val airportInfoJsonFormat: RootJsonFormat[AirportInfo]       = jsonFormat4(AirportInfo.apply)
-  implicit val airlineInfoJsonFormat: RootJsonFormat[AirlineInfo]       = jsonFormat3(AirlineInfo.apply)
-  implicit val airplaneInfoInfoJsonFormat: RootJsonFormat[AirplaneInfo] = jsonFormat3(AirplaneInfo.apply)
-  implicit val flightReceivedJsonFormat: RootJsonFormat[FlightReceived] = jsonFormat10(FlightReceived.apply)
+  implicit val geographyInfoJsonFormat: RootJsonFormat[GeographyInfo]           = jsonFormat4(GeographyInfo.apply)
+  implicit val airportInfoJsonFormat: RootJsonFormat[AirportInfo]               = jsonFormat4(AirportInfo.apply)
+  implicit val airlineInfoJsonFormat: RootJsonFormat[AirlineInfo]               = jsonFormat3(AirlineInfo.apply)
+  implicit val airplaneInfoInfoJsonFormat: RootJsonFormat[AirplaneInfo]         = jsonFormat3(AirplaneInfo.apply)
+  implicit val flightReceivedJsonFormat: RootJsonFormat[FlightReceived]         = jsonFormat10(FlightReceived.apply)
+  implicit val flightReceivedListJsonFormat: RootJsonFormat[FlightReceivedList] = jsonFormat1(FlightReceivedList.apply)
 
   implicit val airportJsonFormat: RootJsonFormat[Airport]                             = jsonFormat2(Airport.apply)
   implicit val topArrivalAirportListJsonFormat: RootJsonFormat[TopArrivalAirportList] = jsonFormat1(TopArrivalAirportList.apply)
@@ -134,7 +142,7 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
   implicit val airlineJsonFormat: RootJsonFormat[Airline]               = jsonFormat2(Airline.apply)
   implicit val topAirlineListJsonFormat: RootJsonFormat[TopAirlineList] = jsonFormat1(TopAirlineList.apply)
 
-  implicit val countFlightStatusJsonFormat: RootJsonFormat[CountFlightStatus] = jsonFormat2(CountFlightStatus.apply)
+  implicit val countFlightStatusJsonFormat: RootJsonFormat[CountFlight] = jsonFormat1(CountFlight.apply)
 
   implicit val countAirlineJsonFormat: RootJsonFormat[CountAirline] = jsonFormat1(CountAirline.apply)
 

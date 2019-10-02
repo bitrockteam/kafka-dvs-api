@@ -7,7 +7,7 @@ import it.bitrock.kafkaflightstream.api.kafka.KafkaConsumerWrapper.NoMessage
 import it.bitrock.kafkaflightstream.api.kafka.{KafkaConsumerWrapper, KafkaConsumerWrapperFactory}
 import spray.json._
 
-object TotalsMessageProcessor {
+object FlightListMessageProcessor {
 
   def props(
       sourceActorRef: ActorRef,
@@ -15,11 +15,11 @@ object TotalsMessageProcessor {
       kafkaConfig: KafkaConfig,
       kafkaConsumerWrapperFactory: KafkaConsumerWrapperFactory
   ): Props =
-    Props(new TotalsMessageProcessor(sourceActorRef, websocketConfig, kafkaConfig, kafkaConsumerWrapperFactory))
+    Props(new FlightListMessageProcessor(sourceActorRef, websocketConfig, kafkaConfig, kafkaConsumerWrapperFactory))
 
 }
 
-class TotalsMessageProcessor(
+class FlightListMessageProcessor(
     val sourceActorRef: ActorRef,
     val websocketConfig: WebsocketConfig,
     val kafkaConfig: KafkaConfig,
@@ -27,24 +27,18 @@ class TotalsMessageProcessor(
 ) extends MessageProcessor {
 
   override val kafkaConsumerWrapper: KafkaConsumerWrapper =
-    kafkaConsumerWrapperFactory.build(
-      self,
-      List(kafkaConfig.totalFlightTopic, kafkaConfig.totalAirlineTopic)
-    )
+    kafkaConsumerWrapperFactory.build(self, List(kafkaConfig.flightReceivedListTopic))
 
   override def receive: Receive = {
     case NoMessage =>
       logger.debug("Got no-message notice from Kafka Consumer, going to poll again")
+
       kafkaConsumerWrapper.pollMessages()
 
-    case total: CountFlight =>
-      logger.debug(s"Got a $total from Kafka Consumer")
-      forwardMessage(ApiEvent(total.getClass.getSimpleName, total).toJson.toString)
-      throttle(kafkaConsumerWrapper.pollMessages())
+    case flightList: FlightReceivedList =>
+      logger.debug(s"Got a $flightList from Kafka Consumer")
+      forwardMessage(flightList.toJson.toString)
 
-    case total: CountAirline =>
-      logger.debug(s"Got a $total from Kafka Consumer")
-      forwardMessage(ApiEvent(total.getClass.getSimpleName, total).toJson.toString)
       throttle(kafkaConsumerWrapper.pollMessages())
 
     case Terminated => self ! PoisonPill

@@ -13,6 +13,7 @@ final case class WebsocketConfig(
     cleanupDelay: FiniteDuration,
     pathPrefix: String,
     flightsPath: String,
+    flightListPath: String,
     topElementsPath: String,
     totalElementsPath: String
 )

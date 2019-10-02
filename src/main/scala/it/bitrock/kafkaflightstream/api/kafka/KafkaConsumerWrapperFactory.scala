@@ -21,8 +21,17 @@ object KafkaConsumerWrapperFactory {
         kafkaConfig,
         processor,
         topics,
-        (record: FlightEnrichedEvent) => record.toFlightReceived
-      )(byteArrayDeserializer, serdeFrom[FlightEnrichedEvent](kafkaConfig.schemaRegistryUrl).deserializer)
+        (record: FlightReceived) => record.toFlightReceived
+      )(byteArrayDeserializer, serdeFrom[FlightReceived](kafkaConfig.schemaRegistryUrl).deserializer)
+
+  def flightListKafkaConsumerFactory(kafkaConfig: KafkaConfig): KafkaConsumerWrapperFactory =
+    (processor: ActorRef, topics: Seq[String]) =>
+      new KafkaConsumerWrapperImpl(
+        kafkaConfig,
+        processor,
+        topics,
+        (record: FlightReceivedList) => record.toFlightReceivedList
+      )(byteArrayDeserializer, serdeFrom[FlightReceivedList](kafkaConfig.schemaRegistryUrl).deserializer)
 
   def topsKafkaConsumerFactory(kafkaConfig: KafkaConfig): KafkaConsumerWrapperFactory =
     (processor: ActorRef, topics: Seq[String]) =>
@@ -47,8 +56,8 @@ object KafkaConsumerWrapperFactory {
         topics,
         (r: SpecificRecord) =>
           r match {
-            case countFlight: CountFlightStatus => countFlight.toCountFlightStatus
-            case countAirline: CountAirline     => countAirline.toCountAirline
+            case countFlight: CountFlight   => countFlight.toCountFlight
+            case countAirline: CountAirline => countAirline.toCountAirline
           }
       )(byteArrayDeserializer, serdeFrom[SpecificRecord](kafkaConfig.schemaRegistryUrl).deserializer)
 

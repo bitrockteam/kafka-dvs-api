@@ -5,9 +5,9 @@ import java.net.URI
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{ImplicitSender, TestKit, TestProbe}
 import it.bitrock.kafkaflightstream.api.config.{ConsumerConfig, KafkaConfig, WebsocketConfig}
+import it.bitrock.kafkaflightstream.api.{BaseSpec, TestValues}
 import it.bitrock.kafkaflightstream.api.definitions._
 import it.bitrock.kafkaflightstream.api.kafka.{KafkaConsumerWrapper, KafkaConsumerWrapperFactory}
-import it.bitrock.kafkaflightstream.api.{BaseSpec, TestValues}
 import it.bitrock.kafkageostream.testcommons.FixtureLoanerAnyResult
 import org.scalatest.BeforeAndAfterAll
 import spray.json._
@@ -15,66 +15,89 @@ import spray.json._
 import scala.concurrent.duration._
 import scala.util.Random
 
-class TotalsMessageProcessorSpec
-    extends TestKit(ActorSystem("TotalsMessageProcessorSpec"))
+class FlightListMessageProcessorSpec
+    extends TestKit(ActorSystem("FlightMessageProcessorSpec"))
     with BaseSpec
     with ImplicitSender
     with BeforeAndAfterAll
     with JsonSupport
     with TestValues {
-  import TotalsMessageProcessorSpec._
 
-  "Totals Message Processor" should {
+  import FlightListMessageProcessorSpec._
 
+  "Flight List Message Processor" should {
     "trigger Kafka Consumer polling" when {
+
       "it starts" in ResourceLoaner.withFixture {
         case Resource(websocketConfig, kafkaConfig, consumerFactory, pollProbe, sourceProbe) =>
-          new TotalsMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
+          new FlightListMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
+
           pollProbe.expectMsg(PollingTriggered)
       }
-      "a CountFlightStatus is received, but only after a delay" in ResourceLoaner.withFixture {
+
+      "a FlightReceivedList message is received, but only after a delay" in ResourceLoaner.withFixture {
         case Resource(websocketConfig, kafkaConfig, consumerFactory, pollProbe, sourceProbe) =>
           val messageProcessor =
-            new TotalsMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
+            new FlightListMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
+
           // First message is sent when processor starts up
           pollProbe.expectMsg(PollingTriggered)
-          messageProcessor ! CountFlight(DefaultCountFlightAmount)
-          pollProbe.expectNoMessage(websocketConfig.throttleDuration)
-          pollProbe.expectMsg(PollingTriggered)
-      }
-      "a CountAirline is received, but only after a delay" in ResourceLoaner.withFixture {
-        case Resource(websocketConfig, kafkaConfig, consumerFactory, pollProbe, sourceProbe) =>
-          val messageProcessor =
-            new TotalsMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
-          // First message is sent when processor starts up
-          pollProbe.expectMsg(PollingTriggered)
-          messageProcessor ! CountAirline(DefaultCountAirlineAmount)
+
+          val flightListMessage = FlightReceivedList(
+            Seq(
+              FlightReceived(
+                DefaultIataNumber,
+                DefaultIcaoNumber,
+                GeographyInfo(DefaultLatitude, DefaultLongitude, DefaultAltitude, DefaultDirection),
+                DefaultSpeed,
+                AirportInfo(DefaultCodeAirport1, DefaultNameAirport1, DefaultNameCountry1, DefaultCodeIso2Country1),
+                AirportInfo(DefaultCodeAirport2, DefaultNameAirport2, DefaultNameCountry2, DefaultCodeIso2Country2),
+                AirlineInfo(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
+                AirplaneInfo(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
+                DefaultStatus,
+                DefaultUpdated
+              )
+            )
+          )
+
+          messageProcessor ! flightListMessage
+
           pollProbe.expectNoMessage(websocketConfig.throttleDuration)
           pollProbe.expectMsg(PollingTriggered)
       }
     }
 
-    "forward a JSON-formatted ApiEvent to source actor" when {
-      "a CountFlightStatus is received" in ResourceLoaner.withFixture {
-        case Resource(websocketConfig, kafkaConfig, consumerFactory, _, sourceProbe) =>
-          val messageProcessor =
-            new TotalsMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
-          val msg = CountFlight(DefaultCountFlightAmount)
-          messageProcessor ! msg
-          val expectedResult = ApiEvent(msg.getClass.getSimpleName, msg).toJson.toString
-          sourceProbe.expectMsg(expectedResult)
-      }
-      "a CountAirline is received" in ResourceLoaner.withFixture {
-        case Resource(websocketConfig, kafkaConfig, consumerFactory, _, sourceProbe) =>
-          val messageProcessor =
-            new TotalsMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
-          val msg = CountAirline(DefaultCountAirlineAmount)
-          messageProcessor ! msg
-          val expectedResult = ApiEvent(msg.getClass.getSimpleName, msg).toJson.toString
-          sourceProbe.expectMsg(expectedResult)
-      }
-    }
+    "forward a JSON to source actor" when {
 
+      "a FlightListReceived message is received" in ResourceLoaner.withFixture {
+        case Resource(websocketConfig, kafkaConfig, consumerFactory, _, sourceProbe) =>
+          val messageProcessor =
+            new FlightListMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
+          val msg = FlightReceivedList(
+            Seq(
+              FlightReceived(
+                DefaultIataNumber,
+                DefaultIcaoNumber,
+                GeographyInfo(DefaultLatitude, DefaultLongitude, DefaultAltitude, DefaultDirection),
+                DefaultSpeed,
+                AirportInfo(DefaultCodeAirport1, DefaultNameAirport1, DefaultNameCountry1, DefaultCodeIso2Country1),
+                AirportInfo(DefaultCodeAirport2, DefaultNameAirport2, DefaultNameCountry2, DefaultCodeIso2Country2),
+                AirlineInfo(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
+                AirplaneInfo(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
+                DefaultStatus,
+                DefaultUpdated
+              )
+            )
+          )
+
+          messageProcessor ! msg
+
+          val expectedResult = msg.toJson.toString
+
+          sourceProbe.expectMsg(expectedResult)
+      }
+
+    }
   }
 
   object ResourceLoaner extends FixtureLoanerAnyResult[Resource] {
@@ -115,10 +138,9 @@ class TotalsMessageProcessorSpec
     shutdown()
     super.afterAll()
   }
-
 }
 
-object TotalsMessageProcessorSpec {
+object FlightListMessageProcessorSpec {
 
   final case class Resource(
       websocketConfig: WebsocketConfig,

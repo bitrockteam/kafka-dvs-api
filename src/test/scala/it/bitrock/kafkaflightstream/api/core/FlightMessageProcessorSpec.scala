@@ -51,7 +51,7 @@ class FlightMessageProcessorSpec
             AirportInfo(DefaultCodeAirport1, DefaultNameAirport1, DefaultNameCountry1, DefaultCodeIso2Country1),
             AirportInfo(DefaultCodeAirport2, DefaultNameAirport2, DefaultNameCountry2, DefaultCodeIso2Country2),
             AirlineInfo(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
-            Some(AirplaneInfo(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode)),
+            AirplaneInfo(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
             DefaultStatus,
             DefaultUpdated
           )
@@ -76,7 +76,7 @@ class FlightMessageProcessorSpec
             AirportInfo(DefaultCodeAirport1, DefaultNameAirport1, DefaultNameCountry1, DefaultCodeIso2Country1),
             AirportInfo(DefaultCodeAirport2, DefaultNameAirport2, DefaultNameCountry2, DefaultCodeIso2Country2),
             AirlineInfo(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
-            Some(AirplaneInfo(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode)),
+            AirplaneInfo(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
             DefaultStatus,
             DefaultUpdated
           )
@@ -94,11 +94,12 @@ class FlightMessageProcessorSpec
 
   object ResourceLoaner extends FixtureLoanerAnyResult[Resource] {
     override def withFixture(body: Resource => Any): Any = {
-      val websocketConfig = WebsocketConfig(1.second, 0.second, "not-used", "not-used", "not-used", "not-used")
+      val websocketConfig = WebsocketConfig(1.second, 0.second, "not-used", "not-used", "not-used", "not-used", "not-used")
       val kafkaConfig =
         KafkaConfig(
           "",
           URI.create("http://localhost:8080"),
+          "",
           "",
           "",
           "",

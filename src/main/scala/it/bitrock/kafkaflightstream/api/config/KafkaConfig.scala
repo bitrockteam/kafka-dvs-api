@@ -9,6 +9,7 @@ final case class KafkaConfig(
     schemaRegistryUrl: URI,
     groupId: String,
     flightReceivedTopic: String,
+    flightReceivedListTopic: String,
     topArrivalAirportTopic: String,
     topDepartureAirportTopic: String,
     topSpeedTopic: String,
