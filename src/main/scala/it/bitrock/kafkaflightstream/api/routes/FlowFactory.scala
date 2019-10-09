@@ -12,10 +12,10 @@ import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
 
 trait FlowFactory {
-  def flow: Flow[Message, Message, NotUsed]
+  def flow(identifier: String): Flow[Message, Message, NotUsed]
 }
 
-class FlowFactoryImpl(processorFactory: MessageProcessorFactory)(
+class FlowFactoryImpl(processorFactory: MessageProcessorFactory, cleanUp: Option[String => Any] = None)(
     implicit ec: ExecutionContext,
     materializer: ActorMaterializer
 ) extends FlowFactory
@@ -24,13 +24,13 @@ class FlowFactoryImpl(processorFactory: MessageProcessorFactory)(
   final private val SourceActorBufferSize       = 1000
   final private val SourceActorOverflowStrategy = OverflowStrategy.dropHead
 
-  def flow: Flow[Message, Message, NotUsed] = {
+  def flow(identifier: String): Flow[Message, Message, NotUsed] = {
     val (sourceActorRef, publisher) = Source
       .actorRef[String](SourceActorBufferSize, SourceActorOverflowStrategy)
       .toMat(BroadcastHub.sink)(Keep.both)
       .run()
 
-    val processor = processorFactory.build(sourceActorRef)
+    val processor = processorFactory.build(sourceActorRef, identifier)
 
     logger.debug("Going to generate a flow")
 
@@ -40,10 +40,12 @@ class FlowFactoryImpl(processorFactory: MessageProcessorFactory)(
         termWatchAfter.onComplete {
           case Success(_) =>
             logger.info("Web-socket connection closed normally")
+            cleanUp.foreach(_(identifier))
 
             processor ! PoisonPill
           case Failure(e) =>
             logger.warn("Web-socket connection terminated", e)
+            cleanUp.foreach(_(identifier))
 
             processor ! PoisonPill
         }

@@ -9,7 +9,8 @@ lazy val commonSettings = Seq(
 lazy val apiModelsCompileSettings = Seq(
   Compile / guardrailTasks := List(
     ScalaServer((Compile / resourceDirectory).value / "api.yaml", pkg = "it.bitrock.kafkaflightstream.api.routes"),
-    ScalaClient((Compile / resourceDirectory).value / "api.yaml", pkg = "it.bitrock.kafkaflightstream.api.routes")
+    ScalaClient((Compile / resourceDirectory).value / "api.yaml", pkg = "it.bitrock.kafkaflightstream.api.routes"),
+    ScalaClient((Compile / resourceDirectory).value / "ksql-server.yaml", pkg = "it.bitrock.kafkaflightstream.api.client.ksqlserver")
   )
 )
 

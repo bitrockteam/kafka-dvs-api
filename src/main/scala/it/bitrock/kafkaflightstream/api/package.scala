@@ -25,5 +25,6 @@ package object tags {
     val flightListFlowFactoryKey: FlowFactoryKey = tag[FlowFactoryKeyTag][String]("flight-list")
     val topsFlowFactoryKey: FlowFactoryKey       = tag[FlowFactoryKeyTag][String]("tops")
     val totalsFlowFactoryKey: FlowFactoryKey     = tag[FlowFactoryKeyTag][String]("totals")
+    val ksqlFlowFactoryKey: FlowFactoryKey       = tag[FlowFactoryKeyTag][String]("ksql")
   }
 }

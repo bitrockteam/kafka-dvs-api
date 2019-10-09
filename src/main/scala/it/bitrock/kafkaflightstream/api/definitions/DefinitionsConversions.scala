@@ -60,6 +60,8 @@ final case class TopAirlineList(elements: Seq[Airline] = Nil) extends EventPaylo
 final case class CountFlight(windowStartTime: String, eventCount: Long)  extends EventPayload
 final case class CountAirline(windowStartTime: String, eventCount: Long) extends EventPayload
 
+final case class KsqlStreamDataResponse(data: String)
+
 final case class ApiEvent[T <: EventPayload](eventType: String, eventPayload: T)
 
 object DefinitionsConversions {
@@ -141,16 +143,15 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
   implicit val airportJsonFormat: RootJsonFormat[Airport]                             = jsonFormat2(Airport.apply)
   implicit val topArrivalAirportListJsonFormat: RootJsonFormat[TopArrivalAirportList] = jsonFormat1(TopArrivalAirportList.apply)
   implicit val topDepartureAirportJsonFormat: RootJsonFormat[TopDepartureAirportList] = jsonFormat1(TopDepartureAirportList.apply)
-
-  implicit val speedFlghtJsonFormat: RootJsonFormat[SpeedFlight]    = jsonFormat2(SpeedFlight.apply)
-  implicit val topSpeedListJsonFormat: RootJsonFormat[TopSpeedList] = jsonFormat1(TopSpeedList.apply)
-
-  implicit val airlineJsonFormat: RootJsonFormat[Airline]               = jsonFormat2(Airline.apply)
-  implicit val topAirlineListJsonFormat: RootJsonFormat[TopAirlineList] = jsonFormat1(TopAirlineList.apply)
+  implicit val speedFlghtJsonFormat: RootJsonFormat[SpeedFlight]                      = jsonFormat2(SpeedFlight.apply)
+  implicit val topSpeedListJsonFormat: RootJsonFormat[TopSpeedList]                   = jsonFormat1(TopSpeedList.apply)
+  implicit val airlineJsonFormat: RootJsonFormat[Airline]                             = jsonFormat2(Airline.apply)
+  implicit val topAirlineListJsonFormat: RootJsonFormat[TopAirlineList]               = jsonFormat1(TopAirlineList.apply)
 
   implicit val countFlightStatusJsonFormat: RootJsonFormat[CountFlight] = jsonFormat2(CountFlight.apply)
+  implicit val countAirlineJsonFormat: RootJsonFormat[CountAirline]     = jsonFormat2(CountAirline.apply)
 
-  implicit val countAirlineJsonFormat: RootJsonFormat[CountAirline] = jsonFormat2(CountAirline.apply)
+  implicit val ksqlStreamDataResponseFormat: RootJsonFormat[KsqlStreamDataResponse] = jsonFormat1(KsqlStreamDataResponse)
 
   implicit def apiEventJsonFormat[T <: EventPayload: JsonFormat]: RootJsonFormat[ApiEvent[T]] = jsonFormat2(ApiEvent.apply[T])
 

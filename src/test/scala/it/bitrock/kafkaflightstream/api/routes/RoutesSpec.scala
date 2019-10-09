@@ -63,6 +63,14 @@ class RoutesSpec extends BaseAsyncSpec with ScalatestRouteTest {
           }
       }
 
+    "open a web-socket channel and stream messages with ksql events on it for WS requests on the streams path" in ResourceLoaner
+      .withFixture {
+        case Resource(routes, wsProbe, websocketConfig) =>
+          WS(Uri(path = Uri.Path./(websocketConfig.pathPrefix)./(websocketConfig.ksqlPath)./("streamId")), wsProbe.flow) ~> routes.streams ~> check {
+            checkWebsocketAndSendTestMessage(wsProbe)
+          }
+      }
+
   }
 
   object ResourceLoaner extends AsyncFixtureLoaner[RoutesSpec.Resource] {
@@ -72,7 +80,8 @@ class RoutesSpec extends BaseAsyncSpec with ScalatestRouteTest {
         flightFlowFactoryKey     -> new TestFlowFactory,
         flightListFlowFactoryKey -> new TestFlowFactory,
         topsFlowFactoryKey       -> new TestFlowFactory,
-        totalsFlowFactoryKey     -> new TestFlowFactory
+        totalsFlowFactoryKey     -> new TestFlowFactory,
+        ksqlFlowFactoryKey       -> new TestFlowFactory
       )
       val websocketConfig = WebsocketConfig(
         throttleDuration = 1.second,
@@ -81,7 +90,8 @@ class RoutesSpec extends BaseAsyncSpec with ScalatestRouteTest {
         flightsPath = "flights",
         flightListPath = "flight-list",
         topElementsPath = "tops",
-        totalElementsPath = "totals"
+        totalElementsPath = "totals",
+        ksqlPath = "ksql"
       )
       val routes = new Routes(flowFactories, websocketConfig)
 
@@ -102,7 +112,7 @@ object RoutesSpec {
   final case class Resource(route: Routes, wsProbe: WSProbe, websocketConfig: WebsocketConfig)
 
   class TestFlowFactory extends FlowFactory {
-    override def flow: Flow[Message, Message, NotUsed] = Flow[Message].map(identity)
+    override def flow(identifier: String): Flow[Message, Message, NotUsed] = Flow[Message].map(identity)
   }
 
 }
