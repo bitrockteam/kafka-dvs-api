@@ -11,7 +11,7 @@ class FlightMessageProcessorFactoryImpl(
 )(implicit system: ActorSystem)
     extends MessageProcessorFactory {
 
-  override def build(sourceActorRef: ActorRef): ActorRef =
+  override def build(sourceActorRef: ActorRef, identifier: String = ""): ActorRef =
     system.actorOf(FlightMessageProcessor.props(sourceActorRef, websocketConfig, kafkaConfig, kafkaConsumerWrapperFactory))
 
 }

@@ -4,7 +4,7 @@ import java.net.URI
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{ImplicitSender, TestKit, TestProbe}
-import it.bitrock.kafkaflightstream.api.config.{ConsumerConfig, KafkaConfig, WebsocketConfig}
+import it.bitrock.kafkaflightstream.api.config.{ConsumerConfig, KafkaConfig, KsqlConfig, WebsocketConfig}
 import it.bitrock.kafkaflightstream.api.{BaseSpec, TestValues}
 import it.bitrock.kafkaflightstream.api.definitions._
 import it.bitrock.kafkaflightstream.api.kafka.{KafkaConsumerWrapper, KafkaConsumerWrapperFactory}
@@ -130,7 +130,7 @@ class FlightListMessageProcessorSpec
 
   object ResourceLoaner extends FixtureLoanerAnyResult[Resource] {
     override def withFixture(body: Resource => Any): Any = {
-      val websocketConfig = WebsocketConfig(1.second, 0.second, "not-used", "not-used", "not-used", "not-used", "not-used")
+      val websocketConfig = WebsocketConfig(1.second, 0.second, "not-used", "not-used", "not-used", "not-used", "not-used", "not-used")
       val kafkaConfig =
         KafkaConfig(
           "",
@@ -144,7 +144,8 @@ class FlightListMessageProcessorSpec
           "",
           "",
           "",
-          ConsumerConfig(1.second, Duration.Zero)
+          ConsumerConfig(1.second, Duration.Zero),
+          KsqlConfig(java.net.URI.create("http://www.example.com"), "")
         )
       val pollProbe                                    = TestProbe(s"poll-probe-${Random.nextInt()}")
       val sourceProbe                                  = TestProbe(s"source-probe-${Random.nextInt()}")

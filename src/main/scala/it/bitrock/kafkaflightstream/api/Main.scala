@@ -1,6 +1,6 @@
 package it.bitrock.kafkaflightstream.api
 
-import akka.actor.ActorSystem
+import akka.actor.{ActorSystem, Scheduler}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
 import akka.http.scaladsl.server.Route
@@ -30,8 +30,14 @@ object Main extends App with LazyLogging {
   implicit val system: ActorSystem             = ActorSystem("KafkaFlightStreamApi")
   implicit val ec: ExecutionContextExecutor    = system.dispatcher
   implicit val materializer: ActorMaterializer = ActorMaterializer()
+  lazy val scheduler: Scheduler                = system.scheduler
 
-  val internalsService = new InternalsService
+  val httpClientFactory                        = new HttpClientFactoryImpl
+  val ksqlClientFactory: KsqlClientFactoryImpl = new KsqlClientFactoryImpl(httpClientFactory)
+  val ksqlOps                                  = new KsqlOpsImpl(ksqlClientFactory)
+  val internalsService                         = new InternalsService
+  val ksqlService                              = new KsqlService(ksqlOps, config.server.websocket)
+  val sessionService                           = new SessionService(ksqlOps)
 
   val flightKafkaConsumerWrapperFactory = flightKafkaConsumerFactory(config.kafka)
   val flightMessageProcessorFactory =
@@ -53,16 +59,27 @@ object Main extends App with LazyLogging {
     new TotalsMessageProcessorFactoryImpl(config.server.websocket, config.kafka, totalsKafkaConsumerWrapperFactory)
   val totalsFlowFactory = new FlowFactoryImpl(totalsMessageProcessorFactory)
 
+  val ksqlKafkaConsumerWrapperFactory = ksqlKafkaConsumerFactory(config.kafka)
+  val ksqlMessageProcessorFactory =
+    new KsqlMessageProcessorFactoryImpl(config.server.websocket, config.kafka, ksqlKafkaConsumerWrapperFactory)
+  val ksqlFlowFactory = new FlowFactoryImpl(
+    ksqlMessageProcessorFactory,
+    Option(
+      streamId => scheduler.scheduleOnce(config.server.websocket.cleanupDelay)(ksqlOps.cleanSession(IndexedSeq(streamId)))
+    )
+  )
+
   val flowFactories: Map[FlowFactoryKey, FlowFactory] =
     Map(
       flightFlowFactoryKey     -> flightFlowFactory,
       flightListFlowFactoryKey -> flightListFlowFactory,
       topsFlowFactoryKey       -> topsFlowFactory,
-      totalsFlowFactoryKey     -> totalsFlowFactory
+      totalsFlowFactoryKey     -> totalsFlowFactory,
+      ksqlFlowFactoryKey       -> ksqlFlowFactory
     )
 
   val api: Route                           = new Routes(flowFactories, config.server.websocket).routes
-  val apiRest: Route                       = new RestRoutes(internalsService).routes
+  val apiRest: Route                       = new RestRoutes(internalsService, ksqlService, sessionService).routes
   val bindingFuture: Future[ServerBinding] = Http().bindAndHandle(api ~ apiRest, host, port)
 
   bindingFuture.map { serverBinding =>
@@ -75,6 +92,7 @@ object Main extends App with LazyLogging {
     val resourcesClosed = for {
       binding <- bindingFuture
       _       <- binding.terminate(hardDeadline = 3.seconds)
+      _       <- httpClientFactory.close()
       t       <- system.terminate()
     } yield t
 

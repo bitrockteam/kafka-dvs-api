@@ -4,6 +4,6 @@ import akka.actor.ActorRef
 
 trait MessageProcessorFactory {
 
-  def build(sourceActorRef: ActorRef): ActorRef
+  def build(sourceActorRef: ActorRef, identifier: String): ActorRef
 
 }

@@ -2,6 +2,7 @@ package it.bitrock.kafkaflightstream.api.routes
 
 import akka.http.scaladsl.server.Directives.{get, handleWebSocketMessages, path, pathPrefix}
 import akka.http.scaladsl.server.PathMatcher._
+import akka.http.scaladsl.server.PathMatchers.Segment
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.RouteConcatenation._
 import it.bitrock.kafkaflightstream.api.config.WebsocketConfig
@@ -18,16 +19,19 @@ class Routes(
   def streams: Route = get {
     pathPrefix(websocketConfig.pathPrefix) {
       path(websocketConfig.flightsPath) {
-        handleWebSocketMessages(flowFactories(flightFlowFactoryKey).flow)
+        handleWebSocketMessages(flowFactories(flightFlowFactoryKey).flow(""))
       } ~
         path(websocketConfig.flightListPath) {
-          handleWebSocketMessages(flowFactories(flightListFlowFactoryKey).flow)
+          handleWebSocketMessages(flowFactories(flightListFlowFactoryKey).flow(""))
         } ~
         path(websocketConfig.topElementsPath) {
-          handleWebSocketMessages(flowFactories(topsFlowFactoryKey).flow)
+          handleWebSocketMessages(flowFactories(topsFlowFactoryKey).flow(""))
         } ~
         path(websocketConfig.totalElementsPath) {
-          handleWebSocketMessages(flowFactories(totalsFlowFactoryKey).flow)
+          handleWebSocketMessages(flowFactories(totalsFlowFactoryKey).flow(""))
+        } ~
+        path(websocketConfig.ksqlPath / Segment) { streamId: String =>
+          handleWebSocketMessages(flowFactories(ksqlFlowFactoryKey).flow(streamId))
         }
     }
   }
