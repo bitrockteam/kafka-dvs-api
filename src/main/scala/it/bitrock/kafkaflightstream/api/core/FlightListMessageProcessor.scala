@@ -29,19 +29,35 @@ class FlightListMessageProcessor(
   override val kafkaConsumerWrapper: KafkaConsumerWrapper =
     kafkaConsumerWrapperFactory.build(self, List(kafkaConfig.flightReceivedListTopic))
 
-  override def receive: Receive = {
+  override def receive: Receive = boxing(CoordinatesBox())
+
+  def boxing(box: CoordinatesBox): Receive = {
+
     case NoMessage =>
       logger.debug("Got no-message notice from Kafka Consumer, going to poll again")
-
       kafkaConsumerWrapper.pollMessages()
 
-    case flightList: FlightReceivedList =>
-      logger.debug(s"Got a $flightList from Kafka Consumer")
-      forwardMessage(flightList.toJson.toString)
+    case Terminated => self ! PoisonPill
 
+    case flights: FlightReceivedList =>
+      logger.debug(s"Got a $flights from Kafka Consumer")
+      forwardMessage(getBoxedFlights(flights, box).toJson.toString)
       throttle(kafkaConsumerWrapper.pollMessages())
 
-    case Terminated => self ! PoisonPill
+    case box: CoordinatesBox =>
+      context.become(boxing(box))
+
+  }
+
+  private def getBoxedFlights(flights: FlightReceivedList, box: CoordinatesBox): FlightReceivedList = {
+    val filteredList = flights.elements.filter { flight =>
+      val coordinate = flight.geography
+      coordinate.latitude < box.leftHighLat &&
+      coordinate.latitude > box.rightLowLat &&
+      coordinate.longitude > box.leftHighLon &&
+      coordinate.longitude < box.rightLowLon
+    }
+    FlightReceivedList(filteredList)
   }
 
 }

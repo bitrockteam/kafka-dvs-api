@@ -2,6 +2,8 @@ package it.bitrock.kafkaflightstream.api
 
 import java.time.Instant
 
+import it.bitrock.kafkaflightstream.api.definitions.CoordinatesBox
+
 import scala.util.Random
 
 trait TestValues {
@@ -10,6 +12,15 @@ trait TestValues {
   final val DefaultLongitude = Random.nextDouble
   final val DefaultAltitude  = Random.nextDouble
   final val DefaultDirection = Random.nextDouble
+
+  final val DefaultInBoxLatitude   = 47
+  final val DefaultInBoxLongitude  = 10
+  final val DefaultOutBoxLatitude  = 0
+  final val DefaultOutBoxLongitude = 0
+
+  final val changedBox                   = CoordinatesBox(101, 99, 99, 101)
+  final val DefaultChangedInBoxLatitude  = 100
+  final val DefaultChangedInBoxLongitude = 100
 
   final val DefaultCodeAirport1     = Random.nextString(10)
   final val DefaultNameAirport1     = Random.nextString(10)

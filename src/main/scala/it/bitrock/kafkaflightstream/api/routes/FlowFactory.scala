@@ -1,15 +1,17 @@
 package it.bitrock.kafkaflightstream.api.routes
 
 import akka.NotUsed
-import akka.actor.PoisonPill
+import akka.actor.{PoisonPill, Terminated}
 import akka.http.scaladsl.model.ws.{Message, TextMessage}
 import akka.stream.scaladsl.{BroadcastHub, Flow, Keep, Sink, Source}
 import akka.stream.{ActorMaterializer, OverflowStrategy}
 import com.typesafe.scalalogging.LazyLogging
 import it.bitrock.kafkaflightstream.api.core.MessageProcessorFactory
+import it.bitrock.kafkaflightstream.api.definitions.{CoordinatesBox, JsonSupport}
 
 import scala.concurrent.ExecutionContext
-import scala.util.{Failure, Success}
+import scala.util.{Failure, Success, Try}
+import spray.json._
 
 trait FlowFactory {
   def flow(identifier: String): Flow[Message, Message, NotUsed]
@@ -19,6 +21,7 @@ class FlowFactoryImpl(processorFactory: MessageProcessorFactory, cleanUp: Option
     implicit ec: ExecutionContext,
     materializer: ActorMaterializer
 ) extends FlowFactory
+    with JsonSupport
     with LazyLogging {
 
   final private val SourceActorBufferSize       = 1000
@@ -30,28 +33,47 @@ class FlowFactoryImpl(processorFactory: MessageProcessorFactory, cleanUp: Option
       .toMat(BroadcastHub.sink)(Keep.both)
       .run()
 
+    val sink =
+      Flow
+        .fromFunction(parseMessage)
+        .collect { case Some(x) => x }
+        .to(Sink.actorRef(sourceActorRef, Terminated))
+
     val processor = processorFactory.build(sourceActorRef, identifier)
 
     logger.debug("Going to generate a flow")
 
     Flow
-      .fromSinkAndSourceCoupled(Sink.ignore, publisher.map(TextMessage(_)))
+      .fromSinkAndSourceCoupled(sink, publisher.map(TextMessage(_)))
       .watchTermination() { (termWatchBefore, termWatchAfter) =>
         termWatchAfter.onComplete {
           case Success(_) =>
             logger.info("Web-socket connection closed normally")
             cleanUp.foreach(_(identifier))
-
             processor ! PoisonPill
           case Failure(e) =>
             logger.warn("Web-socket connection terminated", e)
             cleanUp.foreach(_(identifier))
-
             processor ! PoisonPill
         }
-
         termWatchBefore
       }
+  }
+
+  private def parseMessage: Message => Option[CoordinatesBox] = {
+    case TextMessage.Strict(txt) =>
+      logger.debug(s"Got message: $txt")
+      Try(txt.parseJson.convertTo[CoordinatesBox])
+        .fold(
+          e => {
+            logger.warn(s"Failed to parse JSON message $txt", e)
+            None
+          },
+          Option(_)
+        )
+    case m =>
+      logger.trace(s"Got non-TextMessage, ignoring it: $m")
+      None
   }
 
 }

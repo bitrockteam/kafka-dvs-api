@@ -26,29 +26,23 @@ class FlightListMessageProcessorSpec
   import FlightListMessageProcessorSpec._
 
   "Flight List Message Processor" should {
-    "trigger Kafka Consumer polling" when {
 
+    "trigger Kafka Consumer polling" when {
       "it starts" in ResourceLoaner.withFixture {
         case Resource(websocketConfig, kafkaConfig, consumerFactory, pollProbe, sourceProbe) =>
           new FlightListMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
-
-          pollProbe.expectMsg(PollingTriggered)
+          pollProbe expectMsg PollingTriggered
       }
-
       "a FlightReceivedList message is received, but only after a delay" in ResourceLoaner.withFixture {
         case Resource(websocketConfig, kafkaConfig, consumerFactory, pollProbe, sourceProbe) =>
           val messageProcessor =
             new FlightListMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
-
-          // First message is sent when processor starts up
-          pollProbe.expectMsg(PollingTriggered)
-
           val flightListMessage = FlightReceivedList(
             Seq(
               FlightReceived(
                 DefaultIataNumber,
                 DefaultIcaoNumber,
-                GeographyInfo(DefaultLatitude, DefaultLongitude, DefaultAltitude, DefaultDirection),
+                GeographyInfo(DefaultInBoxLatitude, DefaultInBoxLongitude, DefaultAltitude, DefaultDirection),
                 DefaultSpeed,
                 AirportInfo(
                   DefaultCodeAirport1,
@@ -73,17 +67,15 @@ class FlightListMessageProcessorSpec
               )
             )
           )
-
+          pollProbe expectMsg PollingTriggered
           messageProcessor ! flightListMessage
-
-          pollProbe.expectNoMessage(websocketConfig.throttleDuration)
-          pollProbe.expectMsg(PollingTriggered)
+          pollProbe expectNoMessage websocketConfig.throttleDuration
+          pollProbe expectMsg PollingTriggered
       }
     }
 
     "forward a JSON to source actor" when {
-
-      "a FlightListReceived message is received" in ResourceLoaner.withFixture {
+      "a correct FlightReceivedList message is received" in ResourceLoaner.withFixture {
         case Resource(websocketConfig, kafkaConfig, consumerFactory, _, sourceProbe) =>
           val messageProcessor =
             new FlightListMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
@@ -92,7 +84,7 @@ class FlightListMessageProcessorSpec
               FlightReceived(
                 DefaultIataNumber,
                 DefaultIcaoNumber,
-                GeographyInfo(DefaultLatitude, DefaultLongitude, DefaultAltitude, DefaultDirection),
+                GeographyInfo(DefaultInBoxLatitude, DefaultInBoxLongitude, DefaultAltitude, DefaultDirection),
                 DefaultSpeed,
                 AirportInfo(
                   DefaultCodeAirport1,
@@ -117,15 +109,88 @@ class FlightListMessageProcessorSpec
               )
             )
           )
-
           messageProcessor ! msg
-
-          val expectedResult = msg.toJson.toString
-
-          sourceProbe.expectMsg(expectedResult)
+          sourceProbe expectMsg msg.toJson.toString
       }
-
+      "the flights in the list are inside the box after its change" in ResourceLoaner.withFixture {
+        case Resource(websocketConfig, kafkaConfig, consumerFactory, _, sourceProbe) =>
+          val messageProcessor =
+            new FlightListMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
+          val msg = FlightReceivedList(
+            Seq(
+              FlightReceived(
+                DefaultIataNumber,
+                DefaultIcaoNumber,
+                GeographyInfo(DefaultChangedInBoxLatitude, DefaultChangedInBoxLongitude, DefaultAltitude, DefaultDirection),
+                DefaultSpeed,
+                AirportInfo(
+                  DefaultCodeAirport1,
+                  DefaultNameAirport1,
+                  DefaultNameCountry1,
+                  DefaultCodeIso2Country1,
+                  DefaultTimezone1,
+                  DefaultGmt1
+                ),
+                AirportInfo(
+                  DefaultCodeAirport2,
+                  DefaultNameAirport2,
+                  DefaultNameCountry2,
+                  DefaultCodeIso2Country2,
+                  DefaultTimezone2,
+                  DefaultGmt2
+                ),
+                AirlineInfo(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
+                AirplaneInfo(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
+                DefaultStatus,
+                DefaultUpdated
+              )
+            )
+          )
+          messageProcessor ! changedBox
+          messageProcessor ! msg
+          sourceProbe expectMsg msg.toJson.toString
+      }
     }
+
+    "forward an empty message to source actor" when {
+      "the flights in the list are out of the box" in ResourceLoaner.withFixture {
+        case Resource(websocketConfig, kafkaConfig, consumerFactory, _, sourceProbe) =>
+          val messageProcessor =
+            new FlightListMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
+          messageProcessor ! FlightReceivedList(
+            Seq(
+              FlightReceived(
+                DefaultIataNumber,
+                DefaultIcaoNumber,
+                GeographyInfo(DefaultOutBoxLatitude, DefaultOutBoxLongitude, DefaultAltitude, DefaultDirection),
+                DefaultSpeed,
+                AirportInfo(
+                  DefaultCodeAirport1,
+                  DefaultNameAirport1,
+                  DefaultNameCountry1,
+                  DefaultCodeIso2Country1,
+                  DefaultTimezone1,
+                  DefaultGmt1
+                ),
+                AirportInfo(
+                  DefaultCodeAirport2,
+                  DefaultNameAirport2,
+                  DefaultNameCountry2,
+                  DefaultCodeIso2Country2,
+                  DefaultTimezone2,
+                  DefaultGmt2
+                ),
+                AirlineInfo(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
+                AirplaneInfo(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
+                DefaultStatus,
+                DefaultUpdated
+              )
+            )
+          )
+          sourceProbe expectMsg FlightReceivedList(Seq()).toJson.toString
+      }
+    }
+
   }
 
   object ResourceLoaner extends FixtureLoanerAnyResult[Resource] {
