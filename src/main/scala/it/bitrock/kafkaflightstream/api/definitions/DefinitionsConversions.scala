@@ -20,6 +20,13 @@ import it.bitrock.kafkaflightstream.model.{
 }
 import spray.json._
 
+final case class CoordinatesBox(
+    leftHighLat: Double = 49.8,
+    leftHighLon: Double = -3.7,
+    rightLowLat: Double = 39.7,
+    rightLowLon: Double = 23.6
+)
+
 final case class GeographyInfo(latitude: Double, longitude: Double, altitude: Double, direction: Double)
 final case class AirportInfo(
     codeAirport: String,
@@ -132,6 +139,8 @@ object DefinitionsConversions {
 }
 
 trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
+
+  implicit val coordinatesBoxJsonFormat: RootJsonFormat[CoordinatesBox] = jsonFormat4(CoordinatesBox.apply)
 
   implicit val geographyInfoJsonFormat: RootJsonFormat[GeographyInfo]           = jsonFormat4(GeographyInfo.apply)
   implicit val airportInfoJsonFormat: RootJsonFormat[AirportInfo]               = jsonFormat6(AirportInfo.apply)
