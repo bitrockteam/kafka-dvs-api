@@ -20,12 +20,7 @@ import it.bitrock.kafkaflightstream.model.{
 }
 import spray.json._
 
-final case class CoordinatesBox(
-    leftHighLat: Double = 49.8,
-    leftHighLon: Double = -3.7,
-    rightLowLat: Double = 39.7,
-    rightLowLon: Double = 23.6
-)
+final case class CoordinatesBox(leftHighLat: Double, leftHighLon: Double, rightLowLat: Double, rightLowLon: Double)
 
 final case class GeographyInfo(latitude: Double, longitude: Double, altitude: Double, direction: Double)
 final case class AirportInfo(

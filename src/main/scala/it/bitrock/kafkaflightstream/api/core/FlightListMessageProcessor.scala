@@ -26,10 +26,13 @@ class FlightListMessageProcessor(
     kafkaConsumerWrapperFactory: KafkaConsumerWrapperFactory
 ) extends MessageProcessor {
 
+  val maxNumberFlights = 1000
+  val initialBox       = CoordinatesBox(49.8, -3.7, 39.7, 23.6)
+
   override val kafkaConsumerWrapper: KafkaConsumerWrapper =
     kafkaConsumerWrapperFactory.build(self, List(kafkaConfig.flightReceivedListTopic))
 
-  override def receive: Receive = boxing(CoordinatesBox())
+  override def receive: Receive = boxing(initialBox)
 
   def boxing(box: CoordinatesBox): Receive = {
 
@@ -58,7 +61,7 @@ class FlightListMessageProcessor(
         coordinate.longitude > box.leftHighLon &&
         coordinate.longitude < box.rightLowLon
       }
-      .take(1000)
+      .take(maxNumberFlights)
       .force
     FlightReceivedList(filteredList)
   }

@@ -6,7 +6,7 @@ import akka.http.scaladsl.model.Uri
 
 import scala.concurrent.duration.FiniteDuration
 
-case class KafkaConfig(
+final case class KafkaConfig(
     bootstrapServers: String,
     schemaRegistryUrl: URI,
     groupId: String,

@@ -1,12 +1,14 @@
 package it.bitrock.kafkaflightstream.api.routes
 
+import java.net.URI
+
 import akka.NotUsed
 import akka.actor.ActorRef
 import akka.http.scaladsl.model.Uri
 import akka.http.scaladsl.model.ws.{Message, TextMessage}
 import akka.http.scaladsl.testkit.{ScalatestRouteTest, WSProbe}
 import akka.stream.scaladsl.Flow
-import it.bitrock.kafkaflightstream.api.config.{KafkaConfig, WebsocketConfig}
+import it.bitrock.kafkaflightstream.api.config.{ConsumerConfig, KafkaConfig, KsqlConfig, WebsocketConfig}
 import it.bitrock.kafkaflightstream.api.core.FlightListMessageProcessorFactoryImpl
 import it.bitrock.kafkaflightstream.api.definitions.JsonSupport
 import it.bitrock.kafkaflightstream.api.kafka.{KafkaConsumerWrapper, KafkaConsumerWrapperFactory}
@@ -20,7 +22,7 @@ import org.scalatest.{Assertion, BeforeAndAfterAll}
 import org.scalatestplus.mockito.MockitoSugar._
 
 import scala.concurrent.duration._
-import scala.concurrent.{ExecutionContextExecutor, Future}
+import scala.concurrent.Future
 
 class FlowFactorySpec
     extends AsyncFixtureLoaner[FlowFactorySpec.Resource]
@@ -30,68 +32,72 @@ class FlowFactorySpec
     with JsonSupport
     with TestValues {
 
-  private implicit val ec: ExecutionContextExecutor = system.dispatcher
-
-  private val kafkaConsumerWrapper        = mock[KafkaConsumerWrapper]
-  private val kafkaConsumerWrapperFactory = mock[KafkaConsumerWrapperFactory]
-  private val websocketConfig = WebsocketConfig(
-    throttleDuration = 1.second,
-    cleanupDelay = 0.second,
-    pathPrefix = "path",
-    flightsPath = "flights",
-    flightListPath = "flight-list",
-    topElementsPath = "tops",
-    totalElementsPath = "totals",
-    ksqlPath = "ksql"
-  )
-  private val kafkaConfig = mock[KafkaConfig]
-  private val flightListMessageProcessorFactory =
-    new FlightListMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, kafkaConsumerWrapperFactory)
-  private val flightListFlowFactory: FlowFactory = new FlowFactoryImpl(flightListMessageProcessorFactory)
-
-  when(kafkaConsumerWrapperFactory.build(any[ActorRef], any[Seq[String]])).thenReturn(kafkaConsumerWrapper)
-
-  private val checkWebsocketAndSendTestMessage = { wsProbe: WSProbe =>
-    isWebSocketUpgrade shouldBe true
-
-    val msg = TextMessage.Strict("""
-                |{
-                |    "leftHighLat": 1,
-                |    "leftHighLon": 1,
-                |    "rightLowLat": 2,
-                |    "rightLowLon": 2
-                |}
-              """.stripMargin)
-    wsProbe.sendMessage(msg)
-    1 shouldBe 1
-  }
-
   "flow" should {
-
     "change the box" in withFixture {
       case Resource(routes, wsProbe, websocketConfig) =>
         WS(Uri(path = Uri.Path./(websocketConfig.pathPrefix)./(websocketConfig.flightListPath)), wsProbe.flow) ~> routes.streams ~> check {
-          checkWebsocketAndSendTestMessage(wsProbe)
+          isWebSocketUpgrade shouldBe true
+          val msg = TextMessage.Strict("""
+             |{
+             |    "leftHighLat": 1,
+             |    "leftHighLon": 1,
+             |    "rightLowLat": 2,
+             |    "rightLowLon": 2
+             |}
+          """.stripMargin)
+          wsProbe.sendMessage(msg)
+          1 shouldBe 1
         }
     }
   }
 
   override def withFixture(body: FlowFactorySpec.Resource => Future[Assertion]): Future[Assertion] = {
-    val wsProbe = WSProbe()
+
+    val websocketConfig = WebsocketConfig(
+      throttleDuration = 1.second,
+      cleanupDelay = 0.second,
+      pathPrefix = "path",
+      flightsPath = "flights",
+      flightListPath = "flight-list",
+      topElementsPath = "tops",
+      totalElementsPath = "totals",
+      ksqlPath = "ksql"
+    )
+    val kafkaConfig = KafkaConfig(
+      "",
+      URI.create("http://localhost:8080"),
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ConsumerConfig(1.second, Duration.Zero),
+      KsqlConfig(java.net.URI.create("http://www.example.com"), "")
+    )
+
+    val kafkaConsumerWrapper        = mock[KafkaConsumerWrapper]
+    val kafkaConsumerWrapperFactory = mock[KafkaConsumerWrapperFactory]
+    when(kafkaConsumerWrapperFactory.build(any[ActorRef], any[Seq[String]])).thenReturn(kafkaConsumerWrapper)
+
+    val flightListMessageProcessorFactory =
+      new FlightListMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, kafkaConsumerWrapperFactory)
+
     val flowFactories = Map(
       flightFlowFactoryKey     -> new TestFlowFactory,
-      flightListFlowFactoryKey -> flightListFlowFactory,
+      flightListFlowFactoryKey -> new FlowFactoryImpl(flightListMessageProcessorFactory),
       topsFlowFactoryKey       -> new TestFlowFactory,
       totalsFlowFactoryKey     -> new TestFlowFactory,
       ksqlFlowFactoryKey       -> new TestFlowFactory
     )
 
-    val routes = new Routes(flowFactories, websocketConfig)
-
     body(
       Resource(
-        routes,
-        wsProbe,
+        new Routes(flowFactories, websocketConfig),
+        WSProbe(),
         websocketConfig
       )
     )
