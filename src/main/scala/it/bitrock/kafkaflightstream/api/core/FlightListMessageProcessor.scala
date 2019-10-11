@@ -50,13 +50,16 @@ class FlightListMessageProcessor(
   }
 
   private def getBoxedFlights(flights: FlightReceivedList, box: CoordinatesBox): FlightReceivedList = {
-    val filteredList = flights.elements.filter { flight =>
-      val coordinate = flight.geography
-      coordinate.latitude < box.leftHighLat &&
-      coordinate.latitude > box.rightLowLat &&
-      coordinate.longitude > box.leftHighLon &&
-      coordinate.longitude < box.rightLowLon
-    }
+    val filteredList = flights.elements.view
+      .filter { flight =>
+        val coordinate = flight.geography
+        coordinate.latitude < box.leftHighLat &&
+        coordinate.latitude > box.rightLowLat &&
+        coordinate.longitude > box.leftHighLon &&
+        coordinate.longitude < box.rightLowLon
+      }
+      .take(1000)
+      .force
     FlightReceivedList(filteredList)
   }
 
