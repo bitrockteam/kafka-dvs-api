@@ -60,7 +60,8 @@ object Dependencies {
     "com.typesafe.akka"         %% "akka-stream-testkit"            % Versions.Akka,
     "io.github.embeddedkafka"   %% "embedded-kafka-schema-registry" % Versions.ConfluentPlatform,
     "it.bitrock.kafkageostream" %% "test-commons"                   % Versions.TestCommons,
-    "jakarta.ws.rs"             % "jakarta.ws.rs-api"               % Versions.JakartaWsRs // mandatory when javax.ws.rs-api gets excluded
+    "jakarta.ws.rs"             % "jakarta.ws.rs-api"               % Versions.JakartaWsRs, // mandatory when javax.ws.rs-api gets excluded
+    "org.mockito"               % "mockito-core"                    % "2.7.22"
   ).map(_ % s"$Test,$IntegrationTest")
 
   lazy val excludeDeps: Seq[ExclusionRule] = Seq(

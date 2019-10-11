@@ -33,13 +33,15 @@ class FlowFactoryImpl(processorFactory: MessageProcessorFactory, cleanUp: Option
       .toMat(BroadcastHub.sink)(Keep.both)
       .run()
 
+    val processor = processorFactory.build(sourceActorRef, identifier)
+
     val sink =
       Flow
         .fromFunction(parseMessage)
-        .collect { case Some(x) => x }
-        .to(Sink.actorRef(sourceActorRef, Terminated))
-
-    val processor = processorFactory.build(sourceActorRef, identifier)
+        .collect {
+          case Some(x) => x
+        }
+        .to(Sink.actorRef(processor, Terminated))
 
     logger.debug("Going to generate a flow")
 
@@ -64,13 +66,10 @@ class FlowFactoryImpl(processorFactory: MessageProcessorFactory, cleanUp: Option
     case TextMessage.Strict(txt) =>
       logger.debug(s"Got message: $txt")
       Try(txt.parseJson.convertTo[CoordinatesBox])
-        .fold(
-          e => {
-            logger.warn(s"Failed to parse JSON message $txt", e)
-            None
-          },
-          Option(_)
-        )
+        .fold(e => {
+          logger.warn(s"Failed to parse JSON message $txt", e)
+          None
+        }, Option(_))
     case m =>
       logger.trace(s"Got non-TextMessage, ignoring it: $m")
       None
