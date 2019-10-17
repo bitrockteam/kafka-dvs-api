@@ -1,17 +1,15 @@
 package it.bitrock.kafkaflightstream.api.core
 
-import akka.actor.{ActorRef, ActorSystem}
-import it.bitrock.kafkaflightstream.api.config.{KafkaConfig, WebsocketConfig}
-import it.bitrock.kafkaflightstream.api.kafka.KafkaConsumerWrapperFactory
+import akka.actor.{ActorRef, ActorRefFactory}
+import it.bitrock.kafkaflightstream.api.config.WebsocketConfig
 
 class FlightListMessageProcessorFactoryImpl(
     websocketConfig: WebsocketConfig,
-    kafkaConfig: KafkaConfig,
-    kafkaConsumerWrapperFactory: KafkaConsumerWrapperFactory
-)(implicit system: ActorSystem)
+    kafkaMessageProcessor: ActorRef
+)(implicit system: ActorRefFactory)
     extends MessageProcessorFactory {
 
   override def build(sourceActorRef: ActorRef, identifier: String = ""): ActorRef =
-    system.actorOf(FlightListMessageProcessor.props(sourceActorRef, websocketConfig, kafkaConfig, kafkaConsumerWrapperFactory))
+    system.actorOf(FlightListMessageProcessor.props(sourceActorRef, kafkaMessageProcessor, websocketConfig))
 
 }

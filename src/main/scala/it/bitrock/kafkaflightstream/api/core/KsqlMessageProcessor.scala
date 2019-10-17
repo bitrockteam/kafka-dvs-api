@@ -26,7 +26,8 @@ class KsqlMessageProcessor(
     val kafkaConfig: KafkaConfig,
     kafkaConsumerWrapperFactory: KafkaConsumerWrapperFactory,
     topic: String
-) extends MessageProcessor {
+) extends MessageProcessor
+    with KafkaMessageProcessor {
 
   override val kafkaConsumerWrapper: KafkaConsumerWrapper = kafkaConsumerWrapperFactory.build(self, List(topic))
 
