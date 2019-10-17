@@ -11,6 +11,7 @@ import scala.collection.JavaConverters._
 
 object KafkaConsumerWrapper {
   final case object NoMessage
+  final case object UpdateRequested
 }
 
 trait KafkaConsumerWrapper {

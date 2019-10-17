@@ -24,7 +24,8 @@ class TopsMessageProcessor(
     val websocketConfig: WebsocketConfig,
     val kafkaConfig: KafkaConfig,
     kafkaConsumerWrapperFactory: KafkaConsumerWrapperFactory
-) extends MessageProcessor {
+) extends MessageProcessor
+    with KafkaMessageProcessor {
 
   override val kafkaConsumerWrapper: KafkaConsumerWrapper =
     kafkaConsumerWrapperFactory.build(

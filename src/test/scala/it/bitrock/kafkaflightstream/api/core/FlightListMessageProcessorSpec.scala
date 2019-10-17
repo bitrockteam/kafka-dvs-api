@@ -27,58 +27,12 @@ class FlightListMessageProcessorSpec
 
   "Flight List Message Processor" should {
 
-    "trigger Kafka Consumer polling" when {
-      "it starts" in ResourceLoaner.withFixture {
-        case Resource(websocketConfig, kafkaConfig, consumerFactory, pollProbe, sourceProbe) =>
-          new FlightListMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
-          pollProbe expectMsg PollingTriggered
-      }
-      "a FlightReceivedList message is received, but only after a delay" in ResourceLoaner.withFixture {
-        case Resource(websocketConfig, kafkaConfig, consumerFactory, pollProbe, sourceProbe) =>
-          val messageProcessor =
-            new FlightListMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
-          val flightListMessage = FlightReceivedList(
-            Seq(
-              FlightReceived(
-                DefaultIataNumber,
-                DefaultIcaoNumber,
-                GeographyInfo(DefaultInBoxLatitude, DefaultInBoxLongitude, DefaultAltitude, DefaultDirection),
-                DefaultSpeed,
-                AirportInfo(
-                  DefaultCodeAirport1,
-                  DefaultNameAirport1,
-                  DefaultNameCountry1,
-                  DefaultCodeIso2Country1,
-                  DefaultTimezone1,
-                  DefaultGmt1
-                ),
-                AirportInfo(
-                  DefaultCodeAirport2,
-                  DefaultNameAirport2,
-                  DefaultNameCountry2,
-                  DefaultCodeIso2Country2,
-                  DefaultTimezone2,
-                  DefaultGmt2
-                ),
-                AirlineInfo(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
-                AirplaneInfo(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
-                DefaultStatus,
-                DefaultUpdated
-              )
-            )
-          )
-          pollProbe expectMsg PollingTriggered
-          messageProcessor ! flightListMessage
-          pollProbe expectNoMessage websocketConfig.throttleDuration
-          pollProbe expectMsg PollingTriggered
-      }
-    }
-
     "forward a JSON to source actor" when {
       "a correct FlightReceivedList message is received" in ResourceLoaner.withFixture {
         case Resource(websocketConfig, kafkaConfig, consumerFactory, _, sourceProbe) =>
+          val flightListKafkaMessageProcessor = FlightListKafkaMessageProcessor.build(kafkaConfig, consumerFactory)
           val messageProcessor =
-            new FlightListMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
+            new FlightListMessageProcessorFactoryImpl(websocketConfig, flightListKafkaMessageProcessor).build(sourceProbe.ref)
           val msg = FlightReceivedList(
             Seq(
               FlightReceived(
@@ -114,8 +68,9 @@ class FlightListMessageProcessorSpec
       }
       "the flights in the list are inside the box after its change" in ResourceLoaner.withFixture {
         case Resource(websocketConfig, kafkaConfig, consumerFactory, _, sourceProbe) =>
+          val flightListKafkaMessageProcessor = FlightListKafkaMessageProcessor.build(kafkaConfig, consumerFactory)
           val messageProcessor =
-            new FlightListMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
+            new FlightListMessageProcessorFactoryImpl(websocketConfig, flightListKafkaMessageProcessor).build(sourceProbe.ref)
           val msg = FlightReceivedList(
             Seq(
               FlightReceived(
@@ -155,8 +110,9 @@ class FlightListMessageProcessorSpec
     "forward an empty message to source actor" when {
       "the flights in the list are out of the box" in ResourceLoaner.withFixture {
         case Resource(websocketConfig, kafkaConfig, consumerFactory, _, sourceProbe) =>
+          val flightListKafkaMessageProcessor = FlightListKafkaMessageProcessor.build(kafkaConfig, consumerFactory)
           val messageProcessor =
-            new FlightListMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
+            new FlightListMessageProcessorFactoryImpl(websocketConfig, flightListKafkaMessageProcessor).build(sourceProbe.ref)
           messageProcessor ! FlightReceivedList(
             Seq(
               FlightReceived(
