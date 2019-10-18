@@ -26,7 +26,7 @@ class FlightMessageDispatcherSpec
 
   import FlightMessageDispatcherSpec._
 
-  "Flight Message Processor" should {
+  "Flight Message Dispatcher" should {
     "trigger Kafka Consumer polling" when {
 
       "it starts" in ResourceLoaner.withFixture {
@@ -38,13 +38,13 @@ class FlightMessageDispatcherSpec
 
       "a FlightReceived message is received, but only after a delay" in ResourceLoaner.withFixture {
         case Resource(websocketConfig, kafkaConfig, consumerFactory, pollProbe, sourceProbe) =>
-          val messageProcessor =
+          val messageDispatcher =
             new FlightMessageDispatcherFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
 
           // First message is sent when processor starts up
           pollProbe.expectMsg(PollingTriggered)
 
-          messageProcessor ! FlightReceived(
+          messageDispatcher ! FlightReceived(
             DefaultIataNumber,
             DefaultIcaoNumber,
             GeographyInfo(DefaultLatitude, DefaultLongitude, DefaultAltitude, DefaultDirection),
@@ -81,7 +81,7 @@ class FlightMessageDispatcherSpec
 
       "a FlightReceived message is received" in ResourceLoaner.withFixture {
         case Resource(websocketConfig, kafkaConfig, consumerFactory, _, sourceProbe) =>
-          val messageProcessor =
+          val messageDispatcher =
             new FlightMessageDispatcherFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
           val msg = FlightReceived(
             DefaultIataNumber,
@@ -110,7 +110,7 @@ class FlightMessageDispatcherSpec
             DefaultUpdated
           )
 
-          messageProcessor ! msg
+          messageDispatcher ! msg
 
           val expectedResult = msg.toJson.toString
 

@@ -28,7 +28,7 @@ class KsqlMessageDispatcherSpec
 
   private val topic: String = "test_topic_" + Random.nextLong
 
-  "Ksql Message Processor" should {
+  "Ksql Message Dispatcher" should {
     "trigger Kafka Consumer polling" when {
 
       "it starts" in ResourceLoaner.withFixture {
@@ -40,13 +40,13 @@ class KsqlMessageDispatcherSpec
 
       "a KsqlReceived message is received, but only after a delay" in ResourceLoaner.withFixture {
         case Resource(websocketConfig, kafkaConfig, consumerFactory, pollProbe, sourceProbe) =>
-          val messageProcessor =
+          val messageDispatcher =
             new KsqlMessageDispatcherFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref, topic)
 
           // First message is sent when processor starts up
           pollProbe.expectMsg(PollingTriggered)
 
-          messageProcessor ! KsqlStreamDataResponse(DefaultKsqlMessage.toString)
+          messageDispatcher ! KsqlStreamDataResponse(DefaultKsqlMessage.toString)
 
           pollProbe.expectNoMessage(websocketConfig.throttleDuration)
           pollProbe.expectMsg(PollingTriggered)
@@ -58,11 +58,11 @@ class KsqlMessageDispatcherSpec
 
       "a KsqlReceived message is received" in ResourceLoaner.withFixture {
         case Resource(websocketConfig, kafkaConfig, consumerFactory, _, sourceProbe) =>
-          val messageProcessor =
+          val messageDispatcher =
             new KsqlMessageDispatcherFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref, topic)
           val msg = KsqlStreamDataResponse(DefaultKsqlMessage.toString)
 
-          messageProcessor ! msg
+          messageDispatcher ! msg
 
           val expectedResult = msg.toJson.toString
 
