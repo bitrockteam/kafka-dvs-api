@@ -36,6 +36,12 @@ class TotalsMessageDispatcher(
 
   }
 
+  override def preStart(): Unit = {
+    super.preStart()
+    self ! TotalFlightUpdate
+    self ! TotalAirlineUpdate
+  }
+
 }
 
 object TotalsMessageDispatcher {
