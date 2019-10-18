@@ -1,7 +1,5 @@
 package it.bitrock.kafkaflightstream.api.config
 
-import akka.http.scaladsl.model.Uri
-
 import scala.concurrent.duration.FiniteDuration
 
 final case class ServerConfig(
@@ -17,9 +15,5 @@ final case class WebsocketConfig(
     flightsPath: String,
     flightListPath: String,
     topElementsPath: String,
-    totalElementsPath: String,
-    ksqlPath: String
-) {
-  def pathForStream(streamName: String): String =
-    Uri.Path(pathPrefix)./(ksqlPath)./(streamName).toString
-}
+    totalElementsPath: String
+)

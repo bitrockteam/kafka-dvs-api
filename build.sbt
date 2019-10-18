@@ -1,5 +1,5 @@
 import Dependencies._
-import ReleaseTransformations._
+import sbtrelease.ReleasePlugin.autoImport.ReleaseTransformations._
 
 lazy val commonSettings = Seq(
   organization := "it.bitrock.kafkaflightstream",
@@ -9,8 +9,7 @@ lazy val commonSettings = Seq(
 lazy val apiModelsCompileSettings = Seq(
   Compile / guardrailTasks := List(
     ScalaServer((Compile / resourceDirectory).value / "api.yaml", pkg = "it.bitrock.kafkaflightstream.api.routes"),
-    ScalaClient((Compile / resourceDirectory).value / "api.yaml", pkg = "it.bitrock.kafkaflightstream.api.routes"),
-    ScalaClient((Compile / resourceDirectory).value / "ksql-server.yaml", pkg = "it.bitrock.kafkaflightstream.api.client.ksqlserver")
+    ScalaClient((Compile / resourceDirectory).value / "api.yaml", pkg = "it.bitrock.kafkaflightstream.api.routes")
   )
 )
 

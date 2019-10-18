@@ -71,8 +71,7 @@ class FlowFactorySpec
       flightsPath = "flights",
       flightListPath = "flight-list",
       topElementsPath = "tops",
-      totalElementsPath = "totals",
-      ksqlPath = "ksql"
+      totalElementsPath = "totals"
     )
 
     val kafkaConsumerWrapper        = mock[KafkaConsumerWrapper]
@@ -86,8 +85,7 @@ class FlowFactorySpec
       flightFlowFactoryKey     -> new TestFlowFactory,
       flightListFlowFactoryKey -> new FlowFactoryImpl(flightListMessageProcessorFactory),
       topsFlowFactoryKey       -> new TestFlowFactory,
-      totalsFlowFactoryKey     -> new TestFlowFactory,
-      ksqlFlowFactoryKey       -> new TestFlowFactory
+      totalsFlowFactoryKey     -> new TestFlowFactory
     )
 
     body(

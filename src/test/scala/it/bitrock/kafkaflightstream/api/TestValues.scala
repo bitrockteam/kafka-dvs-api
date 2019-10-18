@@ -97,9 +97,7 @@ trait TestValues {
   final val DefaultCountAirlineAmount = Random.nextLong
   final val DefaultStartTimeWindow    = Random.nextString(10)
 
-  final val DefaultTimestamp    = Instant.now
-  final val DefaultKsqlMessage  = XY(DefaultTimestamp.toEpochMilli, DefaultLatitude)
-  final val DefaultKsqlMessage2 = XY(DefaultTimestamp.toEpochMilli, DefaultLongitude)
+  final val DefaultTimestamp = Instant.now
 
   final val DefaultCurrentStatusRequest     = Random.nextString(10)
   final val DefaultSourceDescriptionRequest = Random.nextString(10)

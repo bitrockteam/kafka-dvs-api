@@ -4,7 +4,6 @@ import akka.actor.{ActorSystem, Scheduler}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
 import akka.http.scaladsl.server.Route
-import akka.http.scaladsl.server.RouteConcatenation._
 import akka.stream.ActorMaterializer
 import com.typesafe.scalalogging.LazyLogging
 import it.bitrock.kafkaflightstream.api.config.AppConfig
@@ -12,7 +11,6 @@ import it.bitrock.kafkaflightstream.api.core._
 import it.bitrock.kafkaflightstream.api.core.poller._
 import it.bitrock.kafkaflightstream.api.kafka.KafkaConsumerWrapperFactory._
 import it.bitrock.kafkaflightstream.api.routes._
-import it.bitrock.kafkaflightstream.api.services._
 import it.bitrock.kafkaflightstream.tags.FlowFactoryKey
 import it.bitrock.kafkaflightstream.tags.TaggedTypes._
 
@@ -33,12 +31,7 @@ object Main extends App with LazyLogging {
   implicit val materializer: ActorMaterializer = ActorMaterializer()
   lazy val scheduler: Scheduler                = system.scheduler
 
-  val httpClientFactory                        = new HttpClientFactoryImpl
-  val ksqlClientFactory: KsqlClientFactoryImpl = new KsqlClientFactoryImpl(httpClientFactory)
-  val ksqlOps                                  = new KsqlOpsImpl(ksqlClientFactory)
-  val internalsService                         = new InternalsService
-  val ksqlService                              = new KsqlService(ksqlOps, config.server.websocket)
-  val sessionService                           = new SessionService(ksqlOps)
+  val httpClientFactory = new HttpClientFactoryImpl
 
   val flightKafkaConsumerWrapperFactory = flightKafkaConsumerFactory(config.kafka)
   val flightMessageDispatcherFactory =
@@ -61,28 +54,16 @@ object Main extends App with LazyLogging {
   val totalsMessageDispatcherFactory    = new TotalsMessageDispatcherFactoryImpl(config.server.websocket, totalsKafkaPollerCache)
   val totalsFlowFactory                 = new FlowFactoryImpl(totalsMessageDispatcherFactory)
 
-  val ksqlKafkaConsumerWrapperFactory = ksqlKafkaConsumerFactory(config.kafka)
-  val ksqlMessageProcessorFactory =
-    new KsqlMessageDispatcherFactoryImpl(config.server.websocket, config.kafka, ksqlKafkaConsumerWrapperFactory)
-  val ksqlFlowFactory = new FlowFactoryImpl(
-    ksqlMessageProcessorFactory,
-    Option(
-      streamId => scheduler.scheduleOnce(config.server.websocket.cleanupDelay)(ksqlOps.cleanSession(IndexedSeq(streamId)))
-    )
-  )
-
   val flowFactories: Map[FlowFactoryKey, FlowFactory] =
     Map(
       flightFlowFactoryKey     -> flightFlowFactory,
       flightListFlowFactoryKey -> flightListFlowFactory,
       topsFlowFactoryKey       -> topsFlowFactory,
-      totalsFlowFactoryKey     -> totalsFlowFactory,
-      ksqlFlowFactoryKey       -> ksqlFlowFactory
+      totalsFlowFactoryKey     -> totalsFlowFactory
     )
 
   val api: Route                           = new Routes(flowFactories, config.server.websocket).routes
-  val apiRest: Route                       = new RestRoutes(internalsService, ksqlService, sessionService).routes
-  val bindingFuture: Future[ServerBinding] = Http().bindAndHandle(api ~ apiRest, host, port)
+  val bindingFuture: Future[ServerBinding] = Http().bindAndHandle(api, host, port)
 
   bindingFuture.map { serverBinding =>
     logger.info(s"Exposing to ${serverBinding.localAddress}")

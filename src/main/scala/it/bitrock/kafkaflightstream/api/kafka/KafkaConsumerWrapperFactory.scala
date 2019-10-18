@@ -3,7 +3,6 @@ package it.bitrock.kafkaflightstream.api.kafka
 import akka.actor.ActorRef
 import it.bitrock.kafkaflightstream.api.config.KafkaConfig
 import it.bitrock.kafkaflightstream.api.definitions.DefinitionsConversions._
-import it.bitrock.kafkaflightstream.api.definitions.KsqlStreamDataResponse
 import it.bitrock.kafkaflightstream.model._
 import it.bitrock.kafkageostream.kafkacommons.serialization.AvroSerdes.serdeFrom
 import org.apache.avro.specific.SpecificRecord
@@ -61,14 +60,5 @@ object KafkaConsumerWrapperFactory {
             case countAirline: CountAirline => countAirline.toCountAirline
           }
       ) (byteArrayDeserializer, serdeFrom[SpecificRecord](kafkaConfig.schemaRegistryUrl).deserializer)
-
-  def ksqlKafkaConsumerFactory(kafkaConfig: KafkaConfig): KafkaConsumerWrapperFactory =
-    (processor: ActorRef, topics: Seq[String]) =>
-      new KafkaConsumerWrapperImpl(
-        kafkaConfig,
-        processor,
-        topics,
-        (value: String) => KsqlStreamDataResponse(value)
-      ) (byteArrayDeserializer, Serdes.String.deserializer)
 
 }
