@@ -3,7 +3,6 @@ package it.bitrock.kafkaflightstream.api.services
 import java.io.IOException
 
 import akka.http.scaladsl.model.{HttpHeader, HttpResponse, StatusCodes}
-import it.bitrock.kafkaflightstream.api.{BaseAsyncSpec, TestValues}
 import it.bitrock.kafkaflightstream.api.client.ksqlserver.definitions.{
   CommandStatus,
   Query,
@@ -23,6 +22,7 @@ import it.bitrock.kafkaflightstream.api.services.models.Response.{
   InternalServerErrorResponse,
   NoContentResponse
 }
+import it.bitrock.kafkaflightstream.api.{BaseAsyncSpec, TestValues}
 
 import scala.concurrent.Future
 

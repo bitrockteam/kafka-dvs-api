@@ -1,10 +1,10 @@
 package it.bitrock.kafkaflightstream
 
 import it.bitrock.kafkaflightstream.api.routes.FlowFactory
-
-import scala.concurrent.duration.FiniteDuration
 import shapeless.tag
 import shapeless.tag.@@
+
+import scala.concurrent.duration.FiniteDuration
 
 package object api {
 

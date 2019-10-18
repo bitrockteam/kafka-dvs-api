@@ -1,13 +1,14 @@
-package it.bitrock.kafkaflightstream.api.core
+package it.bitrock.kafkaflightstream.api.core.poller
 
 import akka.actor.{ActorRef, PoisonPill, Props, Terminated}
 import it.bitrock.kafkaflightstream.api.config.{KafkaConfig, WebsocketConfig}
+import it.bitrock.kafkaflightstream.api.core.dispatcher.MessageDispatcher
 import it.bitrock.kafkaflightstream.api.definitions.KsqlStreamDataResponse
 import it.bitrock.kafkaflightstream.api.kafka.KafkaConsumerWrapper.NoMessage
 import it.bitrock.kafkaflightstream.api.kafka.{KafkaConsumerWrapper, KafkaConsumerWrapperFactory}
 import spray.json._
 
-object KsqlMessageProcessor {
+object KsqlPoller {
 
   def props(
       sourceActorRef: ActorRef,
@@ -16,18 +17,18 @@ object KsqlMessageProcessor {
       kafkaConsumerWrapperFactory: KafkaConsumerWrapperFactory,
       topic: String
   ): Props =
-    Props(new KsqlMessageProcessor(sourceActorRef, websocketConfig, kafkaConfig, kafkaConsumerWrapperFactory, topic))
+    Props(new KsqlPoller(sourceActorRef, websocketConfig, kafkaConfig, kafkaConsumerWrapperFactory, topic))
 
 }
 
-class KsqlMessageProcessor(
+class KsqlPoller(
     val sourceActorRef: ActorRef,
     val websocketConfig: WebsocketConfig,
     val kafkaConfig: KafkaConfig,
     kafkaConsumerWrapperFactory: KafkaConsumerWrapperFactory,
     topic: String
-) extends MessageProcessor
-    with KafkaMessageProcessor {
+) extends MessageDispatcher
+    with KafkaPoller {
 
   override val kafkaConsumerWrapper: KafkaConsumerWrapper = kafkaConsumerWrapperFactory.build(self, List(topic))
 

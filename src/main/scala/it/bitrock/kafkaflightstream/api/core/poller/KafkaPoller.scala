@@ -1,11 +1,11 @@
-package it.bitrock.kafkaflightstream.api.core
+package it.bitrock.kafkaflightstream.api.core.poller
 
 import akka.actor.Actor
 import com.typesafe.scalalogging.LazyLogging
 import it.bitrock.kafkaflightstream.api.config.KafkaConfig
 import it.bitrock.kafkaflightstream.api.kafka.KafkaConsumerWrapper
 
-trait KafkaMessageProcessor extends Actor with LazyLogging {
+trait KafkaPoller extends Actor with LazyLogging {
 
   import context.dispatcher
 

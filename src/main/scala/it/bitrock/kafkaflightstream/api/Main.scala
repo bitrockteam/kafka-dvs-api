@@ -9,6 +9,7 @@ import akka.stream.ActorMaterializer
 import com.typesafe.scalalogging.LazyLogging
 import it.bitrock.kafkaflightstream.api.config.AppConfig
 import it.bitrock.kafkaflightstream.api.core._
+import it.bitrock.kafkaflightstream.api.core.poller.{FlightListKafkaPollerCache, TotalsKafkaPollerCache}
 import it.bitrock.kafkaflightstream.api.kafka.KafkaConsumerWrapperFactory._
 import it.bitrock.kafkaflightstream.api.routes._
 import it.bitrock.kafkaflightstream.api.services._
@@ -40,29 +41,29 @@ object Main extends App with LazyLogging {
   val sessionService                           = new SessionService(ksqlOps)
 
   val flightKafkaConsumerWrapperFactory = flightKafkaConsumerFactory(config.kafka)
-  val flightMessageProcessorFactory =
-    new FlightMessageProcessorFactoryImpl(config.server.websocket, config.kafka, flightKafkaConsumerWrapperFactory)
-  val flightFlowFactory = new FlowFactoryImpl(flightMessageProcessorFactory)
+  val flightMessageDispatcherFactory =
+    new FlightMessageDispatcherFactoryImpl(config.server.websocket, config.kafka, flightKafkaConsumerWrapperFactory)
+  val flightFlowFactory = new FlowFactoryImpl(flightMessageDispatcherFactory)
 
   val flightListKafkaConsumerWrapperFactory = flightListKafkaConsumerFactory(config.kafka)
-  val flightListKafkaMessageProcessor       = FlightListKafkaMessageProcessor.build(config.kafka, flightListKafkaConsumerWrapperFactory)
-  val flightListMessageProcessorFactory =
-    new FlightListMessageProcessorFactoryImpl(config.server.websocket, flightListKafkaMessageProcessor)
-  val flightListFlowFactory = new FlightListFlowFactory(flightListMessageProcessorFactory)
+  val flightListKafkaMessagePollerCache     = FlightListKafkaPollerCache.build(config.kafka, flightListKafkaConsumerWrapperFactory)
+  val flightListMessageDispatcherFactory =
+    new FlightListMessageDispatcherFactoryImpl(config.server.websocket, flightListKafkaMessagePollerCache)
+  val flightListFlowFactory = new FlightListFlowFactory(flightListMessageDispatcherFactory)
 
   val topsKafkaConsumerWrapperFactory = topsKafkaConsumerFactory(config.kafka)
-  val topsMessageProcessorFactory =
-    new TopsMessageProcessorFactoryImpl(config.server.websocket, config.kafka, topsKafkaConsumerWrapperFactory)
-  val topsFlowFactory = new FlowFactoryImpl(topsMessageProcessorFactory)
+  val topsMessageDispatcherFactory =
+    new TopsMessageDispatcherFactoryImpl(config.server.websocket, config.kafka, topsKafkaConsumerWrapperFactory)
+  val topsFlowFactory = new FlowFactoryImpl(topsMessageDispatcherFactory)
 
   val totalsKafkaConsumerWrapperFactory = totalsKafkaConsumerFactory(config.kafka)
-  val totalsMessageProcessorFactory =
-    new TotalsMessageProcessorFactoryImpl(config.server.websocket, config.kafka, totalsKafkaConsumerWrapperFactory)
-  val totalsFlowFactory = new FlowFactoryImpl(totalsMessageProcessorFactory)
+  val totalsKafkaPollerCache            = TotalsKafkaPollerCache.build(config.kafka, totalsKafkaConsumerWrapperFactory)
+  val totalsMessageDispatcherFactory    = new TotalsMessageDispatcherFactoryImpl(config.server.websocket, totalsKafkaPollerCache)
+  val totalsFlowFactory                 = new FlowFactoryImpl(totalsMessageDispatcherFactory)
 
   val ksqlKafkaConsumerWrapperFactory = ksqlKafkaConsumerFactory(config.kafka)
   val ksqlMessageProcessorFactory =
-    new KsqlMessageProcessorFactoryImpl(config.server.websocket, config.kafka, ksqlKafkaConsumerWrapperFactory)
+    new KsqlMessageDispatcherFactoryImpl(config.server.websocket, config.kafka, ksqlKafkaConsumerWrapperFactory)
   val ksqlFlowFactory = new FlowFactoryImpl(
     ksqlMessageProcessorFactory,
     Option(

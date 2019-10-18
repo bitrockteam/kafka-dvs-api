@@ -2,14 +2,15 @@ package it.bitrock.kafkaflightstream.api.core
 
 import akka.actor.{ActorRef, ActorRefFactory}
 import it.bitrock.kafkaflightstream.api.config.WebsocketConfig
+import it.bitrock.kafkaflightstream.api.core.dispatcher.FlightListMessageDispatcher
 
-class FlightListMessageProcessorFactoryImpl(
+class FlightListMessageDispatcherFactoryImpl(
     websocketConfig: WebsocketConfig,
-    kafkaMessageProcessor: ActorRef
+    kafkaMessageDispatcher: ActorRef
 )(implicit system: ActorRefFactory)
-    extends MessageProcessorFactory {
+    extends MessageDispatcherFactory {
 
   override def build(sourceActorRef: ActorRef, identifier: String = ""): ActorRef =
-    system.actorOf(FlightListMessageProcessor.props(sourceActorRef, kafkaMessageProcessor, websocketConfig))
+    system.actorOf(FlightListMessageDispatcher.props(sourceActorRef, kafkaMessageDispatcher, websocketConfig))
 
 }

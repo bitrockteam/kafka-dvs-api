@@ -6,7 +6,7 @@ import akka.http.scaladsl.model.ws.{Message, TextMessage}
 import akka.stream.scaladsl.{BroadcastHub, Flow, Keep, Sink, Source}
 import akka.stream.{ActorMaterializer, OverflowStrategy}
 import com.typesafe.scalalogging.LazyLogging
-import it.bitrock.kafkaflightstream.api.core.MessageProcessorFactory
+import it.bitrock.kafkaflightstream.api.core.MessageDispatcherFactory
 
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
@@ -15,7 +15,7 @@ trait FlowFactory {
   def flow(identifier: String): Flow[Message, Message, NotUsed]
 }
 
-class FlowFactoryImpl(processorFactory: MessageProcessorFactory, cleanUp: Option[String => Any] = None)(
+class FlowFactoryImpl(processorFactory: MessageDispatcherFactory, cleanUp: Option[String => Any] = None)(
     implicit ec: ExecutionContext,
     materializer: ActorMaterializer
 ) extends FlowFactory

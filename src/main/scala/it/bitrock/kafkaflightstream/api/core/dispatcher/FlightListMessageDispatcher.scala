@@ -1,25 +1,16 @@
-package it.bitrock.kafkaflightstream.api.core
+package it.bitrock.kafkaflightstream.api.core.dispatcher
 
 import akka.actor.{ActorRef, PoisonPill, Props, Terminated}
 import it.bitrock.kafkaflightstream.api.config.WebsocketConfig
 import it.bitrock.kafkaflightstream.api.definitions._
-import it.bitrock.kafkaflightstream.api.kafka.KafkaConsumerWrapper.UpdateRequested
+import it.bitrock.kafkaflightstream.api.kafka.KafkaConsumerWrapper.FlightListUpdate
 import spray.json._
 
-object FlightListMessageProcessor {
-  def props(
-      sourceActorRef: ActorRef,
-      kafkaMessageProcessor: ActorRef,
-      websocketConfig: WebsocketConfig
-  ): Props =
-    Props(new FlightListMessageProcessor(sourceActorRef, kafkaMessageProcessor, websocketConfig))
-}
-
-class FlightListMessageProcessor(
+class FlightListMessageDispatcher(
     val sourceActorRef: ActorRef,
     kafkaMessageProcessor: ActorRef,
     val websocketConfig: WebsocketConfig
-) extends MessageProcessor {
+) extends MessageDispatcher {
 
   import context.dispatcher
   val maxNumberFlights = 1000
@@ -31,9 +22,9 @@ class FlightListMessageProcessor(
 
     case Terminated => self ! PoisonPill
 
-    case UpdateRequested =>
-      kafkaMessageProcessor ! UpdateRequested
-      context.system.scheduler.scheduleOnce(websocketConfig.throttleDuration)(self ! UpdateRequested)
+    case FlightListUpdate =>
+      kafkaMessageProcessor ! FlightListUpdate
+      context.system.scheduler.scheduleOnce(websocketConfig.throttleDuration)(self ! FlightListUpdate)
 
     case flights: FlightReceivedList =>
       logger.debug(s"Got a $flights from Kafka Consumer")
@@ -41,7 +32,7 @@ class FlightListMessageProcessor(
 
     case box: CoordinatesBox =>
       context.become(boxing(box))
-      self ! UpdateRequested
+      self ! FlightListUpdate
 
   }
 
@@ -59,4 +50,13 @@ class FlightListMessageProcessor(
     FlightReceivedList(filteredList)
   }
 
+}
+
+object FlightListMessageDispatcher {
+  def props(
+      sourceActorRef: ActorRef,
+      kafkaMessageProcessor: ActorRef,
+      websocketConfig: WebsocketConfig
+  ): Props =
+    Props(new FlightListMessageDispatcher(sourceActorRef, kafkaMessageProcessor, websocketConfig))
 }

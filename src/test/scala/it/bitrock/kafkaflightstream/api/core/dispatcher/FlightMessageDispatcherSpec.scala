@@ -1,10 +1,11 @@
-package it.bitrock.kafkaflightstream.api.core
+package it.bitrock.kafkaflightstream.api.core.dispatcher
 
 import java.net.URI
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{ImplicitSender, TestKit, TestProbe}
 import it.bitrock.kafkaflightstream.api.config.{ConsumerConfig, KafkaConfig, KsqlConfig, WebsocketConfig}
+import it.bitrock.kafkaflightstream.api.core.FlightMessageDispatcherFactoryImpl
 import it.bitrock.kafkaflightstream.api.definitions._
 import it.bitrock.kafkaflightstream.api.kafka.{KafkaConsumerWrapper, KafkaConsumerWrapperFactory}
 import it.bitrock.kafkaflightstream.api.{BaseSpec, TestValues}
@@ -15,37 +16,60 @@ import spray.json._
 import scala.concurrent.duration._
 import scala.util.Random
 
-class KsqlMessageProcessorSpec
-    extends TestKit(ActorSystem("KsqlMessageProcessorSpec"))
+class FlightMessageDispatcherSpec
+    extends TestKit(ActorSystem("FlightMessageProcessorSpec"))
     with BaseSpec
     with ImplicitSender
     with BeforeAndAfterAll
     with JsonSupport
     with TestValues {
 
-  import KsqlMessageProcessorSpec._
+  import FlightMessageDispatcherSpec._
 
-  private val topic: String = "test_topic_" + Random.nextLong
-
-  "Ksql Message Processor" should {
+  "Flight Message Dispatcher" should {
     "trigger Kafka Consumer polling" when {
 
       "it starts" in ResourceLoaner.withFixture {
         case Resource(websocketConfig, kafkaConfig, consumerFactory, pollProbe, sourceProbe) =>
-          new KsqlMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref, topic)
+          new FlightMessageDispatcherFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
 
           pollProbe.expectMsg(PollingTriggered)
       }
 
-      "a KsqlReceived message is received, but only after a delay" in ResourceLoaner.withFixture {
+      "a FlightReceived message is received, but only after a delay" in ResourceLoaner.withFixture {
         case Resource(websocketConfig, kafkaConfig, consumerFactory, pollProbe, sourceProbe) =>
-          val messageProcessor =
-            new KsqlMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref, topic)
+          val messageDispatcher =
+            new FlightMessageDispatcherFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
 
           // First message is sent when processor starts up
           pollProbe.expectMsg(PollingTriggered)
 
-          messageProcessor ! KsqlStreamDataResponse(DefaultKsqlMessage.toString)
+          messageDispatcher ! FlightReceived(
+            DefaultIataNumber,
+            DefaultIcaoNumber,
+            GeographyInfo(DefaultLatitude, DefaultLongitude, DefaultAltitude, DefaultDirection),
+            DefaultSpeed,
+            AirportInfo(
+              DefaultCodeAirport1,
+              DefaultNameAirport1,
+              DefaultNameCountry1,
+              DefaultCodeIso2Country1,
+              DefaultTimezone1,
+              DefaultGmt1
+            ),
+            AirportInfo(
+              DefaultCodeAirport2,
+              DefaultNameAirport2,
+              DefaultNameCountry2,
+              DefaultCodeIso2Country2,
+              DefaultTimezone2,
+              DefaultGmt2
+            ),
+            AirlineInfo(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
+            AirplaneInfo(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
+            DefaultStatus,
+            DefaultUpdated
+          )
 
           pollProbe.expectNoMessage(websocketConfig.throttleDuration)
           pollProbe.expectMsg(PollingTriggered)
@@ -55,13 +79,38 @@ class KsqlMessageProcessorSpec
 
     "forward a JSON to source actor" when {
 
-      "a KsqlReceived message is received" in ResourceLoaner.withFixture {
+      "a FlightReceived message is received" in ResourceLoaner.withFixture {
         case Resource(websocketConfig, kafkaConfig, consumerFactory, _, sourceProbe) =>
-          val messageProcessor =
-            new KsqlMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref, topic)
-          val msg = KsqlStreamDataResponse(DefaultKsqlMessage.toString)
+          val messageDispatcher =
+            new FlightMessageDispatcherFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
+          val msg = FlightReceived(
+            DefaultIataNumber,
+            DefaultIcaoNumber,
+            GeographyInfo(DefaultLatitude, DefaultLongitude, DefaultAltitude, DefaultDirection),
+            DefaultSpeed,
+            AirportInfo(
+              DefaultCodeAirport1,
+              DefaultNameAirport1,
+              DefaultNameCountry1,
+              DefaultCodeIso2Country1,
+              DefaultTimezone1,
+              DefaultGmt1
+            ),
+            AirportInfo(
+              DefaultCodeAirport2,
+              DefaultNameAirport2,
+              DefaultNameCountry2,
+              DefaultCodeIso2Country2,
+              DefaultTimezone2,
+              DefaultGmt2
+            ),
+            AirlineInfo(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
+            AirplaneInfo(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
+            DefaultStatus,
+            DefaultUpdated
+          )
 
-          messageProcessor ! msg
+          messageDispatcher ! msg
 
           val expectedResult = msg.toJson.toString
 
@@ -114,7 +163,7 @@ class KsqlMessageProcessorSpec
 
 }
 
-object KsqlMessageProcessorSpec {
+object FlightMessageDispatcherSpec {
 
   final case class Resource(
       websocketConfig: WebsocketConfig,
@@ -128,7 +177,7 @@ object KsqlMessageProcessorSpec {
 
   class TestKafkaConsumerWrapperFactory(pollActorRef: ActorRef) extends KafkaConsumerWrapperFactory {
 
-    override def build(processor: ActorRef, topics: Seq[String]): KafkaConsumerWrapper = new KafkaConsumerWrapper {
+    override def build(processor: ActorRef, topics: Seq[String] = List()): KafkaConsumerWrapper = new KafkaConsumerWrapper {
 
       override def pollMessages(): Unit =
         pollActorRef ! PollingTriggered

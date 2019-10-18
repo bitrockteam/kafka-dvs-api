@@ -1,13 +1,15 @@
-package it.bitrock.kafkaflightstream.api.core
+package it.bitrock.kafkaflightstream.api.core.dispatcher
 
 import java.net.URI
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{ImplicitSender, TestKit, TestProbe}
 import it.bitrock.kafkaflightstream.api.config.{ConsumerConfig, KafkaConfig, KsqlConfig, WebsocketConfig}
-import it.bitrock.kafkaflightstream.api.{BaseSpec, TestValues}
+import it.bitrock.kafkaflightstream.api.core.FlightListMessageDispatcherFactoryImpl
+import it.bitrock.kafkaflightstream.api.core.poller.FlightListKafkaPollerCache
 import it.bitrock.kafkaflightstream.api.definitions._
 import it.bitrock.kafkaflightstream.api.kafka.{KafkaConsumerWrapper, KafkaConsumerWrapperFactory}
+import it.bitrock.kafkaflightstream.api.{BaseSpec, TestValues}
 import it.bitrock.kafkageostream.testcommons.FixtureLoanerAnyResult
 import org.scalatest.BeforeAndAfterAll
 import spray.json._
@@ -15,24 +17,24 @@ import spray.json._
 import scala.concurrent.duration._
 import scala.util.Random
 
-class FlightListMessageProcessorSpec
-    extends TestKit(ActorSystem("FlightMessageProcessorSpec"))
+class FlightListMessageDispatcherSpec
+    extends TestKit(ActorSystem("FlightMessageDispatcherSpec"))
     with BaseSpec
     with ImplicitSender
     with BeforeAndAfterAll
     with JsonSupport
     with TestValues {
 
-  import FlightListMessageProcessorSpec._
+  import FlightListMessageDispatcherSpec._
 
-  "Flight List Message Processor" should {
+  "Flight List Message Dispatcher" should {
 
     "forward a JSON to source actor" when {
       "a correct FlightReceivedList message is received" in ResourceLoaner.withFixture {
         case Resource(websocketConfig, kafkaConfig, consumerFactory, _, sourceProbe) =>
-          val flightListKafkaMessageProcessor = FlightListKafkaMessageProcessor.build(kafkaConfig, consumerFactory)
+          val flightListKafkaMessageProcessor = FlightListKafkaPollerCache.build(kafkaConfig, consumerFactory)
           val messageProcessor =
-            new FlightListMessageProcessorFactoryImpl(websocketConfig, flightListKafkaMessageProcessor).build(sourceProbe.ref)
+            new FlightListMessageDispatcherFactoryImpl(websocketConfig, flightListKafkaMessageProcessor).build(sourceProbe.ref)
           val msg = FlightReceivedList(
             Seq(
               FlightReceived(
@@ -68,9 +70,9 @@ class FlightListMessageProcessorSpec
       }
       "the flights in the list are inside the box after its change" in ResourceLoaner.withFixture {
         case Resource(websocketConfig, kafkaConfig, consumerFactory, _, sourceProbe) =>
-          val flightListKafkaMessageProcessor = FlightListKafkaMessageProcessor.build(kafkaConfig, consumerFactory)
+          val flightListKafkaMessageProcessor = FlightListKafkaPollerCache.build(kafkaConfig, consumerFactory)
           val messageProcessor =
-            new FlightListMessageProcessorFactoryImpl(websocketConfig, flightListKafkaMessageProcessor).build(sourceProbe.ref)
+            new FlightListMessageDispatcherFactoryImpl(websocketConfig, flightListKafkaMessageProcessor).build(sourceProbe.ref)
           val msg = FlightReceivedList(
             Seq(
               FlightReceived(
@@ -110,9 +112,9 @@ class FlightListMessageProcessorSpec
     "forward an empty message to source actor" when {
       "the flights in the list are out of the box" in ResourceLoaner.withFixture {
         case Resource(websocketConfig, kafkaConfig, consumerFactory, _, sourceProbe) =>
-          val flightListKafkaMessageProcessor = FlightListKafkaMessageProcessor.build(kafkaConfig, consumerFactory)
+          val flightListKafkaMessageProcessor = FlightListKafkaPollerCache.build(kafkaConfig, consumerFactory)
           val messageProcessor =
-            new FlightListMessageProcessorFactoryImpl(websocketConfig, flightListKafkaMessageProcessor).build(sourceProbe.ref)
+            new FlightListMessageDispatcherFactoryImpl(websocketConfig, flightListKafkaMessageProcessor).build(sourceProbe.ref)
           messageProcessor ! FlightReceivedList(
             Seq(
               FlightReceived(
@@ -190,7 +192,7 @@ class FlightListMessageProcessorSpec
   }
 }
 
-object FlightListMessageProcessorSpec {
+object FlightListMessageDispatcherSpec {
 
   final case class Resource(
       websocketConfig: WebsocketConfig,

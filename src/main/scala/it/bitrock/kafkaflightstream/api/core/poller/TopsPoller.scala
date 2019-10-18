@@ -1,13 +1,14 @@
-package it.bitrock.kafkaflightstream.api.core
+package it.bitrock.kafkaflightstream.api.core.poller
 
 import akka.actor.{ActorRef, PoisonPill, Props, Terminated}
 import it.bitrock.kafkaflightstream.api.config.{KafkaConfig, WebsocketConfig}
+import it.bitrock.kafkaflightstream.api.core.dispatcher.MessageDispatcher
 import it.bitrock.kafkaflightstream.api.definitions._
 import it.bitrock.kafkaflightstream.api.kafka.KafkaConsumerWrapper.NoMessage
 import it.bitrock.kafkaflightstream.api.kafka.{KafkaConsumerWrapper, KafkaConsumerWrapperFactory}
 import spray.json._
 
-object TopsMessageProcessor {
+object TopsPoller {
 
   def props(
       sourceActorRef: ActorRef,
@@ -15,17 +16,17 @@ object TopsMessageProcessor {
       kafkaConfig: KafkaConfig,
       kafkaConsumerWrapperFactory: KafkaConsumerWrapperFactory
   ): Props =
-    Props(new TopsMessageProcessor(sourceActorRef, websocketConfig, kafkaConfig, kafkaConsumerWrapperFactory))
+    Props(new TopsPoller(sourceActorRef, websocketConfig, kafkaConfig, kafkaConsumerWrapperFactory))
 
 }
 
-class TopsMessageProcessor(
+class TopsPoller(
     val sourceActorRef: ActorRef,
     val websocketConfig: WebsocketConfig,
     val kafkaConfig: KafkaConfig,
     kafkaConsumerWrapperFactory: KafkaConsumerWrapperFactory
-) extends MessageProcessor
-    with KafkaMessageProcessor {
+) extends MessageDispatcher
+    with KafkaPoller {
 
   override val kafkaConsumerWrapper: KafkaConsumerWrapper =
     kafkaConsumerWrapperFactory.build(
