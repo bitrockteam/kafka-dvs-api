@@ -6,11 +6,11 @@ import it.bitrock.kafkaflightstream.api.core.dispatcher.FlightListMessageDispatc
 
 class FlightListMessageDispatcherFactoryImpl(
     websocketConfig: WebsocketConfig,
-    kafkaMessageProcessor: ActorRef
+    kafkaMessageDispatcher: ActorRef
 )(implicit system: ActorRefFactory)
     extends MessageDispatcherFactory {
 
   override def build(sourceActorRef: ActorRef, identifier: String = ""): ActorRef =
-    system.actorOf(FlightListMessageDispatcher.props(sourceActorRef, kafkaMessageProcessor, websocketConfig))
+    system.actorOf(FlightListMessageDispatcher.props(sourceActorRef, kafkaMessageDispatcher, websocketConfig))
 
 }
