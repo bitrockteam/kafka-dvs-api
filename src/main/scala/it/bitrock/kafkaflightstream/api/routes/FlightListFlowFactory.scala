@@ -6,14 +6,14 @@ import akka.http.scaladsl.model.ws.{Message, TextMessage}
 import akka.stream.scaladsl.{BroadcastHub, Flow, Keep, Sink, Source}
 import akka.stream.{ActorMaterializer, OverflowStrategy}
 import com.typesafe.scalalogging.LazyLogging
-import it.bitrock.kafkaflightstream.api.core.MessageProcessorFactory
+import it.bitrock.kafkaflightstream.api.core.MessageDispatcherFactory
 import it.bitrock.kafkaflightstream.api.definitions.{CoordinatesBox, JsonSupport}
 import spray.json._
 
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success, Try}
 
-class FlightListFlowFactory(processorFactory: MessageProcessorFactory, cleanUp: Option[String => Any] = None)(
+class FlightListFlowFactory(processorFactory: MessageDispatcherFactory, cleanUp: Option[String => Any] = None)(
     implicit ec: ExecutionContext,
     materializer: ActorMaterializer
 ) extends FlowFactory

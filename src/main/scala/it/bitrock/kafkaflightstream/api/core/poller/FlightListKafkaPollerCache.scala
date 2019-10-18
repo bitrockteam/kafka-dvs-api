@@ -1,23 +1,23 @@
-package it.bitrock.kafkaflightstream.api.core.processor
+package it.bitrock.kafkaflightstream.api.core.poller
 
 import akka.actor.{ActorRef, ActorRefFactory, PoisonPill, Props, Terminated}
 import it.bitrock.kafkaflightstream.api.config.KafkaConfig
 import it.bitrock.kafkaflightstream.api.definitions._
-import it.bitrock.kafkaflightstream.api.kafka.KafkaConsumerWrapper.{NoMessage, UpdateRequested}
+import it.bitrock.kafkaflightstream.api.kafka.KafkaConsumerWrapper.{NoMessage, FlightListUpdate}
 import it.bitrock.kafkaflightstream.api.kafka.{KafkaConsumerWrapper, KafkaConsumerWrapperFactory}
 
-object FlightListKafkaMessageProcessor {
+object FlightListKafkaPollerCache {
 
   def build(kafkaConfig: KafkaConfig, kafkaConsumerWrapperFactory: KafkaConsumerWrapperFactory)(
       implicit parentSystem: ActorRefFactory
   ): ActorRef =
-    parentSystem.actorOf(Props(new FlightListKafkaMessageProcessor(kafkaConfig, kafkaConsumerWrapperFactory)))
+    parentSystem.actorOf(Props(new FlightListKafkaPollerCache(kafkaConfig, kafkaConsumerWrapperFactory)))
 }
 
-class FlightListKafkaMessageProcessor(
+class FlightListKafkaPollerCache(
     val kafkaConfig: KafkaConfig,
     kafkaConsumerWrapperFactory: KafkaConsumerWrapperFactory
-) extends KafkaMessageProcessor {
+) extends KafkaPoller {
 
   override val kafkaConsumerWrapper: KafkaConsumerWrapper =
     kafkaConsumerWrapperFactory.build(self, List(kafkaConfig.flightReceivedListTopic))
@@ -34,7 +34,7 @@ class FlightListKafkaMessageProcessor(
       if (flights.elements.nonEmpty) context.become(active(flights))
       throttle(kafkaConsumerWrapper.pollMessages())
 
-    case UpdateRequested => sender ! cache
+    case FlightListUpdate => sender ! cache
 
     case Terminated => self ! PoisonPill
   }

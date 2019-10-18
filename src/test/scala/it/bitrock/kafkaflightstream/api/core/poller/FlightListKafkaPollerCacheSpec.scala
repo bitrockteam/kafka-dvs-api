@@ -1,4 +1,4 @@
-package it.bitrock.kafkaflightstream.api.core.processor
+package it.bitrock.kafkaflightstream.api.core.poller
 
 import java.net.URI
 
@@ -14,7 +14,7 @@ import org.scalatest.BeforeAndAfterAll
 import scala.concurrent.duration._
 import scala.util.Random
 
-class FlightListKafkaMessageProcessorSpec
+class FlightListKafkaPollerCacheSpec
     extends TestKit(ActorSystem("FlightListKafkaMessageProcessorSpec"))
     with BaseSpec
     with ImplicitSender
@@ -22,19 +22,19 @@ class FlightListKafkaMessageProcessorSpec
     with JsonSupport
     with TestValues {
 
-  import FlightListKafkaMessageProcessorSpec._
+  import FlightListKafkaPollerCacheSpec._
 
   "Flight List Kafka Message Processor" should {
 
     "trigger Kafka Consumer polling" when {
       "it starts" in ResourceLoaner.withFixture {
         case Resource(kafkaConfig, consumerFactory, pollProbe) =>
-          FlightListKafkaMessageProcessor.build(kafkaConfig, consumerFactory)
+          FlightListKafkaPollerCache.build(kafkaConfig, consumerFactory)
           pollProbe expectMsg PollingTriggered
       }
       "a FlightReceivedList message is received, but only after a delay" in ResourceLoaner.withFixture {
         case Resource(kafkaConfig, consumerFactory, pollProbe) =>
-          val messageProcessor = FlightListKafkaMessageProcessor.build(kafkaConfig, consumerFactory)
+          val messageProcessor = FlightListKafkaPollerCache.build(kafkaConfig, consumerFactory)
           val flightListMessage = FlightReceivedList(
             Seq(
               FlightReceived(
@@ -110,7 +110,7 @@ class FlightListKafkaMessageProcessorSpec
   }
 }
 
-object FlightListKafkaMessageProcessorSpec {
+object FlightListKafkaPollerCacheSpec {
 
   final case class Resource(
       kafkaConfig: KafkaConfig,

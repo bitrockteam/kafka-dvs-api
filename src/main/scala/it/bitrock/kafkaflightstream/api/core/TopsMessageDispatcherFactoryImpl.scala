@@ -2,17 +2,17 @@ package it.bitrock.kafkaflightstream.api.core
 
 import akka.actor.{ActorRef, ActorSystem}
 import it.bitrock.kafkaflightstream.api.config.{KafkaConfig, WebsocketConfig}
-import it.bitrock.kafkaflightstream.api.core.processor.TopsMessageProcessor
+import it.bitrock.kafkaflightstream.api.core.poller.TopsPoller
 import it.bitrock.kafkaflightstream.api.kafka.KafkaConsumerWrapperFactory
 
-class TopsMessageProcessorFactoryImpl(
+class TopsMessageDispatcherFactoryImpl(
     websocketConfig: WebsocketConfig,
     kafkaConfig: KafkaConfig,
     kafkaConsumerWrapperFactory: KafkaConsumerWrapperFactory
 )(implicit system: ActorSystem)
-    extends MessageProcessorFactory {
+    extends MessageDispatcherFactory {
 
   override def build(sourceActorRef: ActorRef, identifier: String = ""): ActorRef =
-    system.actorOf(TopsMessageProcessor.props(sourceActorRef, websocketConfig, kafkaConfig, kafkaConsumerWrapperFactory))
+    system.actorOf(TopsPoller.props(sourceActorRef, websocketConfig, kafkaConfig, kafkaConsumerWrapperFactory))
 
 }

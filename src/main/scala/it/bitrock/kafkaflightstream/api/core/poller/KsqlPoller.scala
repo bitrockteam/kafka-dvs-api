@@ -1,33 +1,36 @@
-package it.bitrock.kafkaflightstream.api.core.processor
+package it.bitrock.kafkaflightstream.api.core.poller
 
 import akka.actor.{ActorRef, PoisonPill, Props, Terminated}
 import it.bitrock.kafkaflightstream.api.config.{KafkaConfig, WebsocketConfig}
-import it.bitrock.kafkaflightstream.api.definitions._
+import it.bitrock.kafkaflightstream.api.core.dispatcher.MessageDispatcher
+import it.bitrock.kafkaflightstream.api.definitions.KsqlStreamDataResponse
 import it.bitrock.kafkaflightstream.api.kafka.KafkaConsumerWrapper.NoMessage
 import it.bitrock.kafkaflightstream.api.kafka.{KafkaConsumerWrapper, KafkaConsumerWrapperFactory}
 import spray.json._
 
-object FlightMessageProcessor {
+object KsqlPoller {
 
   def props(
       sourceActorRef: ActorRef,
       websocketConfig: WebsocketConfig,
       kafkaConfig: KafkaConfig,
-      kafkaConsumerWrapperFactory: KafkaConsumerWrapperFactory
+      kafkaConsumerWrapperFactory: KafkaConsumerWrapperFactory,
+      topic: String
   ): Props =
-    Props(new FlightMessageProcessor(sourceActorRef, websocketConfig, kafkaConfig, kafkaConsumerWrapperFactory))
+    Props(new KsqlPoller(sourceActorRef, websocketConfig, kafkaConfig, kafkaConsumerWrapperFactory, topic))
 
 }
 
-class FlightMessageProcessor(
+class KsqlPoller(
     val sourceActorRef: ActorRef,
     val websocketConfig: WebsocketConfig,
     val kafkaConfig: KafkaConfig,
-    kafkaConsumerWrapperFactory: KafkaConsumerWrapperFactory
-) extends MessageProcessor
-    with KafkaMessageProcessor {
+    kafkaConsumerWrapperFactory: KafkaConsumerWrapperFactory,
+    topic: String
+) extends MessageDispatcher
+    with KafkaPoller {
 
-  override val kafkaConsumerWrapper: KafkaConsumerWrapper = kafkaConsumerWrapperFactory.build(self, List(kafkaConfig.flightReceivedTopic))
+  override val kafkaConsumerWrapper: KafkaConsumerWrapper = kafkaConsumerWrapperFactory.build(self, List(topic))
 
   override def receive: Receive = {
     case NoMessage =>
@@ -35,9 +38,9 @@ class FlightMessageProcessor(
 
       kafkaConsumerWrapper.pollMessages()
 
-    case flight: FlightReceived =>
-      logger.debug(s"Got a $flight from Kafka Consumer")
-      forwardMessage(flight.toJson.toString)
+    case obj: KsqlStreamDataResponse =>
+      logger.debug(s"Got a $obj from Kafka Consumer")
+      forwardMessage(obj.toJson.toString)
 
       throttle(kafkaConsumerWrapper.pollMessages())
 

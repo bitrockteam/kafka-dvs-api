@@ -1,11 +1,11 @@
-package it.bitrock.kafkaflightstream.api.core.processor
+package it.bitrock.kafkaflightstream.api.core.dispatcher
 
 import akka.actor.{Actor, ActorRef}
 import com.typesafe.scalalogging.LazyLogging
 import it.bitrock.kafkaflightstream.api.config.WebsocketConfig
 import it.bitrock.kafkaflightstream.api.definitions.JsonSupport
 
-trait MessageProcessor extends Actor with JsonSupport with LazyLogging {
+trait MessageDispatcher extends Actor with JsonSupport with LazyLogging {
 
   val sourceActorRef: ActorRef
 
