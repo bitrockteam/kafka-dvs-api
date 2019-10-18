@@ -1,10 +1,11 @@
-package it.bitrock.kafkaflightstream.api.core
+package it.bitrock.kafkaflightstream.api.core.processor
 
 import java.net.URI
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{ImplicitSender, TestKit, TestProbe}
 import it.bitrock.kafkaflightstream.api.config.{ConsumerConfig, KafkaConfig, KsqlConfig, WebsocketConfig}
+import it.bitrock.kafkaflightstream.api.core.KsqlMessageProcessorFactoryImpl
 import it.bitrock.kafkaflightstream.api.definitions._
 import it.bitrock.kafkaflightstream.api.kafka.{KafkaConsumerWrapper, KafkaConsumerWrapperFactory}
 import it.bitrock.kafkaflightstream.api.{BaseSpec, TestValues}
@@ -15,60 +16,37 @@ import spray.json._
 import scala.concurrent.duration._
 import scala.util.Random
 
-class FlightMessageProcessorSpec
-    extends TestKit(ActorSystem("FlightMessageProcessorSpec"))
+class KsqlMessageProcessorSpec
+    extends TestKit(ActorSystem("KsqlMessageProcessorSpec"))
     with BaseSpec
     with ImplicitSender
     with BeforeAndAfterAll
     with JsonSupport
     with TestValues {
 
-  import FlightMessageProcessorSpec._
+  import KsqlMessageProcessorSpec._
 
-  "Flight Message Processor" should {
+  private val topic: String = "test_topic_" + Random.nextLong
+
+  "Ksql Message Processor" should {
     "trigger Kafka Consumer polling" when {
 
       "it starts" in ResourceLoaner.withFixture {
         case Resource(websocketConfig, kafkaConfig, consumerFactory, pollProbe, sourceProbe) =>
-          new FlightMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
+          new KsqlMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref, topic)
 
           pollProbe.expectMsg(PollingTriggered)
       }
 
-      "a FlightReceived message is received, but only after a delay" in ResourceLoaner.withFixture {
+      "a KsqlReceived message is received, but only after a delay" in ResourceLoaner.withFixture {
         case Resource(websocketConfig, kafkaConfig, consumerFactory, pollProbe, sourceProbe) =>
           val messageProcessor =
-            new FlightMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
+            new KsqlMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref, topic)
 
           // First message is sent when processor starts up
           pollProbe.expectMsg(PollingTriggered)
 
-          messageProcessor ! FlightReceived(
-            DefaultIataNumber,
-            DefaultIcaoNumber,
-            GeographyInfo(DefaultLatitude, DefaultLongitude, DefaultAltitude, DefaultDirection),
-            DefaultSpeed,
-            AirportInfo(
-              DefaultCodeAirport1,
-              DefaultNameAirport1,
-              DefaultNameCountry1,
-              DefaultCodeIso2Country1,
-              DefaultTimezone1,
-              DefaultGmt1
-            ),
-            AirportInfo(
-              DefaultCodeAirport2,
-              DefaultNameAirport2,
-              DefaultNameCountry2,
-              DefaultCodeIso2Country2,
-              DefaultTimezone2,
-              DefaultGmt2
-            ),
-            AirlineInfo(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
-            AirplaneInfo(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
-            DefaultStatus,
-            DefaultUpdated
-          )
+          messageProcessor ! KsqlStreamDataResponse(DefaultKsqlMessage.toString)
 
           pollProbe.expectNoMessage(websocketConfig.throttleDuration)
           pollProbe.expectMsg(PollingTriggered)
@@ -78,36 +56,11 @@ class FlightMessageProcessorSpec
 
     "forward a JSON to source actor" when {
 
-      "a FlightReceived message is received" in ResourceLoaner.withFixture {
+      "a KsqlReceived message is received" in ResourceLoaner.withFixture {
         case Resource(websocketConfig, kafkaConfig, consumerFactory, _, sourceProbe) =>
           val messageProcessor =
-            new FlightMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
-          val msg = FlightReceived(
-            DefaultIataNumber,
-            DefaultIcaoNumber,
-            GeographyInfo(DefaultLatitude, DefaultLongitude, DefaultAltitude, DefaultDirection),
-            DefaultSpeed,
-            AirportInfo(
-              DefaultCodeAirport1,
-              DefaultNameAirport1,
-              DefaultNameCountry1,
-              DefaultCodeIso2Country1,
-              DefaultTimezone1,
-              DefaultGmt1
-            ),
-            AirportInfo(
-              DefaultCodeAirport2,
-              DefaultNameAirport2,
-              DefaultNameCountry2,
-              DefaultCodeIso2Country2,
-              DefaultTimezone2,
-              DefaultGmt2
-            ),
-            AirlineInfo(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
-            AirplaneInfo(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
-            DefaultStatus,
-            DefaultUpdated
-          )
+            new KsqlMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref, topic)
+          val msg = KsqlStreamDataResponse(DefaultKsqlMessage.toString)
 
           messageProcessor ! msg
 
@@ -162,7 +115,7 @@ class FlightMessageProcessorSpec
 
 }
 
-object FlightMessageProcessorSpec {
+object KsqlMessageProcessorSpec {
 
   final case class Resource(
       websocketConfig: WebsocketConfig,
@@ -176,7 +129,7 @@ object FlightMessageProcessorSpec {
 
   class TestKafkaConsumerWrapperFactory(pollActorRef: ActorRef) extends KafkaConsumerWrapperFactory {
 
-    override def build(processor: ActorRef, topics: Seq[String] = List()): KafkaConsumerWrapper = new KafkaConsumerWrapper {
+    override def build(processor: ActorRef, topics: Seq[String]): KafkaConsumerWrapper = new KafkaConsumerWrapper {
 
       override def pollMessages(): Unit =
         pollActorRef ! PollingTriggered

@@ -2,6 +2,7 @@ package it.bitrock.kafkaflightstream.api.core
 
 import akka.actor.{ActorRef, ActorSystem}
 import it.bitrock.kafkaflightstream.api.config.{KafkaConfig, WebsocketConfig}
+import it.bitrock.kafkaflightstream.api.core.processor.TotalsMessageProcessor
 import it.bitrock.kafkaflightstream.api.kafka.KafkaConsumerWrapperFactory
 
 class TotalsMessageProcessorFactoryImpl(

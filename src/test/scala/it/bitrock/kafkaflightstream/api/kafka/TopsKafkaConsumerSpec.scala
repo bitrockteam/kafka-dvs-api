@@ -9,13 +9,13 @@ import it.bitrock.kafkaflightstream.api.definitions._
 import it.bitrock.kafkaflightstream.api.kafka.KafkaConsumerWrapper.NoMessage
 import it.bitrock.kafkaflightstream.api.{BaseSpec, TestValues}
 import it.bitrock.kafkaflightstream.model.{
-  Airport => KAirport,
   Airline => KAirline,
+  Airport => KAirport,
   SpeedFlight => KSpeedFlight,
+  TopAirlineList => KTopAirlineList,
   TopArrivalAirportList => KTopArrivalAirportList,
   TopDepartureAirportList => KTopDepartureAirportList,
-  TopSpeedList => KTopSpeedList,
-  TopAirlineList => KTopAirlineList
+  TopSpeedList => KTopSpeedList
 }
 import it.bitrock.kafkageostream.kafkacommons.serialization.ImplicitConversions._
 import it.bitrock.kafkageostream.testcommons.FixtureLoanerAnyResult

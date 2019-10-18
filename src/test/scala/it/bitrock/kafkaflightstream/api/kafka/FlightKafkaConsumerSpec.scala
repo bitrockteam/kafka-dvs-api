@@ -5,10 +5,9 @@ import java.net.URI
 import akka.actor.ActorSystem
 import akka.testkit.{TestKit, TestProbe}
 import it.bitrock.kafkaflightstream.api.config.{AppConfig, KafkaConfig}
-import it.bitrock.kafkaflightstream.api.definitions.{AirlineInfo, AirplaneInfo, AirportInfo, FlightReceived, GeographyInfo}
+import it.bitrock.kafkaflightstream.api.definitions._
 import it.bitrock.kafkaflightstream.api.kafka.KafkaConsumerWrapper.NoMessage
 import it.bitrock.kafkaflightstream.api.{BaseSpec, TestValues}
-import it.bitrock.kafkageostream.kafkacommons.serialization.ImplicitConversions._
 import it.bitrock.kafkaflightstream.model.{
   AirlineInfo => KAirlineInfo,
   AirplaneInfo => KAirplaneInfo,
@@ -16,6 +15,7 @@ import it.bitrock.kafkaflightstream.model.{
   FlightReceived => KFlightReceived,
   GeographyInfo => KGeographyInfo
 }
+import it.bitrock.kafkageostream.kafkacommons.serialization.ImplicitConversions._
 import it.bitrock.kafkageostream.testcommons.FixtureLoanerAnyResult
 import net.manub.embeddedkafka.schemaregistry.{EmbeddedKafka, EmbeddedKafkaConfig, _}
 import org.apache.kafka.common.serialization.{Serde, Serdes}

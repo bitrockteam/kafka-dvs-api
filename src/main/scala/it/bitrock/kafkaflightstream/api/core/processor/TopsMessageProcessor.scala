@@ -1,4 +1,4 @@
-package it.bitrock.kafkaflightstream.api.core
+package it.bitrock.kafkaflightstream.api.core.processor
 
 import akka.actor.{ActorRef, PoisonPill, Props, Terminated}
 import it.bitrock.kafkaflightstream.api.config.{KafkaConfig, WebsocketConfig}
@@ -7,7 +7,7 @@ import it.bitrock.kafkaflightstream.api.kafka.KafkaConsumerWrapper.NoMessage
 import it.bitrock.kafkaflightstream.api.kafka.{KafkaConsumerWrapper, KafkaConsumerWrapperFactory}
 import spray.json._
 
-object TotalsMessageProcessor {
+object TopsMessageProcessor {
 
   def props(
       sourceActorRef: ActorRef,
@@ -15,11 +15,11 @@ object TotalsMessageProcessor {
       kafkaConfig: KafkaConfig,
       kafkaConsumerWrapperFactory: KafkaConsumerWrapperFactory
   ): Props =
-    Props(new TotalsMessageProcessor(sourceActorRef, websocketConfig, kafkaConfig, kafkaConsumerWrapperFactory))
+    Props(new TopsMessageProcessor(sourceActorRef, websocketConfig, kafkaConfig, kafkaConsumerWrapperFactory))
 
 }
 
-class TotalsMessageProcessor(
+class TopsMessageProcessor(
     val sourceActorRef: ActorRef,
     val websocketConfig: WebsocketConfig,
     val kafkaConfig: KafkaConfig,
@@ -30,7 +30,7 @@ class TotalsMessageProcessor(
   override val kafkaConsumerWrapper: KafkaConsumerWrapper =
     kafkaConsumerWrapperFactory.build(
       self,
-      List(kafkaConfig.totalFlightTopic, kafkaConfig.totalAirlineTopic)
+      List(kafkaConfig.topArrivalAirportTopic, kafkaConfig.topDepartureAirportTopic, kafkaConfig.topSpeedTopic, kafkaConfig.topAirlineTopic)
     )
 
   override def receive: Receive = {
@@ -38,14 +38,24 @@ class TotalsMessageProcessor(
       logger.debug("Got no-message notice from Kafka Consumer, going to poll again")
       kafkaConsumerWrapper.pollMessages()
 
-    case total: CountFlight =>
-      logger.debug(s"Got a $total from Kafka Consumer")
-      forwardMessage(ApiEvent(total.getClass.getSimpleName, total).toJson.toString)
+    case top: TopArrivalAirportList =>
+      logger.debug(s"Got a $top from Kafka Consumer")
+      forwardMessage(ApiEvent(top.getClass.getSimpleName, top).toJson.toString)
       throttle(kafkaConsumerWrapper.pollMessages())
 
-    case total: CountAirline =>
-      logger.debug(s"Got a $total from Kafka Consumer")
-      forwardMessage(ApiEvent(total.getClass.getSimpleName, total).toJson.toString)
+    case top: TopDepartureAirportList =>
+      logger.debug(s"Got a $top from Kafka Consumer")
+      forwardMessage(ApiEvent(top.getClass.getSimpleName, top).toJson.toString)
+      throttle(kafkaConsumerWrapper.pollMessages())
+
+    case top: TopSpeedList =>
+      logger.debug(s"Got a $top from Kafka Consumer")
+      forwardMessage(ApiEvent(top.getClass.getSimpleName, top).toJson.toString)
+      throttle(kafkaConsumerWrapper.pollMessages())
+
+    case top: TopAirlineList =>
+      logger.debug(s"Got a $top from Kafka Consumer")
+      forwardMessage(ApiEvent(top.getClass.getSimpleName, top).toJson.toString)
       throttle(kafkaConsumerWrapper.pollMessages())
 
     case Terminated => self ! PoisonPill

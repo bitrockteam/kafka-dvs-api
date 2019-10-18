@@ -8,7 +8,7 @@ import it.bitrock.kafkaflightstream.api.config.{AppConfig, KafkaConfig}
 import it.bitrock.kafkaflightstream.api.definitions._
 import it.bitrock.kafkaflightstream.api.kafka.KafkaConsumerWrapper.NoMessage
 import it.bitrock.kafkaflightstream.api.{BaseSpec, TestValues}
-import it.bitrock.kafkaflightstream.model.{CountFlight => KCountFlight, CountAirline => KCountAirline}
+import it.bitrock.kafkaflightstream.model.{CountAirline => KCountAirline, CountFlight => KCountFlight}
 import it.bitrock.kafkageostream.kafkacommons.serialization.ImplicitConversions._
 import it.bitrock.kafkageostream.testcommons.FixtureLoanerAnyResult
 import net.manub.embeddedkafka.schemaregistry.{EmbeddedKafka, EmbeddedKafkaConfig, _}

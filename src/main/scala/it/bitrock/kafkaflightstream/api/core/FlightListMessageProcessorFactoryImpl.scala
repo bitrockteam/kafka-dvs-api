@@ -2,6 +2,7 @@ package it.bitrock.kafkaflightstream.api.core
 
 import akka.actor.{ActorRef, ActorRefFactory}
 import it.bitrock.kafkaflightstream.api.config.WebsocketConfig
+import it.bitrock.kafkaflightstream.api.core.processor.FlightListMessageProcessor
 
 class FlightListMessageProcessorFactoryImpl(
     websocketConfig: WebsocketConfig,

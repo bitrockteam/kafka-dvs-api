@@ -1,4 +1,4 @@
-package it.bitrock.kafkaflightstream.api.core
+package it.bitrock.kafkaflightstream.api.core.processor
 
 import akka.actor.Actor
 import com.typesafe.scalalogging.LazyLogging

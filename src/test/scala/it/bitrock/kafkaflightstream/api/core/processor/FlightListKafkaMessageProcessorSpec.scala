@@ -1,4 +1,4 @@
-package it.bitrock.kafkaflightstream.api.core
+package it.bitrock.kafkaflightstream.api.core.processor
 
 import java.net.URI
 

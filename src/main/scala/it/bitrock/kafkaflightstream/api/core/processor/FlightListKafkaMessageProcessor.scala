@@ -1,4 +1,4 @@
-package it.bitrock.kafkaflightstream.api.core
+package it.bitrock.kafkaflightstream.api.core.processor
 
 import akka.actor.{ActorRef, ActorRefFactory, PoisonPill, Props, Terminated}
 import it.bitrock.kafkaflightstream.api.config.KafkaConfig

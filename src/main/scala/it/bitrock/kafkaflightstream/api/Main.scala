@@ -9,6 +9,7 @@ import akka.stream.ActorMaterializer
 import com.typesafe.scalalogging.LazyLogging
 import it.bitrock.kafkaflightstream.api.config.AppConfig
 import it.bitrock.kafkaflightstream.api.core._
+import it.bitrock.kafkaflightstream.api.core.processor.FlightListKafkaMessageProcessor
 import it.bitrock.kafkaflightstream.api.kafka.KafkaConsumerWrapperFactory._
 import it.bitrock.kafkaflightstream.api.routes._
 import it.bitrock.kafkaflightstream.api.services._

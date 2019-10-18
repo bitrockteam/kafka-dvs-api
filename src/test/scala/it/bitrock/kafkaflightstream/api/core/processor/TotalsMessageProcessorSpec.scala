@@ -1,10 +1,11 @@
-package it.bitrock.kafkaflightstream.api.core
+package it.bitrock.kafkaflightstream.api.core.processor
 
 import java.net.URI
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{ImplicitSender, TestKit, TestProbe}
 import it.bitrock.kafkaflightstream.api.config.{ConsumerConfig, KafkaConfig, KsqlConfig, WebsocketConfig}
+import it.bitrock.kafkaflightstream.api.core.TotalsMessageProcessorFactoryImpl
 import it.bitrock.kafkaflightstream.api.definitions._
 import it.bitrock.kafkaflightstream.api.kafka.{KafkaConsumerWrapper, KafkaConsumerWrapperFactory}
 import it.bitrock.kafkaflightstream.api.{BaseSpec, TestValues}
@@ -15,125 +16,62 @@ import spray.json._
 import scala.concurrent.duration._
 import scala.util.Random
 
-class TopsMessageProcessorSpec
-    extends TestKit(ActorSystem("TopsMessageProcessorSpec"))
+class TotalsMessageProcessorSpec
+    extends TestKit(ActorSystem("TotalsMessageProcessorSpec"))
     with BaseSpec
     with ImplicitSender
     with BeforeAndAfterAll
     with JsonSupport
     with TestValues {
-  import TopsMessageProcessorSpec._
+  import TotalsMessageProcessorSpec._
 
-  "Tops Message Processor" should {
+  "Totals Message Processor" should {
 
     "trigger Kafka Consumer polling" when {
       "it starts" in ResourceLoaner.withFixture {
         case Resource(websocketConfig, kafkaConfig, consumerFactory, pollProbe, sourceProbe) =>
-          new TopsMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
-
+          new TotalsMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
           pollProbe.expectMsg(PollingTriggered)
       }
-      "a TopArrivalAirportList is received, but only after a delay" in ResourceLoaner.withFixture {
+      "a CountFlightStatus is received, but only after a delay" in ResourceLoaner.withFixture {
         case Resource(websocketConfig, kafkaConfig, consumerFactory, pollProbe, sourceProbe) =>
           val messageProcessor =
-            new TopsMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
-
+            new TotalsMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
           // First message is sent when processor starts up
           pollProbe.expectMsg(PollingTriggered)
-
-          messageProcessor ! TopArrivalAirportList()
-
+          messageProcessor ! CountFlight(DefaultStartTimeWindow, DefaultCountFlightAmount)
           pollProbe.expectNoMessage(websocketConfig.throttleDuration)
           pollProbe.expectMsg(PollingTriggered)
       }
-      "a TopDepartureAirportList is received, but only after a delay" in ResourceLoaner.withFixture {
+      "a CountAirline is received, but only after a delay" in ResourceLoaner.withFixture {
         case Resource(websocketConfig, kafkaConfig, consumerFactory, pollProbe, sourceProbe) =>
           val messageProcessor =
-            new TopsMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
-
+            new TotalsMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
           // First message is sent when processor starts up
           pollProbe.expectMsg(PollingTriggered)
-
-          messageProcessor ! TopDepartureAirportList()
-
-          pollProbe.expectNoMessage(websocketConfig.throttleDuration)
-          pollProbe.expectMsg(PollingTriggered)
-      }
-      "a TopSpeedList is received, but only after a delay" in ResourceLoaner.withFixture {
-        case Resource(websocketConfig, kafkaConfig, consumerFactory, pollProbe, sourceProbe) =>
-          val messageProcessor =
-            new TopsMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
-
-          // First message is sent when processor starts up
-          pollProbe.expectMsg(PollingTriggered)
-
-          messageProcessor ! TopSpeedList()
-
-          pollProbe.expectNoMessage(websocketConfig.throttleDuration)
-          pollProbe.expectMsg(PollingTriggered)
-      }
-      "a TopAirlineList is received, but only after a delay" in ResourceLoaner.withFixture {
-        case Resource(websocketConfig, kafkaConfig, consumerFactory, pollProbe, sourceProbe) =>
-          val messageProcessor =
-            new TopsMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
-
-          // First message is sent when processor starts up
-          pollProbe.expectMsg(PollingTriggered)
-
-          messageProcessor ! TopAirlineList()
-
+          messageProcessor ! CountAirline(DefaultStartTimeWindow, DefaultCountAirlineAmount)
           pollProbe.expectNoMessage(websocketConfig.throttleDuration)
           pollProbe.expectMsg(PollingTriggered)
       }
     }
 
     "forward a JSON-formatted ApiEvent to source actor" when {
-      "a TopArrivalAirportList is received" in ResourceLoaner.withFixture {
+      "a CountFlightStatus is received" in ResourceLoaner.withFixture {
         case Resource(websocketConfig, kafkaConfig, consumerFactory, _, sourceProbe) =>
           val messageProcessor =
-            new TopsMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
-          val msg = TopArrivalAirportList()
-
+            new TotalsMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
+          val msg = CountFlight(DefaultStartTimeWindow, DefaultCountFlightAmount)
           messageProcessor ! msg
-
           val expectedResult = ApiEvent(msg.getClass.getSimpleName, msg).toJson.toString
-
           sourceProbe.expectMsg(expectedResult)
       }
-      "a TopDepartureAirportList is received" in ResourceLoaner.withFixture {
+      "a CountAirline is received" in ResourceLoaner.withFixture {
         case Resource(websocketConfig, kafkaConfig, consumerFactory, _, sourceProbe) =>
           val messageProcessor =
-            new TopsMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
-          val msg = TopDepartureAirportList()
-
+            new TotalsMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
+          val msg = CountAirline(DefaultStartTimeWindow, DefaultCountAirlineAmount)
           messageProcessor ! msg
-
           val expectedResult = ApiEvent(msg.getClass.getSimpleName, msg).toJson.toString
-
-          sourceProbe.expectMsg(expectedResult)
-      }
-      "a TopSpeedList is received" in ResourceLoaner.withFixture {
-        case Resource(websocketConfig, kafkaConfig, consumerFactory, _, sourceProbe) =>
-          val messageProcessor =
-            new TopsMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
-          val msg = TopSpeedList()
-
-          messageProcessor ! msg
-
-          val expectedResult = ApiEvent(msg.getClass.getSimpleName, msg).toJson.toString
-
-          sourceProbe.expectMsg(expectedResult)
-      }
-      "a TopAirlineList is received" in ResourceLoaner.withFixture {
-        case Resource(websocketConfig, kafkaConfig, consumerFactory, _, sourceProbe) =>
-          val messageProcessor =
-            new TopsMessageProcessorFactoryImpl(websocketConfig, kafkaConfig, consumerFactory).build(sourceProbe.ref)
-          val msg = TopAirlineList()
-
-          messageProcessor ! msg
-
-          val expectedResult = ApiEvent(msg.getClass.getSimpleName, msg).toJson.toString
-
           sourceProbe.expectMsg(expectedResult)
       }
     }
@@ -182,7 +120,7 @@ class TopsMessageProcessorSpec
 
 }
 
-object TopsMessageProcessorSpec {
+object TotalsMessageProcessorSpec {
 
   final case class Resource(
       websocketConfig: WebsocketConfig,
