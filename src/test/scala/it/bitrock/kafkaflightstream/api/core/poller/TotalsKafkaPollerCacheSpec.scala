@@ -22,7 +22,7 @@ class TotalsKafkaPollerCacheSpec
     with JsonSupport
     with TestValues {
 
-  import KafkaPollerCacheSpec._
+  import KafkaPollerCache._
 
   "Totals Kafka Poller Cache" should {
 

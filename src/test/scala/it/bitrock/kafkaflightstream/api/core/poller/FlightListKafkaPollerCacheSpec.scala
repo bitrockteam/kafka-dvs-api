@@ -2,11 +2,11 @@ package it.bitrock.kafkaflightstream.api.core.poller
 
 import java.net.URI
 
-import akka.actor.{ActorRef, ActorSystem}
+import akka.actor.ActorSystem
 import akka.testkit.{ImplicitSender, TestKit, TestProbe}
 import it.bitrock.kafkaflightstream.api.config.{ConsumerConfig, KafkaConfig, KsqlConfig}
 import it.bitrock.kafkaflightstream.api.definitions._
-import it.bitrock.kafkaflightstream.api.kafka.{KafkaConsumerWrapper, KafkaConsumerWrapperFactory}
+import it.bitrock.kafkaflightstream.api.kafka.KafkaConsumerWrapperFactory
 import it.bitrock.kafkaflightstream.api.{BaseSpec, TestValues}
 import it.bitrock.kafkageostream.testcommons.FixtureLoanerAnyResult
 import org.scalatest.BeforeAndAfterAll
@@ -22,7 +22,7 @@ class FlightListKafkaPollerCacheSpec
     with JsonSupport
     with TestValues {
 
-  import KafkaPollerCacheSpec._
+  import KafkaPollerCache._
 
   "Flight List Kafka Poller Cache" should {
 

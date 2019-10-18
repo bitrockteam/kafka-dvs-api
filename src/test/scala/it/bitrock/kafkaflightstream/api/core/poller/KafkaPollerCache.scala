@@ -5,7 +5,7 @@ import akka.testkit.TestProbe
 import it.bitrock.kafkaflightstream.api.config.KafkaConfig
 import it.bitrock.kafkaflightstream.api.kafka.{KafkaConsumerWrapper, KafkaConsumerWrapperFactory}
 
-object KafkaPollerCacheSpec {
+object KafkaPollerCache {
 
   final case class Resource(
       kafkaConfig: KafkaConfig,

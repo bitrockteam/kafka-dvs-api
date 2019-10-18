@@ -29,14 +29,14 @@ class TotalsKafkaPollerCache(val kafkaConfig: KafkaConfig, kafkaConsumerWrapperF
       logger.debug("Got no-message notice from Kafka Consumer, going to poll again")
       kafkaConsumerWrapper.pollMessages()
 
-    case total: CountFlight =>
-      logger.debug(s"Got a $total from Kafka Consumer")
-      if (total.eventCount > 0) context.become(active(total, airlineCache))
+    case countFlight: CountFlight =>
+      logger.debug(s"Got a $countFlight from Kafka Consumer")
+      if (countFlight.eventCount > 0) context.become(active(countFlight, airlineCache))
       throttle(kafkaConsumerWrapper.pollMessages())
 
-    case total: CountAirline =>
-      logger.debug(s"Got a $total from Kafka Consumer")
-      if (total.eventCount > 0) context.become(active(flightCache, total))
+    case countAirline: CountAirline =>
+      logger.debug(s"Got a $countAirline from Kafka Consumer")
+      if (countAirline.eventCount > 0) context.become(active(flightCache, countAirline))
       throttle(kafkaConsumerWrapper.pollMessages())
 
     case TotalFlightUpdate => sender ! flightCache
