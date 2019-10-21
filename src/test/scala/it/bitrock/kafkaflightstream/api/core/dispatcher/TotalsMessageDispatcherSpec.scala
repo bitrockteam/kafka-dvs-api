@@ -36,7 +36,7 @@ class TotalsMessageDispatcherSpec
           val messageDispatcher      = new TotalsMessageDispatcherFactoryImpl(websocketConfig, totalsKafkaPollerCache).build(sourceProbe.ref)
           val msg                    = CountFlight(DefaultStartTimeWindow, DefaultCountFlightAmount)
           messageDispatcher ! msg
-          val expectedResult = msg.toJson.toString
+          val expectedResult = ApiEvent(msg.getClass.getSimpleName, msg).toJson.toString
           sourceProbe.expectMsg(expectedResult)
       }
       "a CountAirline is received" in ResourceLoaner.withFixture {
@@ -45,7 +45,7 @@ class TotalsMessageDispatcherSpec
           val messageDispatcher      = new TotalsMessageDispatcherFactoryImpl(websocketConfig, totalsKafkaPollerCache).build(sourceProbe.ref)
           val msg                    = CountAirline(DefaultStartTimeWindow, DefaultCountAirlineAmount)
           messageDispatcher ! msg
-          val expectedResult = msg.toJson.toString
+          val expectedResult = ApiEvent(msg.getClass.getSimpleName, msg).toJson.toString
           sourceProbe.expectMsg(expectedResult)
       }
     }

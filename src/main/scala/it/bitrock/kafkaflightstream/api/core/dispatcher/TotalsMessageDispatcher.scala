@@ -28,11 +28,11 @@ class TotalsMessageDispatcher(
 
     case totalFlights: CountFlight =>
       logger.debug(s"Got $totalFlights from Kafka Consumer")
-      forwardMessage(totalFlights.toJson.toString)
+      forwardMessage(ApiEvent(totalFlights.getClass.getSimpleName, totalFlights).toJson.toString)
 
     case totalAirlines: CountAirline =>
       logger.debug(s"Got $totalAirlines from Kafka Consumer")
-      forwardMessage(totalAirlines.toJson.toString)
+      forwardMessage(ApiEvent(totalAirlines.getClass.getSimpleName, totalAirlines).toJson.toString)
 
   }
 
