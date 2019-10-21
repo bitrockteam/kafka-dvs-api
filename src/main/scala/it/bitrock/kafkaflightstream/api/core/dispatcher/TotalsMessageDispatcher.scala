@@ -8,7 +8,7 @@ import spray.json._
 
 class TotalsMessageDispatcher(
     val sourceActorRef: ActorRef,
-    kafkaMessageProcessor: ActorRef,
+    kafkaPoller: ActorRef,
     val websocketConfig: WebsocketConfig
 ) extends MessageDispatcher {
 
@@ -19,11 +19,11 @@ class TotalsMessageDispatcher(
     case Terminated => self ! PoisonPill
 
     case TotalFlightUpdate =>
-      kafkaMessageProcessor ! TotalFlightUpdate
+      kafkaPoller ! TotalFlightUpdate
       context.system.scheduler.scheduleOnce(websocketConfig.throttleDuration)(self ! TotalFlightUpdate)
 
     case TotalAirlineUpdate =>
-      kafkaMessageProcessor ! TotalAirlineUpdate
+      kafkaPoller ! TotalAirlineUpdate
       context.system.scheduler.scheduleOnce(websocketConfig.throttleDuration)(self ! TotalAirlineUpdate)
 
     case totalFlights: CountFlight =>
@@ -47,9 +47,7 @@ class TotalsMessageDispatcher(
 object TotalsMessageDispatcher {
   def props(
       sourceActorRef: ActorRef,
-      kafkaMessageProcessor: ActorRef,
+      kafkaPoller: ActorRef,
       websocketConfig: WebsocketConfig
-  ): Props =
-    Props(new TotalsMessageDispatcher(sourceActorRef, kafkaMessageProcessor, websocketConfig))
-
+  ): Props = Props(new TotalsMessageDispatcher(sourceActorRef, kafkaPoller, websocketConfig))
 }

@@ -14,6 +14,10 @@ object KafkaConsumerWrapper {
   final case object FlightListUpdate
   final case object TotalFlightUpdate
   final case object TotalAirlineUpdate
+  final case object TopArrivalAirportUpdate
+  final case object TopDepartureAirportUpdate
+  final case object TopSpeedUpdate
+  final case object TopAirlineUpdate
 }
 
 trait KafkaConsumerWrapper {

@@ -18,7 +18,7 @@ import scala.concurrent.duration._
 import scala.util.Random
 
 class TotalsMessageDispatcherSpec
-    extends TestKit(ActorSystem("TotalsMessageProcessorSpec"))
+    extends TestKit(ActorSystem("TotalsMessageDispatcherSpec"))
     with BaseSpec
     with ImplicitSender
     with BeforeAndAfterAll

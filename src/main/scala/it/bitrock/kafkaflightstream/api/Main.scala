@@ -9,7 +9,7 @@ import akka.stream.ActorMaterializer
 import com.typesafe.scalalogging.LazyLogging
 import it.bitrock.kafkaflightstream.api.config.AppConfig
 import it.bitrock.kafkaflightstream.api.core._
-import it.bitrock.kafkaflightstream.api.core.poller.{FlightListKafkaPollerCache, TotalsKafkaPollerCache}
+import it.bitrock.kafkaflightstream.api.core.poller._
 import it.bitrock.kafkaflightstream.api.kafka.KafkaConsumerWrapperFactory._
 import it.bitrock.kafkaflightstream.api.routes._
 import it.bitrock.kafkaflightstream.api.services._
@@ -52,9 +52,9 @@ object Main extends App with LazyLogging {
   val flightListFlowFactory = new FlightListFlowFactory(flightListMessageDispatcherFactory)
 
   val topsKafkaConsumerWrapperFactory = topsKafkaConsumerFactory(config.kafka)
-  val topsMessageDispatcherFactory =
-    new TopsMessageDispatcherFactoryImpl(config.server.websocket, config.kafka, topsKafkaConsumerWrapperFactory)
-  val topsFlowFactory = new FlowFactoryImpl(topsMessageDispatcherFactory)
+  val topsKafkaPollerCache            = TopsKafkaPollerCache.build(config.kafka, topsKafkaConsumerWrapperFactory)
+  val topsMessageDispatcherFactory    = new TopsMessageDispatcherFactoryImpl(config.server.websocket, topsKafkaPollerCache)
+  val topsFlowFactory                 = new FlowFactoryImpl(topsMessageDispatcherFactory)
 
   val totalsKafkaConsumerWrapperFactory = totalsKafkaConsumerFactory(config.kafka)
   val totalsKafkaPollerCache            = TotalsKafkaPollerCache.build(config.kafka, totalsKafkaConsumerWrapperFactory)
