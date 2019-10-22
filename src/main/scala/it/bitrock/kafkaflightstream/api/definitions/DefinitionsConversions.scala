@@ -62,8 +62,6 @@ final case class TopAirlineList(elements: Seq[Airline] = Nil) extends EventPaylo
 final case class CountFlight(windowStartTime: String, eventCount: Long)  extends EventPayload
 final case class CountAirline(windowStartTime: String, eventCount: Long) extends EventPayload
 
-final case class KsqlStreamDataResponse(data: String)
-
 final case class ApiEvent[T <: EventPayload](eventType: String, eventPayload: T)
 
 object DefinitionsConversions {
@@ -154,8 +152,6 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
 
   implicit val countFlightStatusJsonFormat: RootJsonFormat[CountFlight] = jsonFormat2(CountFlight.apply)
   implicit val countAirlineJsonFormat: RootJsonFormat[CountAirline]     = jsonFormat2(CountAirline.apply)
-
-  implicit val ksqlStreamDataResponseFormat: RootJsonFormat[KsqlStreamDataResponse] = jsonFormat1(KsqlStreamDataResponse)
 
   implicit def apiEventJsonFormat[T <: EventPayload: JsonFormat]: RootJsonFormat[ApiEvent[T]] = jsonFormat2(ApiEvent.apply[T])
 

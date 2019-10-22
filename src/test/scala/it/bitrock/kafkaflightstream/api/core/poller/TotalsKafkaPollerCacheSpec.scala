@@ -4,7 +4,7 @@ import java.net.URI
 
 import akka.actor.ActorSystem
 import akka.testkit.{ImplicitSender, TestKit, TestProbe}
-import it.bitrock.kafkaflightstream.api.config.{ConsumerConfig, KafkaConfig, KsqlConfig}
+import it.bitrock.kafkaflightstream.api.config.{ConsumerConfig, KafkaConfig}
 import it.bitrock.kafkaflightstream.api.definitions.{CountAirline, CountFlight, JsonSupport}
 import it.bitrock.kafkaflightstream.api.kafka.KafkaConsumerWrapperFactory
 import it.bitrock.kafkaflightstream.api.{BaseSpec, TestValues}
@@ -68,8 +68,7 @@ class TotalsKafkaPollerCacheSpec
           "",
           "",
           "",
-          ConsumerConfig(1.second, Duration.Zero),
-          KsqlConfig(java.net.URI.create("http://www.example.com"), "")
+          ConsumerConfig(1.second, Duration.Zero)
         )
       val pollProbe                                    = TestProbe(s"poll-probe-${Random.nextInt()}")
       val consumerFactory: KafkaConsumerWrapperFactory = new TestKafkaConsumerWrapperFactory(pollProbe.ref)

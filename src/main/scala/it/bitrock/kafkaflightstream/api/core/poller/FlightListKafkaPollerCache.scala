@@ -3,7 +3,7 @@ package it.bitrock.kafkaflightstream.api.core.poller
 import akka.actor.{ActorRef, ActorRefFactory, PoisonPill, Props, Terminated}
 import it.bitrock.kafkaflightstream.api.config.KafkaConfig
 import it.bitrock.kafkaflightstream.api.definitions._
-import it.bitrock.kafkaflightstream.api.kafka.KafkaConsumerWrapper.{NoMessage, FlightListUpdate}
+import it.bitrock.kafkaflightstream.api.kafka.KafkaConsumerWrapper.{FlightListUpdate, NoMessage}
 import it.bitrock.kafkaflightstream.api.kafka.{KafkaConsumerWrapper, KafkaConsumerWrapperFactory}
 
 object FlightListKafkaPollerCache {
