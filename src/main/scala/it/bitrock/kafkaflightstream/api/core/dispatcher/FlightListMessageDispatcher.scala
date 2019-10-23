@@ -8,7 +8,7 @@ import spray.json._
 
 class FlightListMessageDispatcher(
     val sourceActorRef: ActorRef,
-    kafkaMessageProcessor: ActorRef,
+    kafkaPoller: ActorRef,
     val websocketConfig: WebsocketConfig
 ) extends MessageDispatcher {
 
@@ -23,7 +23,7 @@ class FlightListMessageDispatcher(
     case Terminated => self ! PoisonPill
 
     case FlightListUpdate =>
-      kafkaMessageProcessor ! FlightListUpdate
+      kafkaPoller ! FlightListUpdate
       context.system.scheduler.scheduleOnce(websocketConfig.throttleDuration)(self ! FlightListUpdate)
 
     case flights: FlightReceivedList =>
@@ -32,7 +32,7 @@ class FlightListMessageDispatcher(
 
     case box: CoordinatesBox =>
       context.become(boxing(box))
-      self ! FlightListUpdate
+      kafkaPoller ! FlightListUpdate
 
   }
 
@@ -50,13 +50,18 @@ class FlightListMessageDispatcher(
     FlightReceivedList(filteredList)
   }
 
+  override def preStart(): Unit = {
+    super.preStart()
+    self ! FlightListUpdate
+  }
+
 }
 
 object FlightListMessageDispatcher {
   def props(
       sourceActorRef: ActorRef,
-      kafkaMessageProcessor: ActorRef,
+      kafkaPoller: ActorRef,
       websocketConfig: WebsocketConfig
   ): Props =
-    Props(new FlightListMessageDispatcher(sourceActorRef, kafkaMessageProcessor, websocketConfig))
+    Props(new FlightListMessageDispatcher(sourceActorRef, kafkaPoller, websocketConfig))
 }
