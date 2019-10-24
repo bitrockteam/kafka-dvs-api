@@ -32,9 +32,9 @@ class FlightListMessageDispatcherSpec
     "forward a JSON to source actor" when {
       "a correct FlightReceivedList message is received" in ResourceLoaner.withFixture {
         case Resource(websocketConfig, kafkaConfig, consumerFactory, _, sourceProbe) =>
-          val flightListKafkaMessageProcessor = FlightListKafkaPollerCache.build(kafkaConfig, consumerFactory)
+          val flightListKafkaPollerCache = FlightListKafkaPollerCache.build(kafkaConfig, consumerFactory)
           val messageProcessor =
-            new FlightListMessageDispatcherFactoryImpl(websocketConfig, flightListKafkaMessageProcessor).build(sourceProbe.ref)
+            new FlightListMessageDispatcherFactoryImpl(websocketConfig, flightListKafkaPollerCache).build(sourceProbe.ref)
           val msg = FlightReceivedList(
             Seq(
               FlightReceived(
@@ -70,9 +70,9 @@ class FlightListMessageDispatcherSpec
       }
       "the flights in the list are inside the box after its change" in ResourceLoaner.withFixture {
         case Resource(websocketConfig, kafkaConfig, consumerFactory, _, sourceProbe) =>
-          val flightListKafkaMessageProcessor = FlightListKafkaPollerCache.build(kafkaConfig, consumerFactory)
+          val flightListKafkaPollerCache = FlightListKafkaPollerCache.build(kafkaConfig, consumerFactory)
           val messageProcessor =
-            new FlightListMessageDispatcherFactoryImpl(websocketConfig, flightListKafkaMessageProcessor).build(sourceProbe.ref)
+            new FlightListMessageDispatcherFactoryImpl(websocketConfig, flightListKafkaPollerCache).build(sourceProbe.ref)
           val msg = FlightReceivedList(
             Seq(
               FlightReceived(
@@ -112,9 +112,9 @@ class FlightListMessageDispatcherSpec
     "forward an empty message to source actor" when {
       "the flights in the list are out of the box" in ResourceLoaner.withFixture {
         case Resource(websocketConfig, kafkaConfig, consumerFactory, _, sourceProbe) =>
-          val flightListKafkaMessageProcessor = FlightListKafkaPollerCache.build(kafkaConfig, consumerFactory)
+          val flightListKafkaPollerCache = FlightListKafkaPollerCache.build(kafkaConfig, consumerFactory)
           val messageProcessor =
-            new FlightListMessageDispatcherFactoryImpl(websocketConfig, flightListKafkaMessageProcessor).build(sourceProbe.ref)
+            new FlightListMessageDispatcherFactoryImpl(websocketConfig, flightListKafkaPollerCache).build(sourceProbe.ref)
           messageProcessor ! FlightReceivedList(
             Seq(
               FlightReceived(

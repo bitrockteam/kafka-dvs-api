@@ -15,7 +15,7 @@ import scala.concurrent.duration._
 import scala.util.Random
 
 class TotalsKafkaPollerCacheSpec
-    extends TestKit(ActorSystem("FlightListKafkaMessageProcessorSpec"))
+    extends TestKit(ActorSystem("TotalsKafkaPollerCacheSpec"))
     with BaseSpec
     with ImplicitSender
     with BeforeAndAfterAll
