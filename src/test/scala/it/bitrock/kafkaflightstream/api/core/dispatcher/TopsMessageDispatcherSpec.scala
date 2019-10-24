@@ -103,6 +103,11 @@ class TopsMessageDispatcherSpec
     }
   }
 
+  override def afterAll: Unit = {
+    shutdown()
+    super.afterAll()
+  }
+
 }
 
 object TopsMessageDispatcherSpec {
