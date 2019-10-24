@@ -2,13 +2,14 @@ package it.bitrock.kafkaflightstream.api.core.dispatcher
 
 import java.net.URI
 
-import akka.actor.{ActorRef, ActorSystem}
+import akka.actor.ActorSystem
 import akka.testkit.{ImplicitSender, TestKit, TestProbe}
 import it.bitrock.kafkaflightstream.api.config.{ConsumerConfig, KafkaConfig, WebsocketConfig}
+import it.bitrock.kafkaflightstream.api.core.CoreResources.{ResourceMessageDispatcher, TestKafkaConsumerWrapperFactory}
 import it.bitrock.kafkaflightstream.api.core.TopsMessageDispatcherFactoryImpl
 import it.bitrock.kafkaflightstream.api.core.poller.TopsKafkaPollerCache
 import it.bitrock.kafkaflightstream.api.definitions._
-import it.bitrock.kafkaflightstream.api.kafka.{KafkaConsumerWrapper, KafkaConsumerWrapperFactory}
+import it.bitrock.kafkaflightstream.api.kafka.KafkaConsumerWrapperFactory
 import it.bitrock.kafkaflightstream.api.{BaseSpec, TestValues}
 import it.bitrock.kafkageostream.testcommons.FixtureLoanerAnyResult
 import org.scalatest.BeforeAndAfterAll
@@ -25,13 +26,11 @@ class TopsMessageDispatcherSpec
     with JsonSupport
     with TestValues {
 
-  import TopsMessageDispatcherSpec._
-
   "Tops Message Dispatcher" should {
 
     "forward a JSON to source actor" when {
       "a TopArrivalAirportList is received" in ResourceLoaner.withFixture {
-        case Resource(websocketConfig, kafkaConfig, consumerFactory, _, sourceProbe) =>
+        case ResourceMessageDispatcher(websocketConfig, kafkaConfig, consumerFactory, _, sourceProbe) =>
           val topsKafkaPollerCache = TopsKafkaPollerCache.build(kafkaConfig, consumerFactory)
           val messageDispatcher    = new TopsMessageDispatcherFactoryImpl(websocketConfig, topsKafkaPollerCache).build(sourceProbe.ref)
           val msg                  = TopArrivalAirportList(Seq(Airport(DefaultArrivalAirport1Name, DefaultArrivalAirport1Amount)))
@@ -40,7 +39,7 @@ class TopsMessageDispatcherSpec
           sourceProbe.expectMsg(expectedResult)
       }
       "a TopDepartureAirportList is received" in ResourceLoaner.withFixture {
-        case Resource(websocketConfig, kafkaConfig, consumerFactory, _, sourceProbe) =>
+        case ResourceMessageDispatcher(websocketConfig, kafkaConfig, consumerFactory, _, sourceProbe) =>
           val topsKafkaPollerCache = TopsKafkaPollerCache.build(kafkaConfig, consumerFactory)
           val messageDispatcher    = new TopsMessageDispatcherFactoryImpl(websocketConfig, topsKafkaPollerCache).build(sourceProbe.ref)
           val msg                  = TopDepartureAirportList(Seq(Airport(DefaultDepartureAirport1Name, DefaultDepartureAirport1Amount)))
@@ -49,7 +48,7 @@ class TopsMessageDispatcherSpec
           sourceProbe.expectMsg(expectedResult)
       }
       "a TopSpeedList is received" in ResourceLoaner.withFixture {
-        case Resource(websocketConfig, kafkaConfig, consumerFactory, _, sourceProbe) =>
+        case ResourceMessageDispatcher(websocketConfig, kafkaConfig, consumerFactory, _, sourceProbe) =>
           val topsKafkaPollerCache = TopsKafkaPollerCache.build(kafkaConfig, consumerFactory)
           val messageDispatcher    = new TopsMessageDispatcherFactoryImpl(websocketConfig, topsKafkaPollerCache).build(sourceProbe.ref)
           val msg                  = TopSpeedList(Seq(SpeedFlight(DefaultFlightCode1, DefaultSpeed)))
@@ -58,7 +57,7 @@ class TopsMessageDispatcherSpec
           sourceProbe.expectMsg(expectedResult)
       }
       "a TopAirlineList is received" in ResourceLoaner.withFixture {
-        case Resource(websocketConfig, kafkaConfig, consumerFactory, _, sourceProbe) =>
+        case ResourceMessageDispatcher(websocketConfig, kafkaConfig, consumerFactory, _, sourceProbe) =>
           val topsKafkaPollerCache = TopsKafkaPollerCache.build(kafkaConfig, consumerFactory)
           val messageDispatcher    = new TopsMessageDispatcherFactoryImpl(websocketConfig, topsKafkaPollerCache).build(sourceProbe.ref)
           val msg                  = TopAirlineList(Seq(Airline(DefaultAirline1Name, DefaultAirline1Amount)))
@@ -69,8 +68,8 @@ class TopsMessageDispatcherSpec
     }
   }
 
-  object ResourceLoaner extends FixtureLoanerAnyResult[Resource] {
-    override def withFixture(body: Resource => Any): Any = {
+  object ResourceLoaner extends FixtureLoanerAnyResult[ResourceMessageDispatcher] {
+    override def withFixture(body: ResourceMessageDispatcher => Any): Any = {
       val websocketConfig = WebsocketConfig(1.second, 0.second, "not-used", "not-used", "not-used", "not-used", "not-used")
       val kafkaConfig =
         KafkaConfig(
@@ -92,7 +91,7 @@ class TopsMessageDispatcherSpec
       val consumerFactory: KafkaConsumerWrapperFactory = new TestKafkaConsumerWrapperFactory(pollProbe.ref)
 
       body(
-        Resource(
+        ResourceMessageDispatcher(
           websocketConfig,
           kafkaConfig,
           consumerFactory,
@@ -106,40 +105,6 @@ class TopsMessageDispatcherSpec
   override def afterAll: Unit = {
     shutdown()
     super.afterAll()
-  }
-
-}
-
-object TopsMessageDispatcherSpec {
-
-  final case class Resource(
-      websocketConfig: WebsocketConfig,
-      kafkaConfig: KafkaConfig,
-      consumerFactory: KafkaConsumerWrapperFactory,
-      pollProbe: TestProbe,
-      sourceProbe: TestProbe
-  )
-
-  case object PollingTriggered
-
-  class TestKafkaConsumerWrapperFactory(pollActorRef: ActorRef) extends KafkaConsumerWrapperFactory {
-
-    override def build(processor: ActorRef, topics: Seq[String] = List()): KafkaConsumerWrapper = new KafkaConsumerWrapper {
-
-      override def pollMessages(): Unit =
-        pollActorRef ! PollingTriggered
-
-      override def close(): Unit = ()
-
-      override val maxPollRecords: Int = 1
-
-      override def moveTo(epoch: Long): Unit = ()
-
-      override def pause(): Unit = ()
-
-      override def resume(): Unit = ()
-    }
-
   }
 
 }

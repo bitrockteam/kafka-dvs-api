@@ -1,13 +1,21 @@
-package it.bitrock.kafkaflightstream.api.core.poller
+package it.bitrock.kafkaflightstream.api.core
 
 import akka.actor.ActorRef
 import akka.testkit.TestProbe
-import it.bitrock.kafkaflightstream.api.config.KafkaConfig
+import it.bitrock.kafkaflightstream.api.config.{KafkaConfig, WebsocketConfig}
 import it.bitrock.kafkaflightstream.api.kafka.{KafkaConsumerWrapper, KafkaConsumerWrapperFactory}
 
-object KafkaPollerCache {
+object CoreResources {
 
-  final case class Resource(
+  final case class ResourceMessageDispatcher(
+      websocketConfig: WebsocketConfig,
+      kafkaConfig: KafkaConfig,
+      consumerFactory: KafkaConsumerWrapperFactory,
+      pollProbe: TestProbe,
+      sourceProbe: TestProbe
+  )
+
+  final case class ResourceKafkaPollerCache(
       kafkaConfig: KafkaConfig,
       consumerFactory: KafkaConsumerWrapperFactory,
       pollProbe: TestProbe
@@ -34,4 +42,5 @@ object KafkaPollerCache {
     }
 
   }
+
 }

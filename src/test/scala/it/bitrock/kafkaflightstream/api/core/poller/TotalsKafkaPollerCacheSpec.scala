@@ -5,6 +5,7 @@ import java.net.URI
 import akka.actor.ActorSystem
 import akka.testkit.{ImplicitSender, TestKit, TestProbe}
 import it.bitrock.kafkaflightstream.api.config.{ConsumerConfig, KafkaConfig}
+import it.bitrock.kafkaflightstream.api.core.CoreResources.{PollingTriggered, ResourceKafkaPollerCache, TestKafkaConsumerWrapperFactory}
 import it.bitrock.kafkaflightstream.api.definitions.{CountAirline, CountFlight, JsonSupport}
 import it.bitrock.kafkaflightstream.api.kafka.KafkaConsumerWrapperFactory
 import it.bitrock.kafkaflightstream.api.{BaseSpec, TestValues}
@@ -22,18 +23,16 @@ class TotalsKafkaPollerCacheSpec
     with JsonSupport
     with TestValues {
 
-  import KafkaPollerCache._
-
   "Totals Kafka Poller Cache" should {
 
     "trigger Kafka Consumer polling" when {
       "it starts" in ResourceLoaner.withFixture {
-        case Resource(kafkaConfig, consumerFactory, pollProbe) =>
+        case ResourceKafkaPollerCache(kafkaConfig, consumerFactory, pollProbe) =>
           TotalsKafkaPollerCache.build(kafkaConfig, consumerFactory)
           pollProbe expectMsg PollingTriggered
       }
       "a CountFlight message is received, but only after a delay" in ResourceLoaner.withFixture {
-        case Resource(kafkaConfig, consumerFactory, pollProbe) =>
+        case ResourceKafkaPollerCache(kafkaConfig, consumerFactory, pollProbe) =>
           val messagePollerCache = TotalsKafkaPollerCache.build(kafkaConfig, consumerFactory)
           val countFlightMessage = CountFlight(DefaultStartTimeWindow, DefaultCountFlightAmount)
           pollProbe expectMsg PollingTriggered
@@ -42,7 +41,7 @@ class TotalsKafkaPollerCacheSpec
           pollProbe expectMsg PollingTriggered
       }
       "a CountAirline message is received, but only after a delay" in ResourceLoaner.withFixture {
-        case Resource(kafkaConfig, consumerFactory, pollProbe) =>
+        case ResourceKafkaPollerCache(kafkaConfig, consumerFactory, pollProbe) =>
           val messagePollerCache = TotalsKafkaPollerCache.build(kafkaConfig, consumerFactory)
           val countFlightMessage = CountAirline(DefaultStartTimeWindow, DefaultCountAirlineAmount)
           pollProbe expectMsg PollingTriggered
@@ -53,8 +52,8 @@ class TotalsKafkaPollerCacheSpec
     }
   }
 
-  object ResourceLoaner extends FixtureLoanerAnyResult[Resource] {
-    override def withFixture(body: Resource => Any): Any = {
+  object ResourceLoaner extends FixtureLoanerAnyResult[ResourceKafkaPollerCache] {
+    override def withFixture(body: ResourceKafkaPollerCache => Any): Any = {
       val kafkaConfig =
         KafkaConfig(
           "",
@@ -74,7 +73,7 @@ class TotalsKafkaPollerCacheSpec
       val consumerFactory: KafkaConsumerWrapperFactory = new TestKafkaConsumerWrapperFactory(pollProbe.ref)
 
       body(
-        Resource(
+        ResourceKafkaPollerCache(
           kafkaConfig,
           consumerFactory,
           pollProbe
