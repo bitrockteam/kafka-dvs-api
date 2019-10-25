@@ -7,7 +7,11 @@ import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
 import com.typesafe.scalalogging.LazyLogging
 import it.bitrock.kafkaflightstream.api.config.AppConfig
-import it.bitrock.kafkaflightstream.api.core._
+import it.bitrock.kafkaflightstream.api.core.factory.{
+  FlightListMessageDispatcherFactoryImpl,
+  TopsMessageDispatcherFactoryImpl,
+  TotalsMessageDispatcherFactoryImpl
+}
 import it.bitrock.kafkaflightstream.api.core.poller._
 import it.bitrock.kafkaflightstream.api.kafka.KafkaConsumerWrapperFactory._
 import it.bitrock.kafkaflightstream.api.routes._
@@ -33,11 +37,6 @@ object Main extends App with LazyLogging {
 
   val httpClientFactory = new HttpClientFactoryImpl
 
-  val flightKafkaConsumerWrapperFactory = flightKafkaConsumerFactory(config.kafka)
-  val flightMessageDispatcherFactory =
-    new FlightMessageDispatcherFactoryImpl(config.server.websocket, config.kafka, flightKafkaConsumerWrapperFactory)
-  val flightFlowFactory = new FlowFactoryImpl(flightMessageDispatcherFactory)
-
   val flightListKafkaConsumerWrapperFactory = flightListKafkaConsumerFactory(config.kafka)
   val flightListKafkaMessagePollerCache     = FlightListKafkaPollerCache.build(config.kafka, flightListKafkaConsumerWrapperFactory)
   val flightListMessageDispatcherFactory =
@@ -56,7 +55,6 @@ object Main extends App with LazyLogging {
 
   val flowFactories: Map[FlowFactoryKey, FlowFactory] =
     Map(
-      flightFlowFactoryKey     -> flightFlowFactory,
       flightListFlowFactoryKey -> flightListFlowFactory,
       topsFlowFactoryKey       -> topsFlowFactory,
       totalsFlowFactoryKey     -> totalsFlowFactory
