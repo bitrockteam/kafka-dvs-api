@@ -17,12 +17,9 @@ class Routes(
 
   def streams: Route = get {
     pathPrefix(websocketConfig.pathPrefix) {
-      path(websocketConfig.flightsPath) {
-        handleWebSocketMessages(flowFactories(flightFlowFactoryKey).flow(""))
+      path(websocketConfig.flightListPath) {
+        handleWebSocketMessages(flowFactories(flightListFlowFactoryKey).flow(""))
       } ~
-        path(websocketConfig.flightListPath) {
-          handleWebSocketMessages(flowFactories(flightListFlowFactoryKey).flow(""))
-        } ~
         path(websocketConfig.topElementsPath) {
           handleWebSocketMessages(flowFactories(topsFlowFactoryKey).flow(""))
         } ~

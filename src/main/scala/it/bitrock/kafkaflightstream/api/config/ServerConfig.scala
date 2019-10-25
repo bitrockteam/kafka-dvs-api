@@ -12,7 +12,6 @@ final case class WebsocketConfig(
     throttleDuration: FiniteDuration,
     cleanupDelay: FiniteDuration,
     pathPrefix: String,
-    flightsPath: String,
     flightListPath: String,
     topElementsPath: String,
     totalElementsPath: String

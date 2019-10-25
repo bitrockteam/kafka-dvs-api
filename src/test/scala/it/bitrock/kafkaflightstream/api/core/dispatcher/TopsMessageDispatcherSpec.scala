@@ -1,36 +1,18 @@
 package it.bitrock.kafkaflightstream.api.core.dispatcher
 
-import java.net.URI
-
-import akka.actor.ActorSystem
-import akka.testkit.{ImplicitSender, TestKit, TestProbe}
-import it.bitrock.kafkaflightstream.api.config.{ConsumerConfig, KafkaConfig, WebsocketConfig}
-import it.bitrock.kafkaflightstream.api.core.CoreResources.{ResourceMessageDispatcher, TestKafkaConsumerWrapperFactory}
-import it.bitrock.kafkaflightstream.api.core.TopsMessageDispatcherFactoryImpl
+import it.bitrock.kafkaflightstream.api.BaseTestKit
+import it.bitrock.kafkaflightstream.api.core.factory.TopsMessageDispatcherFactoryImpl
 import it.bitrock.kafkaflightstream.api.core.poller.TopsKafkaPollerCache
 import it.bitrock.kafkaflightstream.api.definitions._
-import it.bitrock.kafkaflightstream.api.kafka.KafkaConsumerWrapperFactory
-import it.bitrock.kafkaflightstream.api.{BaseSpec, TestValues}
-import it.bitrock.kafkageostream.testcommons.FixtureLoanerAnyResult
-import org.scalatest.BeforeAndAfterAll
 import spray.json._
 
-import scala.concurrent.duration._
-import scala.util.Random
-
-class TopsMessageDispatcherSpec
-    extends TestKit(ActorSystem("TopsMessageDispatcherSpec"))
-    with BaseSpec
-    with ImplicitSender
-    with BeforeAndAfterAll
-    with JsonSupport
-    with TestValues {
+class TopsMessageDispatcherSpec extends BaseTestKit {
 
   "Tops Message Dispatcher" should {
 
     "forward a JSON to source actor" when {
-      "a TopArrivalAirportList is received" in ResourceLoaner.withFixture {
-        case ResourceMessageDispatcher(websocketConfig, kafkaConfig, consumerFactory, _, sourceProbe) =>
+      "a TopArrivalAirportList is received" in ResourceLoanerDispatcher.withFixture {
+        case ResourceDispatcher(websocketConfig, kafkaConfig, consumerFactory, sourceProbe) =>
           val topsKafkaPollerCache = TopsKafkaPollerCache.build(kafkaConfig, consumerFactory)
           val messageDispatcher    = new TopsMessageDispatcherFactoryImpl(websocketConfig, topsKafkaPollerCache).build(sourceProbe.ref)
           val msg                  = TopArrivalAirportList(Seq(Airport(DefaultArrivalAirport1Name, DefaultArrivalAirport1Amount)))
@@ -38,8 +20,8 @@ class TopsMessageDispatcherSpec
           val expectedResult = ApiEvent(msg.getClass.getSimpleName, msg).toJson.toString
           sourceProbe.expectMsg(expectedResult)
       }
-      "a TopDepartureAirportList is received" in ResourceLoaner.withFixture {
-        case ResourceMessageDispatcher(websocketConfig, kafkaConfig, consumerFactory, _, sourceProbe) =>
+      "a TopDepartureAirportList is received" in ResourceLoanerDispatcher.withFixture {
+        case ResourceDispatcher(websocketConfig, kafkaConfig, consumerFactory, sourceProbe) =>
           val topsKafkaPollerCache = TopsKafkaPollerCache.build(kafkaConfig, consumerFactory)
           val messageDispatcher    = new TopsMessageDispatcherFactoryImpl(websocketConfig, topsKafkaPollerCache).build(sourceProbe.ref)
           val msg                  = TopDepartureAirportList(Seq(Airport(DefaultDepartureAirport1Name, DefaultDepartureAirport1Amount)))
@@ -47,8 +29,8 @@ class TopsMessageDispatcherSpec
           val expectedResult = ApiEvent(msg.getClass.getSimpleName, msg).toJson.toString
           sourceProbe.expectMsg(expectedResult)
       }
-      "a TopSpeedList is received" in ResourceLoaner.withFixture {
-        case ResourceMessageDispatcher(websocketConfig, kafkaConfig, consumerFactory, _, sourceProbe) =>
+      "a TopSpeedList is received" in ResourceLoanerDispatcher.withFixture {
+        case ResourceDispatcher(websocketConfig, kafkaConfig, consumerFactory, sourceProbe) =>
           val topsKafkaPollerCache = TopsKafkaPollerCache.build(kafkaConfig, consumerFactory)
           val messageDispatcher    = new TopsMessageDispatcherFactoryImpl(websocketConfig, topsKafkaPollerCache).build(sourceProbe.ref)
           val msg                  = TopSpeedList(Seq(SpeedFlight(DefaultFlightCode1, DefaultSpeed)))
@@ -56,8 +38,8 @@ class TopsMessageDispatcherSpec
           val expectedResult = ApiEvent(msg.getClass.getSimpleName, msg).toJson.toString
           sourceProbe.expectMsg(expectedResult)
       }
-      "a TopAirlineList is received" in ResourceLoaner.withFixture {
-        case ResourceMessageDispatcher(websocketConfig, kafkaConfig, consumerFactory, _, sourceProbe) =>
+      "a TopAirlineList is received" in ResourceLoanerDispatcher.withFixture {
+        case ResourceDispatcher(websocketConfig, kafkaConfig, consumerFactory, sourceProbe) =>
           val topsKafkaPollerCache = TopsKafkaPollerCache.build(kafkaConfig, consumerFactory)
           val messageDispatcher    = new TopsMessageDispatcherFactoryImpl(websocketConfig, topsKafkaPollerCache).build(sourceProbe.ref)
           val msg                  = TopAirlineList(Seq(Airline(DefaultAirline1Name, DefaultAirline1Amount)))
@@ -66,45 +48,6 @@ class TopsMessageDispatcherSpec
           sourceProbe.expectMsg(expectedResult)
       }
     }
-  }
-
-  object ResourceLoaner extends FixtureLoanerAnyResult[ResourceMessageDispatcher] {
-    override def withFixture(body: ResourceMessageDispatcher => Any): Any = {
-      val websocketConfig = WebsocketConfig(1.second, 0.second, "not-used", "not-used", "not-used", "not-used", "not-used")
-      val kafkaConfig =
-        KafkaConfig(
-          "",
-          URI.create("http://localhost:8080"),
-          "",
-          "",
-          "",
-          "",
-          "",
-          "",
-          "",
-          "",
-          "",
-          ConsumerConfig(1.second, Duration.Zero)
-        )
-      val pollProbe                                    = TestProbe(s"poll-probe-${Random.nextInt()}")
-      val sourceProbe                                  = TestProbe(s"source-probe-${Random.nextInt()}")
-      val consumerFactory: KafkaConsumerWrapperFactory = new TestKafkaConsumerWrapperFactory(pollProbe.ref)
-
-      body(
-        ResourceMessageDispatcher(
-          websocketConfig,
-          kafkaConfig,
-          consumerFactory,
-          pollProbe,
-          sourceProbe
-        )
-      )
-    }
-  }
-
-  override def afterAll: Unit = {
-    shutdown()
-    super.afterAll()
   }
 
 }

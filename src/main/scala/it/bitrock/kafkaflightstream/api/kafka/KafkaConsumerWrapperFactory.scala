@@ -15,15 +15,6 @@ trait KafkaConsumerWrapperFactory {
 object KafkaConsumerWrapperFactory {
   lazy val byteArrayDeserializer: Deserializer[Array[Byte]] = Serdes.ByteArray.deserializer
 
-  def flightKafkaConsumerFactory(kafkaConfig: KafkaConfig): KafkaConsumerWrapperFactory =
-    (processor: ActorRef, topics: Seq[String]) =>
-      new KafkaConsumerWrapperImpl(
-        kafkaConfig,
-        processor,
-        topics,
-        (record: FlightReceived) => record.toFlightReceived
-      ) (byteArrayDeserializer, serdeFrom[FlightReceived](kafkaConfig.schemaRegistryUrl).deserializer)
-
   def flightListKafkaConsumerFactory(kafkaConfig: KafkaConfig): KafkaConsumerWrapperFactory =
     (processor: ActorRef, topics: Seq[String]) =>
       new KafkaConsumerWrapperImpl(

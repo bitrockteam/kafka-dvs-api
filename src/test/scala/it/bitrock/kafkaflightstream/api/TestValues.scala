@@ -1,7 +1,5 @@
 package it.bitrock.kafkaflightstream.api
 
-import java.time.Instant
-
 import it.bitrock.kafkaflightstream.api.definitions.CoordinatesBox
 
 import scala.util.Random
@@ -97,25 +95,4 @@ trait TestValues {
   final val DefaultCountAirlineAmount = Random.nextLong
   final val DefaultStartTimeWindow    = Random.nextString(10)
 
-  final val DefaultTimestamp = Instant.now
-
-  final val DefaultCurrentStatusRequest     = Random.nextString(10)
-  final val DefaultSourceDescriptionRequest = Random.nextString(10)
-  final val DefaultBadRequest               = Random.nextString(10)
-  final val DefaultInternalServerError      = Random.nextString(10)
-  final val DefaultUnhandledRequest         = Random.nextString(10)
-  final val DefaultErrorMessage             = Random.nextString(10)
-  final val DefaultStreamId                 = "aStreamId"
-  final val DefaultEndpoint                 = "anEndpoint"
-
-  final val DefaultNotFoundedStreamId = "notFoundedStreamId"
-  final val DefaultQueryId1           = "QUERY1"
-  final val DefaultQueryId2           = "QUERY2"
-  final val DefaultQueryId3           = "QUERY3"
-  final val DefaultSink1              = "SINK1"
-  final val DefaultSink2              = "SINK2"
-  final val DefaultSink3              = "SINK3"
-
 }
-
-case class XY(x: Double, y: Double)

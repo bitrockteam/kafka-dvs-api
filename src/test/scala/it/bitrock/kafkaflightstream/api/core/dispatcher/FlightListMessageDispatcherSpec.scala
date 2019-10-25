@@ -1,36 +1,18 @@
 package it.bitrock.kafkaflightstream.api.core.dispatcher
 
-import java.net.URI
-
-import akka.actor.ActorSystem
-import akka.testkit.{ImplicitSender, TestKit, TestProbe}
-import it.bitrock.kafkaflightstream.api.config.{ConsumerConfig, KafkaConfig, WebsocketConfig}
-import it.bitrock.kafkaflightstream.api.core.CoreResources.{ResourceMessageDispatcher, TestKafkaConsumerWrapperFactory}
-import it.bitrock.kafkaflightstream.api.core.FlightListMessageDispatcherFactoryImpl
+import it.bitrock.kafkaflightstream.api.BaseTestKit
+import it.bitrock.kafkaflightstream.api.core.factory.FlightListMessageDispatcherFactoryImpl
 import it.bitrock.kafkaflightstream.api.core.poller.FlightListKafkaPollerCache
 import it.bitrock.kafkaflightstream.api.definitions._
-import it.bitrock.kafkaflightstream.api.kafka.KafkaConsumerWrapperFactory
-import it.bitrock.kafkaflightstream.api.{BaseSpec, TestValues}
-import it.bitrock.kafkageostream.testcommons.FixtureLoanerAnyResult
-import org.scalatest.BeforeAndAfterAll
 import spray.json._
 
-import scala.concurrent.duration._
-import scala.util.Random
-
-class FlightListMessageDispatcherSpec
-    extends TestKit(ActorSystem("FlightMessageDispatcherSpec"))
-    with BaseSpec
-    with ImplicitSender
-    with BeforeAndAfterAll
-    with JsonSupport
-    with TestValues {
+class FlightListMessageDispatcherSpec extends BaseTestKit {
 
   "Flight List Message Dispatcher" should {
 
     "forward a JSON to source actor" when {
-      "a correct FlightReceivedList message is received" in ResourceLoaner.withFixture {
-        case ResourceMessageDispatcher(websocketConfig, kafkaConfig, consumerFactory, _, sourceProbe) =>
+      "a correct FlightReceivedList message is received" in ResourceLoanerDispatcher.withFixture {
+        case ResourceDispatcher(websocketConfig, kafkaConfig, consumerFactory, sourceProbe) =>
           val flightListKafkaPollerCache = FlightListKafkaPollerCache.build(kafkaConfig, consumerFactory)
           val messageProcessor =
             new FlightListMessageDispatcherFactoryImpl(websocketConfig, flightListKafkaPollerCache).build(sourceProbe.ref)
@@ -67,8 +49,8 @@ class FlightListMessageDispatcherSpec
           messageProcessor ! msg
           sourceProbe expectMsg msg.toJson.toString
       }
-      "the flights in the list are inside the box after its change" in ResourceLoaner.withFixture {
-        case ResourceMessageDispatcher(websocketConfig, kafkaConfig, consumerFactory, _, sourceProbe) =>
+      "the flights in the list are inside the box after its change" in ResourceLoanerDispatcher.withFixture {
+        case ResourceDispatcher(websocketConfig, kafkaConfig, consumerFactory, sourceProbe) =>
           val flightListKafkaPollerCache = FlightListKafkaPollerCache.build(kafkaConfig, consumerFactory)
           val messageProcessor =
             new FlightListMessageDispatcherFactoryImpl(websocketConfig, flightListKafkaPollerCache).build(sourceProbe.ref)
@@ -109,8 +91,8 @@ class FlightListMessageDispatcherSpec
     }
 
     "forward an empty message to source actor" when {
-      "the flights in the list are out of the box" in ResourceLoaner.withFixture {
-        case ResourceMessageDispatcher(websocketConfig, kafkaConfig, consumerFactory, _, sourceProbe) =>
+      "the flights in the list are out of the box" in ResourceLoanerDispatcher.withFixture {
+        case ResourceDispatcher(websocketConfig, kafkaConfig, consumerFactory, sourceProbe) =>
           val flightListKafkaPollerCache = FlightListKafkaPollerCache.build(kafkaConfig, consumerFactory)
           val messageProcessor =
             new FlightListMessageDispatcherFactoryImpl(websocketConfig, flightListKafkaPollerCache).build(sourceProbe.ref)
@@ -150,42 +132,4 @@ class FlightListMessageDispatcherSpec
 
   }
 
-  object ResourceLoaner extends FixtureLoanerAnyResult[ResourceMessageDispatcher] {
-    override def withFixture(body: ResourceMessageDispatcher => Any): Any = {
-      val websocketConfig = WebsocketConfig(1.second, 0.second, "not-used", "not-used", "not-used", "not-used", "not-used")
-      val kafkaConfig =
-        KafkaConfig(
-          "",
-          URI.create("http://localhost:8080"),
-          "",
-          "",
-          "",
-          "",
-          "",
-          "",
-          "",
-          "",
-          "",
-          ConsumerConfig(1.second, Duration.Zero)
-        )
-      val pollProbe                                    = TestProbe(s"poll-probe-${Random.nextInt()}")
-      val sourceProbe                                  = TestProbe(s"source-probe-${Random.nextInt()}")
-      val consumerFactory: KafkaConsumerWrapperFactory = new TestKafkaConsumerWrapperFactory(pollProbe.ref)
-
-      body(
-        ResourceMessageDispatcher(
-          websocketConfig,
-          kafkaConfig,
-          consumerFactory,
-          pollProbe,
-          sourceProbe
-        )
-      )
-    }
-  }
-
-  override def afterAll: Unit = {
-    shutdown()
-    super.afterAll()
-  }
 }
