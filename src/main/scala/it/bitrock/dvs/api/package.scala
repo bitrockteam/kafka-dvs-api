@@ -1,6 +1,5 @@
 package it.bitrock.dvs
 
-import it.bitrock.dvs.api.routes.FlowFactory
 import shapeless.tag
 import shapeless.tag.@@
 
@@ -17,8 +16,7 @@ package object tags {
   trait FlowFactoryKeyTag
   trait FlowFactoryValueTag
 
-  type FlowFactoryKey   = String @@ FlowFactoryKeyTag
-  type FlowFactoryValue = FlowFactory @@ FlowFactoryValueTag
+  type FlowFactoryKey = String @@ FlowFactoryKeyTag
 
   object TaggedTypes {
     val flightListFlowFactoryKey: FlowFactoryKey = tag[FlowFactoryKeyTag][String]("flight-list")

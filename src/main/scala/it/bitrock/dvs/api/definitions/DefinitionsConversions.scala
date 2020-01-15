@@ -156,3 +156,5 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
   implicit def apiEventJsonFormat[T <: EventPayload: JsonFormat]: RootJsonFormat[ApiEvent[T]] = jsonFormat2(ApiEvent.apply[T])
 
 }
+
+object JsonSupport extends JsonSupport
