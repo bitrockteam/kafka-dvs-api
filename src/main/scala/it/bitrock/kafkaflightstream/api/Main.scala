@@ -35,8 +35,6 @@ object Main extends App with LazyLogging {
   implicit val materializer: ActorMaterializer = ActorMaterializer()
   lazy val scheduler: Scheduler                = system.scheduler
 
-  val httpClientFactory = new HttpClientFactoryImpl
-
   val flightListKafkaConsumerWrapperFactory = flightListKafkaConsumerFactory(config.kafka)
   val flightListKafkaMessagePollerCache     = FlightListKafkaPollerCache.build(config.kafka, flightListKafkaConsumerWrapperFactory)
   val flightListMessageDispatcherFactory =
@@ -73,7 +71,6 @@ object Main extends App with LazyLogging {
     val resourcesClosed = for {
       binding <- bindingFuture
       _       <- binding.terminate(hardDeadline = 3.seconds)
-      _       <- httpClientFactory.close()
       t       <- system.terminate()
     } yield t
 

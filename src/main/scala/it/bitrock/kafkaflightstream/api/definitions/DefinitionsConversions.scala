@@ -99,34 +99,34 @@ object DefinitionsConversions {
       FlightReceivedList(x.elements.map(_.toFlightReceived))
   }
 
-  def toAirport(x: KAirport) = Airport(x.airportCode, x.eventCount)
+  def toAirport(x: KAirport): Airport = Airport(x.airportCode, x.eventCount)
 
   implicit class TopArrivalAirportListOps(x: KTopArrivalAirportList) {
-    def toTopArrivalAirportList = TopArrivalAirportList(x.elements.map(toAirport))
+    def toTopArrivalAirportList: TopArrivalAirportList = TopArrivalAirportList(x.elements.map(toAirport))
   }
 
   implicit class TopDepartureAirportListOps(x: KTopDepartureAirportList) {
-    def toTopDepartureAirportList = TopDepartureAirportList(x.elements.map(toAirport))
+    def toTopDepartureAirportList: TopDepartureAirportList = TopDepartureAirportList(x.elements.map(toAirport))
   }
 
-  def toSpeedFlight(x: KSpeedFlight) = SpeedFlight(x.flightCode, x.speed)
+  def toSpeedFlight(x: KSpeedFlight): SpeedFlight = SpeedFlight(x.flightCode, x.speed)
 
   implicit class TopSpeedListOps(x: KTopSpeedList) {
-    def toTopSpeedList = TopSpeedList(x.elements.map(toSpeedFlight))
+    def toTopSpeedList: TopSpeedList = TopSpeedList(x.elements.map(toSpeedFlight))
   }
 
-  def toAirline(x: KAirline) = Airline(x.airlineName, x.eventCount)
+  def toAirline(x: KAirline): Airline = Airline(x.airlineName, x.eventCount)
 
   implicit class TopAirlineListOps(x: KTopAirlineList) {
-    def toTopAirlineList = TopAirlineList(x.elements.map(toAirline))
+    def toTopAirlineList: TopAirlineList = TopAirlineList(x.elements.map(toAirline))
   }
 
   implicit class CountFlightOps(x: KCountFlight) {
-    def toCountFlight = CountFlight(x.windowStartTime, x.eventCount)
+    def toCountFlight: CountFlight = CountFlight(x.windowStartTime, x.eventCount)
   }
 
   implicit class CountAirlineOps(x: KCountAirline) {
-    def toCountAirline = CountAirline(x.windowStartTime, x.eventCount)
+    def toCountAirline: CountAirline = CountAirline(x.windowStartTime, x.eventCount)
   }
 
 }

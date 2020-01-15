@@ -13,8 +13,8 @@ class FlightListMessageDispatcher(
 ) extends MessageDispatcher {
 
   import context.dispatcher
-  val maxNumberFlights = 1000
-  val initialBox       = CoordinatesBox(49.8, -3.7, 39.7, 23.6)
+  private val maxNumberFlights = 1000
+  private val initialBox       = CoordinatesBox(49.8, -3.7, 39.7, 23.6)
 
   override def receive: Receive = boxing(initialBox)
 
