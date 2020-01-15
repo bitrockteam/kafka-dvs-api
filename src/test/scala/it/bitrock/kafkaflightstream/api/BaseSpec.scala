@@ -43,7 +43,7 @@ abstract class BaseTestKit
     }
   }
 
-  val kafkaConfig =
+  val kafkaConfig: KafkaConfig =
     KafkaConfig(
       "",
       URI.create("http://localhost:8080"),
@@ -58,7 +58,7 @@ abstract class BaseTestKit
       ConsumerConfig(1.second, Duration.Zero)
     )
 
-  val websocketConfig =
+  val websocketConfig: WebsocketConfig =
     WebsocketConfig(
       1.second,
       0.second,

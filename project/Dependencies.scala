@@ -27,6 +27,7 @@ object Dependencies {
     lazy val PureConfig        = "0.12.1"
     lazy val ScalaLogging      = "3.9.2"
     lazy val Slf4j             = "1.7.28"
+    lazy val Mockito           = "2.7.22"
 
   }
 
@@ -61,7 +62,7 @@ object Dependencies {
     "io.github.embeddedkafka"   %% "embedded-kafka-schema-registry" % Versions.ConfluentPlatform,
     "it.bitrock.kafkageostream" %% "test-commons"                   % Versions.TestCommons,
     "jakarta.ws.rs"             % "jakarta.ws.rs-api"               % Versions.JakartaWsRs, // mandatory when javax.ws.rs-api gets excluded
-    "org.mockito"               % "mockito-core"                    % "2.7.22"
+    "org.mockito"               % "mockito-core"                    % Versions.Mockito
   ).map(_ % s"$Test,$IntegrationTest")
 
   lazy val excludeDeps: Seq[ExclusionRule] = Seq(
