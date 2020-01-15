@@ -67,7 +67,6 @@ class RoutesSpec extends BaseAsyncSpec with ScalatestRouteTest {
       )
       val websocketConfig = WebsocketConfig(
         throttleDuration = 1.second,
-        cleanupDelay = 0.second,
         pathPrefix = "path",
         flightListPath = "flight-list",
         topElementsPath = "tops",
@@ -92,7 +91,7 @@ object RoutesSpec {
   final case class Resource(route: Routes, wsProbe: WSProbe, websocketConfig: WebsocketConfig)
 
   class TestFlowFactory extends FlowFactory {
-    override def flow(identifier: String): Flow[Message, Message, NotUsed] = Flow[Message].map(identity)
+    override def flow: Flow[Message, Message, NotUsed] = Flow[Message].map(identity)
   }
 
 }

@@ -65,7 +65,6 @@ class FlowFactorySpec
 
     val websocketConfig = WebsocketConfig(
       throttleDuration = 1.second,
-      cleanupDelay = 0.second,
       pathPrefix = "path",
       flightListPath = "flight-list",
       topElementsPath = "tops",
@@ -80,7 +79,7 @@ class FlowFactorySpec
       new FlightListMessageDispatcherFactoryImpl(websocketConfig, mock[ActorRef])
 
     val flowFactories = Map(
-      flightListFlowFactoryKey -> new FlowFactoryImpl(flightListMessageProcessorFactory),
+      flightListFlowFactoryKey -> FlowFactory.flightFlowFactory(flightListMessageProcessorFactory),
       topsFlowFactoryKey       -> new TestFlowFactory,
       totalsFlowFactoryKey     -> new TestFlowFactory
     )
@@ -100,6 +99,6 @@ object FlowFactorySpec {
   final case class Resource(route: Routes, wsProbe: WSProbe, websocketConfig: WebsocketConfig)
 
   class TestFlowFactory extends FlowFactory {
-    override def flow(identifier: String): Flow[Message, Message, NotUsed] = Flow[Message].map(identity)
+    override def flow: Flow[Message, Message, NotUsed] = Flow[Message].map(identity)
   }
 }

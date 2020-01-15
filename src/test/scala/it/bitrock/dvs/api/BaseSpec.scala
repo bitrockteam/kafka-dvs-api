@@ -60,7 +60,6 @@ abstract class BaseTestKit
 
   val websocketConfig: WebsocketConfig =
     WebsocketConfig(
-      1.second,
       0.second,
       "not-used",
       "not-used",

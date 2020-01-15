@@ -39,17 +39,17 @@ object Main extends App with LazyLogging {
   val flightListKafkaMessagePollerCache     = FlightListKafkaPollerCache.build(config.kafka, flightListKafkaConsumerWrapperFactory)
   val flightListMessageDispatcherFactory =
     new FlightListMessageDispatcherFactoryImpl(config.server.websocket, flightListKafkaMessagePollerCache)
-  val flightListFlowFactory = new FlightListFlowFactory(flightListMessageDispatcherFactory)
+  val flightListFlowFactory = FlowFactory.flightListFlowFactory(flightListMessageDispatcherFactory)
 
   val topsKafkaConsumerWrapperFactory = topsKafkaConsumerFactory(config.kafka)
   val topsKafkaPollerCache            = TopsKafkaPollerCache.build(config.kafka, topsKafkaConsumerWrapperFactory)
   val topsMessageDispatcherFactory    = new TopsMessageDispatcherFactoryImpl(config.server.websocket, topsKafkaPollerCache)
-  val topsFlowFactory                 = new FlowFactoryImpl(topsMessageDispatcherFactory)
+  val topsFlowFactory                 = FlowFactory.flightFlowFactory(topsMessageDispatcherFactory)
 
   val totalsKafkaConsumerWrapperFactory = totalsKafkaConsumerFactory(config.kafka)
   val totalsKafkaPollerCache            = TotalsKafkaPollerCache.build(config.kafka, totalsKafkaConsumerWrapperFactory)
   val totalsMessageDispatcherFactory    = new TotalsMessageDispatcherFactoryImpl(config.server.websocket, totalsKafkaPollerCache)
-  val totalsFlowFactory                 = new FlowFactoryImpl(totalsMessageDispatcherFactory)
+  val totalsFlowFactory                 = FlowFactory.flightFlowFactory(totalsMessageDispatcherFactory)
 
   val flowFactories: Map[FlowFactoryKey, FlowFactory] =
     Map(

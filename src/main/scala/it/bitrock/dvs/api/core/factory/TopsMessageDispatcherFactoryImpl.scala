@@ -10,7 +10,7 @@ class TopsMessageDispatcherFactoryImpl(
 )(implicit system: ActorRefFactory)
     extends MessageDispatcherFactory {
 
-  override def build(sourceActorRef: ActorRef, identifier: String = ""): ActorRef =
+  override def build(sourceActorRef: ActorRef): ActorRef =
     system.actorOf(TopsMessageDispatcher.props(sourceActorRef, kafkaMessageDispatcher, websocketConfig))
 
 }
