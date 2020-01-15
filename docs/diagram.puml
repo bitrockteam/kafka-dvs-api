@@ -1,7 +1,7 @@
 @startuml
-title kafka-flightstream-api architecture
+title kafka-dvs-api architecture
 
-[kafka-flightstream-api] as API
+[kafka-dvs-api] as API
 [Client] as client
 
 interface "Schema Registry" as SchemaRegistry

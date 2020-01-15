@@ -2,14 +2,14 @@ import Dependencies._
 import sbtrelease.ReleasePlugin.autoImport.ReleaseTransformations._
 
 lazy val commonSettings = Seq(
-  organization := "it.bitrock.kafkaflightstream",
+  organization := "it.bitrock.dvs",
   scalaVersion := Versions.Scala
 )
 
 lazy val apiModelsCompileSettings = Seq(
   Compile / guardrailTasks := List(
-    ScalaServer((Compile / resourceDirectory).value / "api.yaml", pkg = "it.bitrock.kafkaflightstream.api.routes"),
-    ScalaClient((Compile / resourceDirectory).value / "api.yaml", pkg = "it.bitrock.kafkaflightstream.api.routes")
+    ScalaServer((Compile / resourceDirectory).value / "api.yaml", pkg = "it.bitrock.dvs.api.routes"),
+    ScalaClient((Compile / resourceDirectory).value / "api.yaml", pkg = "it.bitrock.dvs.api.routes")
   )
 )
 
@@ -36,7 +36,7 @@ lazy val compileSettings = Seq(
 lazy val dependenciesSettings = Seq(
   credentials ++= Seq(
     baseDirectory.value / ".sbt" / ".credentials",
-    Path.userHome / ".sbt" / ".credentials.flightstream"
+    Path.userHome / ".sbt" / ".credentials.bitrock"
   ).collect {
     case c if c.exists => Credentials(c)
   },
@@ -74,7 +74,7 @@ lazy val integrationTestSettings = Defaults.itSettings ++ Seq(
 
 lazy val apiModels = (project in file("api-models"))
   .settings(
-    name := "kafka-flightstream-api-models",
+    name := "kafka-dvs-api-models",
     libraryDependencies ++= ApiModelsDependencies.prodDeps,
     Compile / logLevel := Level.Error
   )
@@ -83,7 +83,7 @@ lazy val apiModels = (project in file("api-models"))
 
 lazy val root = (project in file("."))
   .settings(
-    name := "kafka-flightstream-api"
+    name := "kafka-dvs-api"
   )
   .settings(commonSettings: _*)
   .settings(compileSettings: _*)

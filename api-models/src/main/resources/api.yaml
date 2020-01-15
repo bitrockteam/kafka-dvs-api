@@ -1,7 +1,7 @@
 openapi: '3.0.2'
 info:
-  title: Kafka Flightstream server API
-  description: Kafka Flightstream server API
+  title: DVS server API
+  description: DVS server API
   contact:
     name: Bitrock
     url: https://bitrock.it/
@@ -11,7 +11,7 @@ info:
   version: 1.0.0-SNAPSHOT
 
 servers:
-- url: https://flightstream-api.bitrock.it/v1/rest
+- url: https://dvs-api.bitrock.it/v1/rest
   variables:
     basePath:
       enum:

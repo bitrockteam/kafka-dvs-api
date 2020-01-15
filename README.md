@@ -1,8 +1,8 @@
-# K·Flightstream server API
+# DVS server API
 
-[![Build Status](https://iproject-jenkins.reactive-labs.io/buildStatus/icon?job=kafka-flightstream-api%2Fmaster)](https://iproject-jenkins.reactive-labs.io/view/Kafka%20Flightstream/job/kafka-flightstream-api/job/master/)
+[![Build Status](https://iproject-jenkins.reactive-labs.io/buildStatus/icon?job=kafka-dvs-api%2Fmaster)](https://iproject-jenkins.reactive-labs.io/view/DVS/job/kafka-dvs-api/job/master/)
 
-Scala application with ReST and web-socket APIs serving aggregated Flight events. Part of the [K·FlightStream project](https://github.com/search?q=topic%3Akafka-flightstream+org%3Abitrockteam&type=Repositories).
+Scala application with ReST and web-socket APIs serving aggregated Flight events. Part of the [DVS project](https://github.com/search?q=topic%3Advs+org%3Abitrockteam&type=Repositories).
 
 ## Configuration
 
@@ -17,7 +17,7 @@ The application references the following environment variables:
 
 ### Resolvers
 
-Some dependencies are downloaded from a private Nexus repository. Make sure to provide a `~/.sbt/.credentials.flightstream` file containing valid credentials:
+Some dependencies are downloaded from a private Nexus repository. Make sure to provide a `~/.sbt/.credentials.bitrock` file containing valid credentials:
 
 ```properties
 realm=Sonatype Nexus Repository Manager
