@@ -2,6 +2,7 @@ package it.bitrock.dvs.api.core.poller
 
 import it.bitrock.dvs.api.BaseTestKit
 import it.bitrock.dvs.api.definitions._
+import it.bitrock.dvs.api.BaseTestKit._
 
 class FlightListKafkaPollerCacheSpec extends BaseTestKit {
 

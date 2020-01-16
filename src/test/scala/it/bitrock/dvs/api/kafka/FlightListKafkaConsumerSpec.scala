@@ -6,6 +6,7 @@ import akka.actor.ActorSystem
 import akka.testkit.{TestKit, TestProbe}
 import it.bitrock.dvs.api.config.{AppConfig, KafkaConfig}
 import it.bitrock.dvs.api.definitions._
+import it.bitrock.dvs.api.kafka.FlightListKafkaConsumerSpec.Resource
 import it.bitrock.dvs.api.kafka.KafkaConsumerWrapper.NoMessage
 import it.bitrock.dvs.api.{BaseSpec, TestValues}
 import it.bitrock.dvs.model.avro.{
@@ -197,9 +198,7 @@ class FlightListKafkaConsumerSpec
           // Publish to a topic before consumer is started
           publishToKafka(kafkaConfig.flightReceivedListTopic, "key", kFlightReceivedList)
 
-          val deadline = patienceConfig.interval.fromNow
-
-          while (deadline.hasTimeLeft) {
+          eventually {
             pollMessages()
             processorProbe.expectMsg(NoMessage)
           }
@@ -209,6 +208,11 @@ class FlightListKafkaConsumerSpec
           response shouldBe kFlightReceivedList
         }
     }
+  }
+
+  override def afterAll: Unit = {
+    shutdown()
+    super.afterAll()
   }
 
   object ResourceLoaner extends FixtureLoanerAnyResult[Resource] {
@@ -243,10 +247,9 @@ class FlightListKafkaConsumerSpec
     }
   }
 
-  override def afterAll: Unit = {
-    shutdown()
-    super.afterAll()
-  }
+}
+
+object FlightListKafkaConsumerSpec {
 
   final case class Resource(
       embeddedKafkaConfig: EmbeddedKafkaConfig,

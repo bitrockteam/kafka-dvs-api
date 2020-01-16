@@ -1,6 +1,7 @@
 package it.bitrock.dvs.api.core.dispatcher
 
 import akka.actor.{ActorRef, PoisonPill, Props, Terminated}
+import it.bitrock.dvs.api.ActorSystemOps
 import it.bitrock.dvs.api.config.WebsocketConfig
 import it.bitrock.dvs.api.definitions._
 import it.bitrock.dvs.api.kafka.KafkaConsumerWrapper.FlightListUpdate
@@ -24,7 +25,7 @@ class FlightListMessageDispatcher(
 
     case FlightListUpdate =>
       kafkaPoller ! FlightListUpdate
-      context.system.scheduler.scheduleOnce(websocketConfig.throttleDuration)(self ! FlightListUpdate)
+      context.system.scheduleOnce(websocketConfig.throttleDuration)(self ! FlightListUpdate)
 
     case flights: FlightReceivedList =>
       logger.debug(s"Got a $flights from Kafka Consumer")

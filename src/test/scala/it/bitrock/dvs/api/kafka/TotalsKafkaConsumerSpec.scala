@@ -7,6 +7,7 @@ import akka.testkit.{TestKit, TestProbe}
 import it.bitrock.dvs.api.config.{AppConfig, KafkaConfig}
 import it.bitrock.dvs.api.definitions._
 import it.bitrock.dvs.api.kafka.KafkaConsumerWrapper.NoMessage
+import it.bitrock.dvs.api.kafka.TotalsKafkaConsumerSpec.Resource
 import it.bitrock.dvs.api.{BaseSpec, TestValues}
 import it.bitrock.dvs.model.avro.{CountAirline => KCountAirline, CountFlight => KCountFlight}
 import it.bitrock.kafkacommons.serialization.ImplicitConversions._
@@ -58,8 +59,7 @@ class TotalsKafkaConsumerSpec
           publishToKafka(kafkaConfig.totalFlightTopic, kCountFlightStatus)
           publishToKafka(kafkaConfig.totalAirlineTopic, kCountAirline)
 
-          val deadline = patienceConfig.interval.fromNow
-          while (deadline.hasTimeLeft) {
+          eventually {
             pollMessages()
             processorProbe.expectMsg(NoMessage)
           }
@@ -110,6 +110,9 @@ class TotalsKafkaConsumerSpec
     super.afterAll()
   }
 
+}
+
+object TotalsKafkaConsumerSpec {
   final case class Resource(
       embeddedKafkaConfig: EmbeddedKafkaConfig,
       kafkaConfig: KafkaConfig,

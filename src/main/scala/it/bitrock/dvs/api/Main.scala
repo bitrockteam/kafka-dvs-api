@@ -6,6 +6,8 @@ import akka.http.scaladsl.Http.ServerBinding
 import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
 import com.typesafe.scalalogging.LazyLogging
+import it.bitrock.dvs.api.Tags.FlowFactoryKey
+import it.bitrock.dvs.api.Tags.TaggedTypes._
 import it.bitrock.dvs.api.config.AppConfig
 import it.bitrock.dvs.api.core.factory.{
   FlightListMessageDispatcherFactoryImpl,
@@ -13,10 +15,8 @@ import it.bitrock.dvs.api.core.factory.{
   TotalsMessageDispatcherFactoryImpl
 }
 import it.bitrock.dvs.api.core.poller._
-import it.bitrock.dvs.api.routes._
 import it.bitrock.dvs.api.kafka.KafkaConsumerWrapperFactory._
-import it.bitrock.dvs.tags.FlowFactoryKey
-import it.bitrock.dvs.tags.TaggedTypes._
+import it.bitrock.dvs.api.routes._
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContextExecutor, Future}
@@ -71,8 +71,8 @@ object Main extends App with LazyLogging {
     val resourcesClosed = for {
       binding <- bindingFuture
       _       <- binding.terminate(hardDeadline = 3.seconds)
-      t       <- system.terminate()
-    } yield t
+      _       <- system.terminate()
+    } yield ()
 
     Await.result(resourcesClosed, 10.seconds)
   }

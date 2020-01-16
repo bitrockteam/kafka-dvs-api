@@ -5,6 +5,7 @@ import it.bitrock.dvs.api.config.WebsocketConfig
 import it.bitrock.dvs.api.definitions._
 import it.bitrock.dvs.api.kafka.KafkaConsumerWrapper.{TotalAirlineUpdate, TotalFlightUpdate}
 import spray.json._
+import it.bitrock.dvs.api.ActorSystemOps
 
 class TotalsMessageDispatcher(
     val sourceActorRef: ActorRef,
@@ -20,11 +21,11 @@ class TotalsMessageDispatcher(
 
     case TotalFlightUpdate =>
       kafkaPoller ! TotalFlightUpdate
-      context.system.scheduler.scheduleOnce(websocketConfig.throttleDuration)(self ! TotalFlightUpdate)
+      context.system.scheduleOnce(websocketConfig.throttleDuration)(self ! TotalFlightUpdate)
 
     case TotalAirlineUpdate =>
       kafkaPoller ! TotalAirlineUpdate
-      context.system.scheduler.scheduleOnce(websocketConfig.throttleDuration)(self ! TotalAirlineUpdate)
+      context.system.scheduleOnce(websocketConfig.throttleDuration)(self ! TotalAirlineUpdate)
 
     case totalFlights: CountFlight =>
       logger.debug(s"Got $totalFlights from Kafka Consumer")

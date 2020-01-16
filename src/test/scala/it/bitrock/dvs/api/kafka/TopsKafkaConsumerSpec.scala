@@ -7,6 +7,7 @@ import akka.testkit.{TestKit, TestProbe}
 import it.bitrock.dvs.api.config.{AppConfig, KafkaConfig}
 import it.bitrock.dvs.api.definitions._
 import it.bitrock.dvs.api.kafka.KafkaConsumerWrapper.NoMessage
+import it.bitrock.dvs.api.kafka.TopsKafkaConsumerSpec.Resource
 import it.bitrock.dvs.api.{BaseSpec, TestValues}
 import it.bitrock.dvs.model.avro.{
   Airline => KAirline,
@@ -189,9 +190,7 @@ class TopsKafkaConsumerSpec
           publishToKafka(kafkaConfig.topSpeedTopic, kTopSpeedList)
           publishToKafka(kafkaConfig.topAirlineTopic, kTopAirlineList)
 
-          val deadline = patienceConfig.interval.fromNow
-
-          while (deadline.hasTimeLeft) {
+          eventually {
             pollMessages()
             processorProbe.expectMsg(NoMessage)
           }
@@ -261,6 +260,9 @@ class TopsKafkaConsumerSpec
     super.afterAll()
   }
 
+}
+
+object TopsKafkaConsumerSpec {
   final case class Resource(
       embeddedKafkaConfig: EmbeddedKafkaConfig,
       kafkaConfig: KafkaConfig,

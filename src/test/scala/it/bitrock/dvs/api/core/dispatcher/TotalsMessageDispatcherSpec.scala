@@ -5,6 +5,7 @@ import it.bitrock.dvs.api.core.factory.TotalsMessageDispatcherFactoryImpl
 import it.bitrock.dvs.api.core.poller.TotalsKafkaPollerCache
 import it.bitrock.dvs.api.definitions._
 import spray.json._
+import it.bitrock.dvs.api.BaseTestKit._
 
 class TotalsMessageDispatcherSpec extends BaseTestKit {
 

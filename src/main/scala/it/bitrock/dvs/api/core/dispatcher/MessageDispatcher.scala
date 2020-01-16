@@ -11,9 +11,8 @@ trait MessageDispatcher extends Actor with JsonSupport with LazyLogging {
 
   val websocketConfig: WebsocketConfig
 
-  def forwardMessage(event: String): Unit = {
+  def forwardMessage(event: String): Unit =
     sourceActorRef ! event
-  }
 
   override def preStart(): Unit = {
     super.preStart()

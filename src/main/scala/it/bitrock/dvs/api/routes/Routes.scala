@@ -4,9 +4,9 @@ import akka.http.scaladsl.server.Directives.{get, handleWebSocketMessages, path,
 import akka.http.scaladsl.server.PathMatcher._
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.RouteConcatenation._
+import it.bitrock.dvs.api.Tags.TaggedTypes._
+import it.bitrock.dvs.api.Tags._
 import it.bitrock.dvs.api.config.WebsocketConfig
-import it.bitrock.dvs.tags.FlowFactoryKey
-import it.bitrock.dvs.tags.TaggedTypes._
 
 class Routes(
     flowFactories: Map[FlowFactoryKey, FlowFactory],
