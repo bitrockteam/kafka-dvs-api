@@ -88,6 +88,7 @@ object BaseTestKit {
 
   val websocketConfig: WebsocketConfig =
     WebsocketConfig(
+      1000,
       0.second,
       "not-used",
       "not-used",

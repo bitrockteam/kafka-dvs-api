@@ -9,6 +9,7 @@ final case class ServerConfig(
 )
 
 final case class WebsocketConfig(
+    maxNumberFlights: Int,
     throttleDuration: FiniteDuration,
     pathPrefix: String,
     flightListPath: String,
