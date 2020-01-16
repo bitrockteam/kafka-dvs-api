@@ -1,5 +1,4 @@
 addSbtPlugin("com.typesafe.sbt"          % "sbt-native-packager" % "1.3.19")
-addSbtPlugin("com.twilio"                % "sbt-guardrail"       % "0.47.0")
 addSbtPlugin("com.github.gseitz"         % "sbt-release"         % "1.0.11")
 addSbtPlugin("org.scalameta"             % "sbt-scalafmt"        % "2.2.1")
 addSbtPlugin("ch.epfl.scala"             % "sbt-scalafix"        % "0.9.11")
