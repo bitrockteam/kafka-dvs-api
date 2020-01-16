@@ -49,6 +49,8 @@ object Dependencies {
   }
 
   lazy val prodDeps: Seq[ModuleID] = Seq(
+    "com.typesafe.akka"     %% "akka-http"              % Versions.AkkaHttp,
+    "com.typesafe.akka"     %% "akka-stream"            % Versions.Akka,
     "ch.megard"             %% "akka-http-cors"         % Versions.AkkaHttpCors,
     "com.github.pureconfig" %% "pureconfig"             % Versions.PureConfig,
     "com.typesafe.akka"     %% "akka-http-spray-json"   % Versions.AkkaHttp,

@@ -7,13 +7,14 @@ import akka.http.scaladsl.server.RouteConcatenation._
 import it.bitrock.dvs.api.Tags.TaggedTypes._
 import it.bitrock.dvs.api.Tags._
 import it.bitrock.dvs.api.config.WebsocketConfig
+import it.bitrock.dvs.api.services.InternalsService.healthCheckRoute
 
 class Routes(
     flowFactories: Map[FlowFactoryKey, FlowFactory],
     websocketConfig: WebsocketConfig
 ) {
 
-  val routes: Route = streams
+  val routes: Route = streams ~ healthCheckRoute
 
   def streams: Route = get {
     pathPrefix(websocketConfig.pathPrefix) {

@@ -1,12 +1,12 @@
 package it.bitrock.dvs.api.services
 
-import it.bitrock.dvs.api.routes.internals.{InternalsHandler, InternalsResource}
+import akka.http.scaladsl.model.StatusCodes.OK
+import akka.http.scaladsl.server.Directives.{complete, path}
+import akka.http.scaladsl.server.Route
 
-import scala.concurrent.Future
-
-class InternalsService extends InternalsHandler {
-
-  override def health(respond: InternalsResource.healthResponse.type)(): Future[InternalsResource.healthResponse] =
-    Future.successful(respond.OK)
-
+object InternalsService {
+  def healthCheckRoute: Route =
+    path("health") {
+      complete((OK, "ok"))
+    }
 }

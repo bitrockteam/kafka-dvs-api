@@ -9,14 +9,6 @@ lazy val commonSettings = Seq(
   scalaVersion := Versions.Scala
 )
 
-lazy val apiModelsCompileSettings = Seq(
-  Compile / guardrailTasks := List(
-    ScalaServer((Compile / resourceDirectory).value / "api.yaml", pkg = "it.bitrock.dvs.api.routes"),
-    ScalaClient((Compile / resourceDirectory).value / "api.yaml", pkg = "it.bitrock.dvs.api.routes")
-  ),
-  scalacOptions -= "-Xfatal-warnings"
-)
-
 lazy val compileSettings = Seq(
   Compile / compile := (Compile / compile)
     .dependsOn(
@@ -75,20 +67,6 @@ lazy val testSettings = Seq(
   Test / parallelExecution := false
 )
 
-lazy val integrationTestSettings = Defaults.itSettings ++ Seq(
-  IntegrationTest / logBuffered := false,
-  IntegrationTest / parallelExecution := false
-) ++ inConfig(IntegrationTest)(org.scalafmt.sbt.ScalafmtPlugin.scalafmtConfigSettings)
-
-lazy val apiModels = (project in file("api-models"))
-  .settings(
-    name := "kafka-dvs-api-models",
-    libraryDependencies ++= ApiModelsDependencies.prodDeps,
-    Compile / logLevel := Level.Error
-  )
-  .settings(commonSettings: _*)
-  .settings(apiModelsCompileSettings: _*)
-
 lazy val root = (project in file("."))
   .settings(
     name := "kafka-dvs-api"
@@ -99,8 +77,6 @@ lazy val root = (project in file("."))
   .settings(publishSettings: _*)
   .settings(testSettings: _*)
   .configs(IntegrationTest)
-  .settings(integrationTestSettings: _*)
-  .dependsOn(apiModels)
 
 /**
   * sbt-native-packager plugin
