@@ -1,6 +1,7 @@
 # DVS server API
 
 [![Build Status](https://iproject-jenkins.reactive-labs.io/buildStatus/icon?job=kafka-dvs-api%2Fmaster)](https://iproject-jenkins.reactive-labs.io/view/DVS/job/kafka-dvs-api/job/master/)
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)
 
 Scala application with ReST and web-socket APIs serving aggregated flight events. Part of the [DVS project](https://github.com/search?q=topic%3Advs+org%3Abitrockteam&type=Repositories).
 
