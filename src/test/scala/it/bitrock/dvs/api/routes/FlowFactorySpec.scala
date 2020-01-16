@@ -64,6 +64,7 @@ class FlowFactorySpec
   override def withFixture(body: FlowFactorySpec.Resource => Future[Assertion]): Future[Assertion] = {
 
     val websocketConfig = WebsocketConfig(
+      maxNumberFlights = 1000,
       throttleDuration = 1.second,
       pathPrefix = "path",
       flightListPath = "flight-list",

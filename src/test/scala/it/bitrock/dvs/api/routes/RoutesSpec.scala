@@ -66,6 +66,7 @@ class RoutesSpec extends BaseAsyncSpec with ScalatestRouteTest {
         totalsFlowFactoryKey     -> new TestFlowFactory
       )
       val websocketConfig = WebsocketConfig(
+        maxNumberFlights = 1000,
         throttleDuration = 1.second,
         pathPrefix = "path",
         flightListPath = "flight-list",

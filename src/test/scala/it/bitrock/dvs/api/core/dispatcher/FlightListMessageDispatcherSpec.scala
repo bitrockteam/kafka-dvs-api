@@ -47,6 +47,7 @@ class FlightListMessageDispatcherSpec extends BaseTestKit {
               )
             )
           )
+          messageProcessor ! CoordinatesBox(49.8, -3.7, 39.7, 23.6)
           messageProcessor ! msg
           sourceProbe expectMsg msg.toJson.toString
       }
@@ -127,6 +128,7 @@ class FlightListMessageDispatcherSpec extends BaseTestKit {
               )
             )
           )
+          messageProcessor ! CoordinatesBox(49.8, -3.7, 39.7, 23.6)
           sourceProbe expectMsg FlightReceivedList(Seq()).toJson.toString
       }
     }
