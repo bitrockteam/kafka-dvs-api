@@ -4,7 +4,6 @@ import akka.actor.{ActorSystem, Scheduler}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
 import akka.http.scaladsl.server.Route
-import akka.stream.ActorMaterializer
 import com.typesafe.scalalogging.LazyLogging
 import it.bitrock.dvs.api.Tags.FlowFactoryKey
 import it.bitrock.dvs.api.Tags.TaggedTypes._
@@ -30,10 +29,9 @@ object Main extends App with LazyLogging {
   val host: String = config.server.host
   val port: Int    = config.server.port
 
-  implicit val system: ActorSystem             = ActorSystem("KafkaDVSApi")
-  implicit val ec: ExecutionContextExecutor    = system.dispatcher
-  implicit val materializer: ActorMaterializer = ActorMaterializer()
-  lazy val scheduler: Scheduler                = system.scheduler
+  implicit val system: ActorSystem          = ActorSystem("KafkaDVSApi")
+  implicit val ec: ExecutionContextExecutor = system.dispatcher
+  lazy val scheduler: Scheduler             = system.scheduler
 
   val flightListKafkaConsumerWrapperFactory = flightListKafkaConsumerFactory(config.kafka)
   val flightListKafkaMessagePollerCache     = FlightListKafkaPollerCache.build(config.kafka, flightListKafkaConsumerWrapperFactory)

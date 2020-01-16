@@ -14,12 +14,12 @@ object Dependencies {
   object Versions {
 
     lazy val Scala             = "2.12.10"
-    lazy val Akka              = "2.5.25"
-    lazy val AkkaHttp          = "10.1.10"
-    lazy val AkkaHttpCors      = "0.4.1"
-    lazy val ConfluentPlatform = "5.3.2"
+    lazy val Akka              = "2.6.1"
+    lazy val AkkaHttp          = "10.1.11"
+    lazy val AkkaHttpCors      = "0.4.2"
+    lazy val ConfluentPlatform = "5.4.0"
     lazy val JakartaWsRs       = "2.1.4"
-    lazy val Kafka             = "2.3.1"
+    lazy val Kafka             = "2.4.0"
     lazy val KafkaDVS          = "0.1.14"
     lazy val TestCommons       = "0.0.7"
     lazy val KafkaCommons      = "0.0.7"
