@@ -59,8 +59,7 @@ object FlowFactory extends LazyLogging {
 
   private def buildFlow(sink: Sink[Message, Any], source: Source[String, NotUsed], processor: ActorRef)(
       implicit ec: ExecutionContext
-  ): Flow[Message, Message, NotUsed] = {
-
+  ): Flow[Message, Message, NotUsed] =
     Flow
       .fromSinkAndSourceCoupled(sink, source.map(TextMessage(_)))
       .watchTermination() { (termWatchBefore, termWatchAfter) =>
@@ -74,7 +73,6 @@ object FlowFactory extends LazyLogging {
         }
         termWatchBefore
       }
-  }
 
   private def parseMessage: Message => Option[CoordinatesBox] = {
     case TextMessage.Strict(txt) =>

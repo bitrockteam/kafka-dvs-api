@@ -22,7 +22,7 @@ object KafkaConsumerWrapperFactory {
         processor,
         topics,
         (record: FlightReceivedList) => record.toFlightReceivedList
-      ) (byteArrayDeserializer, serdeFrom[FlightReceivedList](kafkaConfig.schemaRegistryUrl).deserializer)
+      )(byteArrayDeserializer, serdeFrom[FlightReceivedList](kafkaConfig.schemaRegistryUrl).deserializer)
 
   def topsKafkaConsumerFactory(kafkaConfig: KafkaConfig): KafkaConsumerWrapperFactory =
     (processor: ActorRef, topics: Seq[String]) =>
@@ -37,7 +37,7 @@ object KafkaConsumerWrapperFactory {
             case speed: TopSpeedList                       => speed.toTopSpeedList
             case airline: TopAirlineList                   => airline.toTopAirlineList
           }
-      ) (byteArrayDeserializer, serdeFrom[SpecificRecord](kafkaConfig.schemaRegistryUrl).deserializer)
+      )(byteArrayDeserializer, serdeFrom[SpecificRecord](kafkaConfig.schemaRegistryUrl).deserializer)
 
   def totalsKafkaConsumerFactory(kafkaConfig: KafkaConfig): KafkaConsumerWrapperFactory =
     (processor: ActorRef, topics: Seq[String]) =>
@@ -50,6 +50,6 @@ object KafkaConsumerWrapperFactory {
             case countFlight: CountFlight   => countFlight.toCountFlight
             case countAirline: CountAirline => countAirline.toCountAirline
           }
-      ) (byteArrayDeserializer, serdeFrom[SpecificRecord](kafkaConfig.schemaRegistryUrl).deserializer)
+      )(byteArrayDeserializer, serdeFrom[SpecificRecord](kafkaConfig.schemaRegistryUrl).deserializer)
 
 }

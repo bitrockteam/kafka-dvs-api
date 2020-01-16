@@ -6,8 +6,8 @@ import akka.http.scaladsl.model.ws.{Message, TextMessage}
 import akka.http.scaladsl.testkit.{ScalatestRouteTest, WSProbe}
 import akka.stream.scaladsl.Flow
 import it.bitrock.dvs.api.BaseAsyncSpec
+import it.bitrock.dvs.api.Tags.TaggedTypes._
 import it.bitrock.dvs.api.config.WebsocketConfig
-import it.bitrock.dvs.tags.TaggedTypes._
 import it.bitrock.testcommons.AsyncFixtureLoaner
 import org.scalatest.Assertion
 

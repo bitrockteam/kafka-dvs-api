@@ -5,6 +5,7 @@ import it.bitrock.dvs.api.config.WebsocketConfig
 import it.bitrock.dvs.api.definitions._
 import it.bitrock.dvs.api.kafka.KafkaConsumerWrapper._
 import spray.json._
+import it.bitrock.dvs.api.ActorSystemOps
 
 class TopsMessageDispatcher(
     val sourceActorRef: ActorRef,
@@ -19,7 +20,7 @@ class TopsMessageDispatcher(
 
     case topUpdate @ (TopArrivalAirportUpdate | TopDepartureAirportUpdate | TopSpeedUpdate | TopAirlineUpdate) =>
       kafkaPoller ! topUpdate
-      context.system.scheduler.scheduleOnce(websocketConfig.throttleDuration)(self ! topUpdate)
+      context.system.scheduleOnce(websocketConfig.throttleDuration)(self ! topUpdate)
 
     case topList: TopArrivalAirportList =>
       logger.debug(s"Got a $topList from Kafka Consumer")

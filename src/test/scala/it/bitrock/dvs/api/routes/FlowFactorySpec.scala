@@ -12,7 +12,7 @@ import it.bitrock.dvs.api.definitions.JsonSupport
 import it.bitrock.dvs.api.kafka.{KafkaConsumerWrapper, KafkaConsumerWrapperFactory}
 import it.bitrock.dvs.api.routes.FlowFactorySpec.{Resource, TestFlowFactory}
 import it.bitrock.dvs.api.{BaseAsyncSpec, TestValues}
-import it.bitrock.dvs.tags.TaggedTypes._
+import it.bitrock.dvs.api.Tags.TaggedTypes._
 import it.bitrock.testcommons.AsyncFixtureLoaner
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito.when
@@ -30,7 +30,7 @@ class FlowFactorySpec
     with JsonSupport
     with TestValues {
 
-  private implicit val ec: ExecutionContextExecutor = system.dispatcher
+  implicit private val ec: ExecutionContextExecutor = system.dispatcher
 
   private val kafkaConsumerWrapper        = mock[KafkaConsumerWrapper]
   private val kafkaConsumerWrapperFactory = mock[KafkaConsumerWrapperFactory]
@@ -41,12 +41,12 @@ class FlowFactorySpec
     isWebSocketUpgrade shouldBe true
 
     val msg = TextMessage.Strict("""
-                |{
-                |    "leftHighLat": 1,
-                |    "leftHighLon": 1,
-                |    "rightLowLat": 2,
-                |    "rightLowLon": 2
-                |}
+                                   |{
+                                   |    "leftHighLat": 1,
+                                   |    "leftHighLon": 1,
+                                   |    "rightLowLat": 2,
+                                   |    "rightLowLon": 2
+                                   |}
               """.stripMargin)
     wsProbe.sendMessage(msg)
     1 shouldBe 1
