@@ -75,6 +75,7 @@ pipeline {
 			echo "user=${NEXUS_USER}" >> .sbt/.credentials
 			echo "password=${NEXUS_PASSWORD}" >> .sbt/.credentials
 			"""
+            sh "sbt fixCheck scalafmtCheckAll"
                         sh "sbt 'release with-defaults'"
                         githubNotify status: "SUCCESS",
                                 credentialsId: GITHUB_CREDENTIALS,
@@ -140,6 +141,7 @@ pipeline {
 			echo "user=${NEXUS_USER}" >> .sbt/.credentials
 			echo "password=${NEXUS_PASSWORD}" >> .sbt/.credentials
 			"""
+			sh "sbt fixCheck scalafmtCheckAll"
 			sh "sbt test docker:publishLocal docker:clean"
                     githubNotify status: "SUCCESS",
                             credentialsId: GITHUB_CREDENTIALS,
