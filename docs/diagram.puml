@@ -4,8 +4,6 @@ title kafka-dvs-api architecture
 [kafka-dvs-api] as API
 [Client] as client
 
-interface "Schema Registry" as SchemaRegistry
-
 node Kafka {
     database "flight_received\ntopic" as FlightTopic
     database "top_arrival_airport\ntopic" as TopArrivalAirportTopic
@@ -21,7 +19,6 @@ TopDepartureAirportTopic --> API
 TopSpeedTopic --> API
 TopAirlineTopic --> API
 TotalFlightTopic --> API
-API <-- SchemaRegistry
 API ..> client : flights
 API ..> client : topElementsChanged
 API ..> client : totalElementsChanged
