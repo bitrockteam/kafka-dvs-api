@@ -1,0 +1,363 @@
+asyncapi: 2.0.0
+
+info:
+  title: Bitrock DVS server API
+  version: 1.0.0
+  license:
+    name: MIT
+    url: 'https://spdx.org/licenses/MIT.html'
+
+servers:
+  default:
+    url: dvs.reactive-labs.io
+    description: The push API provided by Bitrock DVS
+    protocol: ws
+
+defaultContentType: application/json
+
+channels:
+  stream/flight-list:
+    publish:
+      message:
+        $ref: '#/components/messages/coordinatesBox'
+    subscribe:
+      message:
+        $ref: '#/components/messages/FlightReceivedList'
+  stream/topElementsChanged:
+    subscribe:
+      message:
+        $ref: '#/components/messages/TopElementsChangedStreamEvent'
+  stream/totalElementsChanged:
+    subscribe:
+      message:
+        $ref: '#/components/messages/TotalElementsChangedStreamEvent'
+
+components:
+  messages:
+    # commands
+    coordinatesBox:
+      name: coordinatesBox
+      title: Coordinates box
+      summary: The bounding box that will be updated with the flight data
+      payload:
+        $ref: '#/components/schemas/coordinatesBox'
+
+    # events
+    FlightReceived:
+      summary: Flight received
+      tags:
+        - name: flight
+      payload:
+        type: object
+        required:
+          - iataNumber
+          - icaoNumber
+          - geography
+          - speed
+          - airportDeparture
+          - airportArrival
+          - airline
+          - airplane
+          - status
+          - updated
+        properties:
+          iataNumber:
+            type: string
+          icaoNumber:
+            type: string
+          geography:
+            $ref: '#/components/schemas/GeographyInfo'
+          speed:
+            type: number
+            format: double
+          airportDeparture:
+            $ref: '#/components/schemas/AirportInfo'
+          airportArrival:
+            $ref: '#/components/schemas/AirportInfo'
+          airline:
+            $ref: '#/components/schemas/AirlineInfo'
+          airplane:
+            $ref: '#/components/schemas/AirplaneInfo'
+          status:
+            type: string
+          updated:
+            type: string
+    FlightReceivedList:
+      summary: The list of received flights
+      payload:
+        type: object
+        required:
+          - elements
+        properties:
+          elements:
+            type: array
+            items:
+              $ref: '#/components/schemas/FlightReceived'
+    TopElementsChangedStreamEvent:
+      tags:
+        - name: topElementsChanged
+      payload:
+        type: object
+        required:
+          - eventType
+          - eventPayload
+        properties:
+          eventType:
+            type: string
+          eventPayload:
+            oneOf:
+              - $ref: '#/components/schemas/TopArrivalAirportList'
+              - $ref: '#/components/schemas/TopDepartureAirportList'
+              - $ref: '#/components/schemas/TopSpeedList'
+              - $ref: '#/components/schemas/TopAirlineList'
+    TotalElementsChangedStreamEvent:
+      tags:
+        - name: totalElementsChanged
+      payload:
+        type: object
+        required:
+          - eventType
+          - eventPayload
+        properties:
+          eventType:
+            type: string
+          eventPayload:
+            oneOf:
+              - $ref: '#/components/schemas/TotalFlights'
+              - $ref: '#/components/schemas/TotalAirline'
+
+  schemas:
+    coordinatesBox:
+      type: object
+      required:
+        - leftHighLat
+        - leftHighLon
+        - rightLowLat
+        - rightLowLon
+      properties:
+        leftHighLat:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+        leftHighLon:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+        rightLowLat:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+        rightLowLon:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+    GeographyInfo:
+      description: 'geographyInfo:'
+      type: object
+      required:
+        - latitude
+        - longitude
+        - altitude
+        - direction
+      properties:
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+        altitude:
+          type: number
+          format: double
+        direction:
+          type: number
+          format: double
+    AirportInfo:
+      description: 'airportInfo:'
+      type: object
+      required:
+        - codeAirport
+        - nameAirport
+        - nameCountry
+        - codeIso2Country
+        - timezone
+        - gmt
+      properties:
+        codeAirport:
+          type: string
+        nameAirport:
+          type: string
+        nameCountry:
+          type: string
+        codeIso2Country:
+          type: string
+        timezone:
+          type: string
+        gmt:
+          type: string
+    AirlineInfo:
+      description: 'airlineInfo:'
+      type: object
+      required:
+        - codeAirline
+        - nameAirline
+        - sizeAirline
+      properties:
+        codeAirline:
+          type: string
+        nameAirline:
+          type: string
+        sizeAirline:
+          type: string
+    AirplaneInfo:
+      type: object
+      required:
+        - numberRegistration
+        - productionLine
+        - modelCode
+      properties:
+        numberRegistration:
+          type: string
+        productionLine:
+          type: string
+        modelCode:
+          type: string
+    FlightReceived:
+      type: object
+      required:
+        - iataNumber
+        - icaoNumber
+        - geography
+        - speed
+        - airportDeparture
+        - airportArrival
+        - airline
+        - airplane
+        - status
+        - updated
+      properties:
+        iataNumber:
+          type: string
+        icaoNumber:
+          type: string
+        geography:
+          $ref: '#/components/schemas/GeographyInfo'
+        speed:
+          type: number
+          format: double
+        airportDeparture:
+          $ref: '#/components/schemas/AirportInfo'
+        airportArrival:
+          $ref: '#/components/schemas/AirportInfo'
+        airline:
+          $ref: '#/components/schemas/AirlineInfo'
+        airplane:
+          $ref: '#/components/schemas/AirplaneInfo'
+        status:
+          type: string
+        updated:
+          type: string
+    TopArrivalAirportList:
+      description: Top arrival airport list
+      type: object
+      required:
+        - elements
+      properties:
+        elements:
+          $ref: '#/components/schemas/AirportList'
+    TopDepartureAirportList:
+      description: Top departure airport list
+      type: object
+      required:
+        - elements
+      properties:
+        elements:
+          $ref: '#/components/schemas/AirportList'
+    TopSpeedList:
+      description: Top speed list
+      type: object
+      required:
+        - elements
+      properties:
+        elements:
+          $ref: '#/components/schemas/SpeedList'
+    TopAirlineList:
+      description: Top airline list
+      type: object
+      required:
+        - elements
+      properties:
+        elements:
+          $ref: '#/components/schemas/AirlineList'
+    AirportList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Airport'
+    Airport:
+      type: object
+      required:
+        - airportCode
+        - eventCount
+      properties:
+        airportCode:
+          type: string
+        eventCount:
+          type: integer
+          format: int64
+          default: 0
+    SpeedList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Speed'
+    Speed:
+      type: object
+      required:
+        - flightCode
+        - speed
+      properties:
+        flightCode:
+          type: string
+        speed:
+          type: number
+          format: double
+    AirlineList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Airline'
+    Airline:
+      type: object
+      required:
+        - airlineName
+        - eventCount
+      properties:
+        airlineName:
+          type: string
+        eventCount:
+          type: integer
+          format: int64
+          default: 0
+    TotalFlights:
+      type: object
+      required:
+        - flightStatus
+        - eventCount
+      properties:
+        flightStatus:
+          type: string
+        eventCount:
+          type: integer
+          format: int64
+          default: 0
+    TotalAirline:
+      type: object
+      required:
+        - eventCount
+      properties:
+        eventCount:
+          type: integer
+          format: int64
+          default: 0
