@@ -42,7 +42,7 @@ class FlightListMessageDispatcherSpec extends BaseTestKit {
                 AirlineInfo(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
                 AirplaneInfo(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
                 DefaultStatus,
-                DefaultUpdated
+                DefaultUpdated.toEpochMilli
               )
             )
           )
@@ -80,7 +80,7 @@ class FlightListMessageDispatcherSpec extends BaseTestKit {
                 AirlineInfo(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
                 AirplaneInfo(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
                 DefaultStatus,
-                DefaultUpdated
+                DefaultUpdated.toEpochMilli
               )
             )
           )
@@ -122,7 +122,7 @@ class FlightListMessageDispatcherSpec extends BaseTestKit {
                 AirlineInfo(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
                 AirplaneInfo(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
                 DefaultStatus,
-                DefaultUpdated
+                DefaultUpdated.toEpochMilli
               )
             )
           )
