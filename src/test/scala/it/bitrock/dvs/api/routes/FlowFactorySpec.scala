@@ -6,13 +6,12 @@ import akka.http.scaladsl.model.Uri
 import akka.http.scaladsl.model.ws.{Message, TextMessage}
 import akka.http.scaladsl.testkit.{ScalatestRouteTest, WSProbe}
 import akka.stream.scaladsl.Flow
+import it.bitrock.dvs.api.Tags.TaggedTypes._
 import it.bitrock.dvs.api.config.WebsocketConfig
 import it.bitrock.dvs.api.core.factory.FlightListMessageDispatcherFactoryImpl
-import it.bitrock.dvs.api.definitions.JsonSupport
 import it.bitrock.dvs.api.kafka.{KafkaConsumerWrapper, KafkaConsumerWrapperFactory}
 import it.bitrock.dvs.api.routes.FlowFactorySpec.{Resource, TestFlowFactory}
-import it.bitrock.dvs.api.{BaseAsyncSpec, TestValues}
-import it.bitrock.dvs.api.Tags.TaggedTypes._
+import it.bitrock.dvs.api.{BaseAsyncSpec, JsonSupport, TestValues}
 import it.bitrock.testcommons.AsyncFixtureLoaner
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito.when

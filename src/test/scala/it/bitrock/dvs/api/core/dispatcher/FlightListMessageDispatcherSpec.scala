@@ -4,7 +4,7 @@ import it.bitrock.dvs.api.BaseTestKit
 import it.bitrock.dvs.api.BaseTestKit._
 import it.bitrock.dvs.api.core.factory.FlightListMessageDispatcherFactoryImpl
 import it.bitrock.dvs.api.core.poller.FlightListKafkaPollerCache
-import it.bitrock.dvs.api.definitions._
+import it.bitrock.dvs.api.model._
 import spray.json._
 
 class FlightListMessageDispatcherSpec extends BaseTestKit {

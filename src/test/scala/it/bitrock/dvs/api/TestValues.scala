@@ -1,6 +1,6 @@
 package it.bitrock.dvs.api
 
-import it.bitrock.dvs.api.definitions.CoordinatesBox
+import it.bitrock.dvs.api.model.CoordinatesBox
 
 import scala.util.Random
 

@@ -6,7 +6,6 @@ import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{ImplicitSender, TestKit, TestProbe}
 import it.bitrock.dvs.api.BaseTestKit._
 import it.bitrock.dvs.api.config.{ConsumerConfig, KafkaConfig, WebsocketConfig}
-import it.bitrock.dvs.api.definitions.JsonSupport
 import it.bitrock.dvs.api.kafka.{KafkaConsumerWrapper, KafkaConsumerWrapperFactory}
 import it.bitrock.testcommons.{AsyncSuite, FixtureLoanerAnyResult, Suite}
 import org.scalatest.BeforeAndAfterAll

@@ -7,8 +7,8 @@ import akka.stream.scaladsl.{BroadcastHub, Flow, Keep, Sink, Source}
 import akka.stream.{CompletionStrategy, Materializer, OverflowStrategy}
 import com.typesafe.scalalogging.LazyLogging
 import it.bitrock.dvs.api.core.factory.MessageDispatcherFactory
-import it.bitrock.dvs.api.definitions.CoordinatesBox
-import it.bitrock.dvs.api.definitions.JsonSupport.coordinatesBoxJsonFormat
+import it.bitrock.dvs.api.model.CoordinatesBox
+import it.bitrock.dvs.api.JsonSupport.coordinatesBoxJsonFormat
 import spray.json._
 
 import scala.concurrent.ExecutionContext
