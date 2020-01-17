@@ -54,6 +54,12 @@ pipeline {
             }
         }
         stage("Building master release") {
+            agent {
+                dockerfile {
+                     filename 'Dockerfile.build'
+                     args '--group-add 994 -v /var/run/docker.sock:/var/run/docker.sock -v /var/lib/jenkins/.cache/coursier/v1:/sbt-cache/.cache/coursier/v1 -v /var/lib/jenkins/.sbtboot:/sbt-cache/.sbtboot -v /var/lib/jenkins/.sbt/boot/:/sbt-cache/.boot -v /var/lib/jenkins/.ivy2:/sbt-cache/.ivy2'
+                }
+            }
             when {
                 allOf {
                     branch RELEASE_BRANCH
@@ -68,15 +74,15 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: 'BitrockNexus',
                             usernameVariable: 'NEXUS_USER',
                             passwordVariable: 'NEXUS_PASSWORD')]) {
-			sh """
-			mkdir .sbt
-			echo "realm=Sonatype Nexus Repository Manager" > .sbt/.credentials
-			echo "host=nexus.reactive-labs.io" >> .sbt/.credentials
-			echo "user=${NEXUS_USER}" >> .sbt/.credentials
-			echo "password=${NEXUS_PASSWORD}" >> .sbt/.credentials
-			"""
-            sh "sbt fixCheck scalafmtCheckAll"
-                        sh "sbt 'release with-defaults'"
+                        sh """
+                        mkdir -p .sbt
+                        echo "realm=Sonatype Nexus Repository Manager" > .sbt/.credentials
+                        echo "host=nexus.reactive-labs.io" >> .sbt/.credentials
+                        echo "user=${NEXUS_USER}" >> .sbt/.credentials
+                        echo "password=${NEXUS_PASSWORD}" >> .sbt/.credentials
+                        """
+                        sh "sbt -Dsbt.global.base=.sbt -Dsbt.boot.directory=.sbt -Dsbt.ivy.home=.ivy2 fixCheck scalafmtCheckAll"
+                        sh "sbt -Dsbt.global.base=.sbt -Dsbt.boot.directory=.sbt -Dsbt.ivy.home=.ivy2 'release with-defaults'"
                         githubNotify status: "SUCCESS",
                                 credentialsId: GITHUB_CREDENTIALS,
                                 description: "Build success",
@@ -119,6 +125,12 @@ pipeline {
 	    }
  	}
         stage("Building feature/develop") {
+             agent {
+                dockerfile {
+                     filename 'Dockerfile.build'
+                     args '--group-add 994 -v /var/run/docker.sock:/var/run/docker.sock -v /var/lib/jenkins/.cache/coursier/v1:/sbt-cache/.cache/coursier/v1 -v /var/lib/jenkins/.sbtboot:/sbt-cache/.sbtboot -v /var/lib/jenkins/.sbt/boot/:/sbt-cache/.boot -v /var/lib/jenkins/.ivy2:/sbt-cache/.ivy2'
+                }
+            }
             when {
                 allOf {
                     not {
@@ -134,15 +146,15 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'BitrockNexus',
                         usernameVariable: 'NEXUS_USER',
                         passwordVariable: 'NEXUS_PASSWORD')]) {
-                    	sh """
-			mkdir .sbt
-			echo "realm=Sonatype Nexus Repository Manager" > .sbt/.credentials
-			echo "host=nexus.reactive-labs.io" >> .sbt/.credentials
-			echo "user=${NEXUS_USER}" >> .sbt/.credentials
-			echo "password=${NEXUS_PASSWORD}" >> .sbt/.credentials
-			"""
-			sh "sbt fixCheck scalafmtCheckAll"
-			sh "sbt test docker:publishLocal docker:clean"
+                    sh """
+                        mkdir -p .sbt
+                        echo "realm=Sonatype Nexus Repository Manager" > .sbt/.credentials
+                        echo "host=nexus.reactive-labs.io" >> .sbt/.credentials
+                        echo "user=${NEXUS_USER}" >> .sbt/.credentials
+                        echo "password=${NEXUS_PASSWORD}" >> .sbt/.credentials
+                    """
+                    sh "sbt -Dsbt.global.base=.sbt -Dsbt.boot.directory=.sbt -Dsbt.ivy.home=.ivy2 fixCheck scalafmtCheckAll"
+                    sh "sbt -Dsbt.global.base=.sbt -Dsbt.boot.directory=.sbt -Dsbt.ivy.home=.ivy2 test docker:publishLocal docker:clean"
                     githubNotify status: "SUCCESS",
                             credentialsId: GITHUB_CREDENTIALS,
                             description: "Build success",
