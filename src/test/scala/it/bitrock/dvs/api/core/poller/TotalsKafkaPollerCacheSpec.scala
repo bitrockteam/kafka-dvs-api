@@ -1,7 +1,7 @@
 package it.bitrock.dvs.api.core.poller
 
 import it.bitrock.dvs.api.BaseTestKit
-import it.bitrock.dvs.api.definitions.{CountAirline, CountFlight}
+import it.bitrock.dvs.api.model.{CountAirline, CountFlight}
 import it.bitrock.dvs.api.BaseTestKit._
 
 class TotalsKafkaPollerCacheSpec extends BaseTestKit {

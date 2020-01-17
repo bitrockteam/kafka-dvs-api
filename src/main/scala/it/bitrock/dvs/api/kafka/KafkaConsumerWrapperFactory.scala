@@ -2,7 +2,7 @@ package it.bitrock.dvs.api.kafka
 
 import akka.actor.ActorRef
 import it.bitrock.dvs.api.config.KafkaConfig
-import it.bitrock.dvs.api.definitions.DefinitionsConversions._
+import it.bitrock.dvs.api.model.DefinitionsConversions._
 import it.bitrock.dvs.model.avro._
 import it.bitrock.kafkacommons.serialization.AvroSerdes.serdeFrom
 import org.apache.avro.specific.SpecificRecord

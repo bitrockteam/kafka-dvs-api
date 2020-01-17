@@ -3,7 +3,7 @@ package it.bitrock.dvs.api.core.dispatcher
 import it.bitrock.dvs.api.BaseTestKit
 import it.bitrock.dvs.api.core.factory.TopsMessageDispatcherFactoryImpl
 import it.bitrock.dvs.api.core.poller.TopsKafkaPollerCache
-import it.bitrock.dvs.api.definitions._
+import it.bitrock.dvs.api.model._
 import spray.json._
 import it.bitrock.dvs.api.BaseTestKit._
 
