@@ -31,7 +31,7 @@ final case class AirportInfo(
     timezone: String,
     gmt: String
 )
-final case class AirlineInfo(codeAirline: String, nameAirline: String, sizeAirline: String)
+final case class AirlineInfo(codeAirline: String, nameAirline: String, sizeAirline: Long)
 final case class AirplaneInfo(numberRegistration: String, productionLine: String, modelCode: String)
 final case class FlightReceived(
     iataNumber: String,
@@ -43,7 +43,7 @@ final case class FlightReceived(
     airline: AirlineInfo,
     airplane: AirplaneInfo,
     status: String,
-    updated: String
+    updated: Long
 )
 final case class FlightReceivedList(elements: Seq[FlightReceived])
 
@@ -90,7 +90,7 @@ object DefinitionsConversions {
         toAirlineInfo(x.airline),
         toAirplaneInfo(x.airplane),
         x.status,
-        x.updated
+        x.updated.toEpochMilli
       )
   }
 
