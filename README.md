@@ -40,9 +40,7 @@ The application references the following Kafka topics:
 
 ## API documentation
 
-Web-socket APIs are documented using [AsyncAPI](https://www.asyncapi.com) standard in [this descriptor](api-models/src/main/resources/asyncapi.yaml).
-
-ReST APIs are documented using [OpenAPI v3](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md) standard in [this descriptor](api-models/src/main/resources/api.yaml).
+Web-socket APIs are documented using [AsyncAPI](https://www.asyncapi.com) standard in [this descriptor](src/main/resources/asyncapi.yaml).
 
 ## How to test
 
