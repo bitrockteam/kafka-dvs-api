@@ -13,6 +13,8 @@ The application references the following environment variables:
 - `PORT`: server port
 - `KAFKA.BOOTSTRAP.SERVERS`: valid `bootstrap.servers` value (see [Confluent docs](https://docs.confluent.io/current/clients/consumer.html#configuration))
 - `SCHEMAREGISTRY.URL`: valid `schema.registry.url` value (see [Confluent docs](https://docs.confluent.io/current/schema-registry/docs/schema_registry_tutorial.html#java-consumers))
+- `SERVER.WEBSOCKET.MAX.NUMBER.FLIGHTS`: max number of elements returned by API
+- `SERVER.WEBSOCKET.THROTTLE.DURATION`: time interval between each update
 
 ## Dependencies
 
@@ -26,17 +28,6 @@ host=nexus.reactive-labs.io
 user=<your-username>
 password=<your-password>
 ```
-
-### Kafka topics
-
-The application references the following Kafka topics:
-
-- `flight_received`
-- `top_arrival_airport`
-- `top_departure_airport`
-- `top_speed`
-- `top_airline`
-- `total_flight`
 
 ## API documentation
 
@@ -68,3 +59,6 @@ sbt docker:publish
 
 Architectural diagram is available [here](docs/diagram.puml). It can be rendered using [PlantText](https://www.planttext.com).
 
+## Contribution
+
+If you'd like to contribute to the project, make sure to review our [recommendations](CONTRIBUTING.md).
