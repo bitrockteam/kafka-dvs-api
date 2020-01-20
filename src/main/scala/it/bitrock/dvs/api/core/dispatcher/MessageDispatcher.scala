@@ -2,8 +2,8 @@ package it.bitrock.dvs.api.core.dispatcher
 
 import akka.actor.{Actor, ActorRef}
 import com.typesafe.scalalogging.LazyLogging
-import it.bitrock.dvs.api.config.WebsocketConfig
 import it.bitrock.dvs.api.JsonSupport
+import it.bitrock.dvs.api.config.WebsocketConfig
 
 trait MessageDispatcher extends Actor with JsonSupport with LazyLogging {
 

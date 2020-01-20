@@ -8,7 +8,7 @@ import akka.http.scaladsl.testkit.{ScalatestRouteTest, WSProbe}
 import akka.stream.scaladsl.Flow
 import it.bitrock.dvs.api.Tags.TaggedTypes._
 import it.bitrock.dvs.api.config.WebsocketConfig
-import it.bitrock.dvs.api.core.factory.FlightListMessageDispatcherFactoryImpl
+import it.bitrock.dvs.api.core.factory.MessageDispatcherFactory
 import it.bitrock.dvs.api.kafka.{KafkaConsumerWrapper, KafkaConsumerWrapperFactory}
 import it.bitrock.dvs.api.routes.FlowFactorySpec.{Resource, TestFlowFactory}
 import it.bitrock.dvs.api.{BaseAsyncSpec, JsonSupport, TestValues}
@@ -76,7 +76,7 @@ class FlowFactorySpec
     when(kafkaConsumerWrapperFactory.build(any[ActorRef], any[Seq[String]])).thenReturn(kafkaConsumerWrapper)
 
     val flightListMessageProcessorFactory =
-      new FlightListMessageDispatcherFactoryImpl(websocketConfig, mock[ActorRef])
+      MessageDispatcherFactory.flightListMessageDispatcherFactory(mock[ActorRef], websocketConfig)
 
     val flowFactories = Map(
       flightListFlowFactoryKey -> FlowFactory.flightFlowFactory(flightListMessageProcessorFactory),

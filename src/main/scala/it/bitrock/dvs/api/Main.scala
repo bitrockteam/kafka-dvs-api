@@ -8,11 +8,7 @@ import com.typesafe.scalalogging.LazyLogging
 import it.bitrock.dvs.api.Tags.FlowFactoryKey
 import it.bitrock.dvs.api.Tags.TaggedTypes._
 import it.bitrock.dvs.api.config.AppConfig
-import it.bitrock.dvs.api.core.factory.{
-  FlightListMessageDispatcherFactoryImpl,
-  TopsMessageDispatcherFactoryImpl,
-  TotalsMessageDispatcherFactoryImpl
-}
+import it.bitrock.dvs.api.core.factory.MessageDispatcherFactory
 import it.bitrock.dvs.api.core.poller._
 import it.bitrock.dvs.api.kafka.KafkaConsumerWrapperFactory._
 import it.bitrock.dvs.api.routes._
@@ -36,18 +32,19 @@ object Main extends App with LazyLogging {
   val flightListKafkaConsumerWrapperFactory = flightListKafkaConsumerFactory(config.kafka)
   val flightListKafkaMessagePollerCache     = FlightListKafkaPollerCache.build(config.kafka, flightListKafkaConsumerWrapperFactory)
   val flightListMessageDispatcherFactory =
-    new FlightListMessageDispatcherFactoryImpl(config.server.websocket, flightListKafkaMessagePollerCache)
+    MessageDispatcherFactory.flightListMessageDispatcherFactory(flightListKafkaMessagePollerCache, config.server.websocket)
   val flightListFlowFactory = FlowFactory.flightListFlowFactory(flightListMessageDispatcherFactory)
 
   val topsKafkaConsumerWrapperFactory = topsKafkaConsumerFactory(config.kafka)
   val topsKafkaPollerCache            = TopsKafkaPollerCache.build(config.kafka, topsKafkaConsumerWrapperFactory)
-  val topsMessageDispatcherFactory    = new TopsMessageDispatcherFactoryImpl(config.server.websocket, topsKafkaPollerCache)
+  val topsMessageDispatcherFactory    = MessageDispatcherFactory.topsMessageDispatcherFactory(topsKafkaPollerCache, config.server.websocket)
   val topsFlowFactory                 = FlowFactory.flightFlowFactory(topsMessageDispatcherFactory)
 
   val totalsKafkaConsumerWrapperFactory = totalsKafkaConsumerFactory(config.kafka)
   val totalsKafkaPollerCache            = TotalsKafkaPollerCache.build(config.kafka, totalsKafkaConsumerWrapperFactory)
-  val totalsMessageDispatcherFactory    = new TotalsMessageDispatcherFactoryImpl(config.server.websocket, totalsKafkaPollerCache)
-  val totalsFlowFactory                 = FlowFactory.flightFlowFactory(totalsMessageDispatcherFactory)
+  val totalsMessageDispatcherFactory =
+    MessageDispatcherFactory.totalsMessageDispatcherFactory(totalsKafkaPollerCache, config.server.websocket)
+  val totalsFlowFactory = FlowFactory.flightFlowFactory(totalsMessageDispatcherFactory)
 
   val flowFactories: Map[FlowFactoryKey, FlowFactory] =
     Map(
