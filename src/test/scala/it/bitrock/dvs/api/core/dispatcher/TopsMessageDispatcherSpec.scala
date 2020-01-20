@@ -13,40 +13,40 @@ class TopsMessageDispatcherSpec extends BaseTestKit {
 
     "forward a JSON to source actor" when {
       "a TopArrivalAirportList is received" in ResourceLoanerDispatcher.withFixture {
-        case ResourceDispatcher(websocketConfig, kafkaConfig, consumerFactory, sourceProbe) =>
+        case ResourceDispatcher(webSocketConfig, kafkaConfig, consumerFactory, sourceProbe) =>
           val topsKafkaPollerCache = TopsKafkaPollerCache.build(kafkaConfig, consumerFactory)
           val messageDispatcher =
-            MessageDispatcherFactory.topsMessageDispatcherFactory(topsKafkaPollerCache, websocketConfig).build(sourceProbe.ref)
+            MessageDispatcherFactory.topsMessageDispatcherFactory(topsKafkaPollerCache, webSocketConfig).build(sourceProbe.ref)
           val msg = TopArrivalAirportList(Seq(Airport(DefaultArrivalAirport1Name, DefaultArrivalAirport1Amount)))
           messageDispatcher ! msg
           val expectedResult = ApiEvent(msg.getClass.getSimpleName, msg).toJson.toString
           sourceProbe.expectMsg(expectedResult)
       }
       "a TopDepartureAirportList is received" in ResourceLoanerDispatcher.withFixture {
-        case ResourceDispatcher(websocketConfig, kafkaConfig, consumerFactory, sourceProbe) =>
+        case ResourceDispatcher(webSocketConfig, kafkaConfig, consumerFactory, sourceProbe) =>
           val topsKafkaPollerCache = TopsKafkaPollerCache.build(kafkaConfig, consumerFactory)
           val messageDispatcher =
-            MessageDispatcherFactory.topsMessageDispatcherFactory(topsKafkaPollerCache, websocketConfig).build(sourceProbe.ref)
+            MessageDispatcherFactory.topsMessageDispatcherFactory(topsKafkaPollerCache, webSocketConfig).build(sourceProbe.ref)
           val msg = TopDepartureAirportList(Seq(Airport(DefaultDepartureAirport1Name, DefaultDepartureAirport1Amount)))
           messageDispatcher ! msg
           val expectedResult = ApiEvent(msg.getClass.getSimpleName, msg).toJson.toString
           sourceProbe.expectMsg(expectedResult)
       }
       "a TopSpeedList is received" in ResourceLoanerDispatcher.withFixture {
-        case ResourceDispatcher(websocketConfig, kafkaConfig, consumerFactory, sourceProbe) =>
+        case ResourceDispatcher(webSocketConfig, kafkaConfig, consumerFactory, sourceProbe) =>
           val topsKafkaPollerCache = TopsKafkaPollerCache.build(kafkaConfig, consumerFactory)
           val messageDispatcher =
-            MessageDispatcherFactory.topsMessageDispatcherFactory(topsKafkaPollerCache, websocketConfig).build(sourceProbe.ref)
+            MessageDispatcherFactory.topsMessageDispatcherFactory(topsKafkaPollerCache, webSocketConfig).build(sourceProbe.ref)
           val msg = TopSpeedList(Seq(SpeedFlight(DefaultFlightCode1, DefaultSpeed)))
           messageDispatcher ! msg
           val expectedResult = ApiEvent(msg.getClass.getSimpleName, msg).toJson.toString
           sourceProbe.expectMsg(expectedResult)
       }
       "a TopAirlineList is received" in ResourceLoanerDispatcher.withFixture {
-        case ResourceDispatcher(websocketConfig, kafkaConfig, consumerFactory, sourceProbe) =>
+        case ResourceDispatcher(webSocketConfig, kafkaConfig, consumerFactory, sourceProbe) =>
           val topsKafkaPollerCache = TopsKafkaPollerCache.build(kafkaConfig, consumerFactory)
           val messageDispatcher =
-            MessageDispatcherFactory.topsMessageDispatcherFactory(topsKafkaPollerCache, websocketConfig).build(sourceProbe.ref)
+            MessageDispatcherFactory.topsMessageDispatcherFactory(topsKafkaPollerCache, webSocketConfig).build(sourceProbe.ref)
           val msg = TopAirlineList(Seq(Airline(DefaultAirline1Name, DefaultAirline1Amount)))
           messageDispatcher ! msg
           val expectedResult = ApiEvent(msg.getClass.getSimpleName, msg).toJson.toString

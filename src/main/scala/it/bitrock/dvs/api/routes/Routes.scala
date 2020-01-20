@@ -4,28 +4,21 @@ import akka.http.scaladsl.server.Directives.{get, handleWebSocketMessages, path,
 import akka.http.scaladsl.server.PathMatcher._
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.RouteConcatenation._
-import it.bitrock.dvs.api.Tags.TaggedTypes._
-import it.bitrock.dvs.api.Tags._
-import it.bitrock.dvs.api.config.WebsocketConfig
-import it.bitrock.dvs.api.services.InternalsService.healthCheckRoute
+import it.bitrock.dvs.api.config.WebSocketConfig
 
-class Routes(
-    flowFactories: Map[FlowFactoryKey, FlowFactory],
-    websocketConfig: WebsocketConfig
-) {
+object Routes {
+  final case class FlowFactories(flightListFlowFactory: FlowFactory, topsFlowFactory: FlowFactory, totalsFlowFactory: FlowFactory)
 
-  val routes: Route = streams ~ healthCheckRoute
-
-  def streams: Route = get {
-    pathPrefix(websocketConfig.pathPrefix) {
-      path(websocketConfig.flightListPath) {
-        handleWebSocketMessages(flowFactories(flightListFlowFactoryKey).flow)
+  def webSocketRoutes(webSocketConfig: WebSocketConfig, flowFactories: FlowFactories): Route = get {
+    pathPrefix(webSocketConfig.pathPrefix) {
+      path(webSocketConfig.flightListPath) {
+        handleWebSocketMessages(flowFactories.flightListFlowFactory.flow)
       } ~
-        path(websocketConfig.topElementsPath) {
-          handleWebSocketMessages(flowFactories(topsFlowFactoryKey).flow)
+        path(webSocketConfig.topElementsPath) {
+          handleWebSocketMessages(flowFactories.topsFlowFactory.flow)
         } ~
-        path(websocketConfig.totalElementsPath) {
-          handleWebSocketMessages(flowFactories(totalsFlowFactoryKey).flow)
+        path(webSocketConfig.totalElementsPath) {
+          handleWebSocketMessages(flowFactories.totalsFlowFactory.flow)
         }
     }
   }
