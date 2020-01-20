@@ -2,7 +2,7 @@ package it.bitrock.dvs.api.core.dispatcher
 
 import it.bitrock.dvs.api.BaseTestKit
 import it.bitrock.dvs.api.BaseTestKit._
-import it.bitrock.dvs.api.core.factory.FlightListMessageDispatcherFactoryImpl
+import it.bitrock.dvs.api.core.factory.MessageDispatcherFactory
 import it.bitrock.dvs.api.core.poller.FlightListKafkaPollerCache
 import it.bitrock.dvs.api.model._
 import spray.json._
@@ -16,7 +16,7 @@ class FlightListMessageDispatcherSpec extends BaseTestKit {
         case ResourceDispatcher(websocketConfig, kafkaConfig, consumerFactory, sourceProbe) =>
           val flightListKafkaPollerCache = FlightListKafkaPollerCache.build(kafkaConfig, consumerFactory)
           val messageProcessor =
-            new FlightListMessageDispatcherFactoryImpl(websocketConfig, flightListKafkaPollerCache).build(sourceProbe.ref)
+            MessageDispatcherFactory.flightListMessageDispatcherFactory(flightListKafkaPollerCache, websocketConfig).build(sourceProbe.ref)
           val msg = FlightReceivedList(
             Seq(
               FlightReceived(
@@ -55,7 +55,7 @@ class FlightListMessageDispatcherSpec extends BaseTestKit {
         case ResourceDispatcher(websocketConfig, kafkaConfig, consumerFactory, sourceProbe) =>
           val flightListKafkaPollerCache = FlightListKafkaPollerCache.build(kafkaConfig, consumerFactory)
           val messageProcessor =
-            new FlightListMessageDispatcherFactoryImpl(websocketConfig, flightListKafkaPollerCache).build(sourceProbe.ref)
+            MessageDispatcherFactory.flightListMessageDispatcherFactory(flightListKafkaPollerCache, websocketConfig).build(sourceProbe.ref)
           val msg = FlightReceivedList(
             Seq(
               FlightReceived(
@@ -97,7 +97,7 @@ class FlightListMessageDispatcherSpec extends BaseTestKit {
         case ResourceDispatcher(websocketConfig, kafkaConfig, consumerFactory, sourceProbe) =>
           val flightListKafkaPollerCache = FlightListKafkaPollerCache.build(kafkaConfig, consumerFactory)
           val messageProcessor =
-            new FlightListMessageDispatcherFactoryImpl(websocketConfig, flightListKafkaPollerCache).build(sourceProbe.ref)
+            MessageDispatcherFactory.flightListMessageDispatcherFactory(flightListKafkaPollerCache, websocketConfig).build(sourceProbe.ref)
           messageProcessor ! FlightReceivedList(
             Seq(
               FlightReceived(

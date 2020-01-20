@@ -5,9 +5,9 @@ import java.net.URI
 import akka.actor.ActorSystem
 import akka.testkit.{TestKit, TestProbe}
 import it.bitrock.dvs.api.config.{AppConfig, KafkaConfig}
-import it.bitrock.dvs.api.model._
 import it.bitrock.dvs.api.kafka.KafkaConsumerWrapper.NoMessage
 import it.bitrock.dvs.api.kafka.TotalsKafkaConsumerSpec.Resource
+import it.bitrock.dvs.api.model._
 import it.bitrock.dvs.api.{BaseSpec, TestValues}
 import it.bitrock.dvs.model.avro.{CountAirline => KCountAirline, CountFlight => KCountFlight}
 import it.bitrock.kafkacommons.serialization.ImplicitConversions._

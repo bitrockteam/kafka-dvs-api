@@ -3,8 +3,8 @@ package it.bitrock.dvs.api.core.dispatcher
 import akka.actor.{ActorRef, PoisonPill, Props, Terminated}
 import it.bitrock.dvs.api.ActorSystemOps
 import it.bitrock.dvs.api.config.WebsocketConfig
-import it.bitrock.dvs.api.model._
 import it.bitrock.dvs.api.kafka.KafkaConsumerWrapper.FlightListUpdate
+import it.bitrock.dvs.api.model._
 import spray.json._
 
 class FlightListMessageDispatcher(

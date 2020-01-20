@@ -2,9 +2,9 @@ package it.bitrock.dvs.api.core.poller
 
 import akka.actor.{ActorRef, ActorRefFactory, PoisonPill, Props, Terminated}
 import it.bitrock.dvs.api.config.KafkaConfig
-import it.bitrock.dvs.api.model._
-import it.bitrock.dvs.api.kafka.{KafkaConsumerWrapper, KafkaConsumerWrapperFactory}
 import it.bitrock.dvs.api.kafka.KafkaConsumerWrapper.{FlightListUpdate, NoMessage}
+import it.bitrock.dvs.api.kafka.{KafkaConsumerWrapper, KafkaConsumerWrapperFactory}
+import it.bitrock.dvs.api.model._
 
 object FlightListKafkaPollerCache {
 
