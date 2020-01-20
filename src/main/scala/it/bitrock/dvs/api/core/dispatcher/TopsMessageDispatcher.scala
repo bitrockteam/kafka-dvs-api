@@ -2,7 +2,7 @@ package it.bitrock.dvs.api.core.dispatcher
 
 import akka.actor._
 import it.bitrock.dvs.api.ActorSystemOps
-import it.bitrock.dvs.api.config.WebsocketConfig
+import it.bitrock.dvs.api.config.WebSocketConfig
 import it.bitrock.dvs.api.kafka.KafkaConsumerWrapper._
 import it.bitrock.dvs.api.model._
 import spray.json._
@@ -10,7 +10,7 @@ import spray.json._
 class TopsMessageDispatcher(
     val sourceActorRef: ActorRef,
     kafkaPoller: ActorRef,
-    val websocketConfig: WebsocketConfig
+    val webSocketConfig: WebSocketConfig
 ) extends MessageDispatcher {
 
   import context.dispatcher
@@ -20,7 +20,7 @@ class TopsMessageDispatcher(
 
     case topUpdate @ (TopArrivalAirportUpdate | TopDepartureAirportUpdate | TopSpeedUpdate | TopAirlineUpdate) =>
       kafkaPoller ! topUpdate
-      context.system.scheduleOnce(websocketConfig.throttleDuration)(self ! topUpdate)
+      context.system.scheduleOnce(webSocketConfig.throttleDuration)(self ! topUpdate)
 
     case topList: TopArrivalAirportList =>
       logger.debug(s"Got a $topList from Kafka Consumer")
@@ -53,6 +53,6 @@ object TopsMessageDispatcher {
   def props(
       sourceActorRef: ActorRef,
       kafkaPoller: ActorRef,
-      websocketConfig: WebsocketConfig
-  ): Props = Props(new TopsMessageDispatcher(sourceActorRef, kafkaPoller, websocketConfig))
+      webSocketConfig: WebSocketConfig
+  ): Props = Props(new TopsMessageDispatcher(sourceActorRef, kafkaPoller, webSocketConfig))
 }

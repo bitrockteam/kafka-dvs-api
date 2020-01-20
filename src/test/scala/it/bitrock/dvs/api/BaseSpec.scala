@@ -5,7 +5,7 @@ import java.net.URI
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{ImplicitSender, TestKit, TestProbe}
 import it.bitrock.dvs.api.BaseTestKit._
-import it.bitrock.dvs.api.config.{ConsumerConfig, KafkaConfig, WebsocketConfig}
+import it.bitrock.dvs.api.config.{ConsumerConfig, KafkaConfig, WebSocketConfig}
 import it.bitrock.dvs.api.kafka.{KafkaConsumerWrapper, KafkaConsumerWrapperFactory}
 import it.bitrock.testcommons.{AsyncSuite, FixtureLoanerAnyResult, Suite}
 import org.scalatest.BeforeAndAfterAll
@@ -53,7 +53,7 @@ abstract class BaseTestKit
       val consumerFactory = new TestKafkaConsumerWrapperFactory(pollProbe.ref)
       body(
         ResourceDispatcher(
-          websocketConfig,
+          webSocketConfig,
           kafkaConfig,
           consumerFactory,
           sourceProbe
@@ -85,8 +85,8 @@ object BaseTestKit {
       ConsumerConfig(1.second, Duration.Zero)
     )
 
-  val websocketConfig: WebsocketConfig =
-    WebsocketConfig(
+  val webSocketConfig: WebSocketConfig =
+    WebSocketConfig(
       1000,
       0.second,
       "not-used",
@@ -104,7 +104,7 @@ object BaseTestKit {
   )
 
   final case class ResourceDispatcher(
-      websocketConfig: WebsocketConfig,
+      webSocketConfig: WebSocketConfig,
       kafkaConfig: KafkaConfig,
       consumerFactory: KafkaConsumerWrapperFactory,
       sourceProbe: TestProbe

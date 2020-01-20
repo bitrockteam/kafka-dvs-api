@@ -2,7 +2,7 @@ package it.bitrock.dvs.api.core.dispatcher
 
 import akka.actor.{ActorRef, PoisonPill, Props, Terminated}
 import it.bitrock.dvs.api.ActorSystemOps
-import it.bitrock.dvs.api.config.WebsocketConfig
+import it.bitrock.dvs.api.config.WebSocketConfig
 import it.bitrock.dvs.api.kafka.KafkaConsumerWrapper.FlightListUpdate
 import it.bitrock.dvs.api.model._
 import spray.json._
@@ -10,7 +10,7 @@ import spray.json._
 class FlightListMessageDispatcher(
     val sourceActorRef: ActorRef,
     kafkaPoller: ActorRef,
-    val websocketConfig: WebsocketConfig
+    val webSocketConfig: WebSocketConfig
 ) extends MessageDispatcher {
 
   import context.dispatcher
@@ -24,7 +24,7 @@ class FlightListMessageDispatcher(
 
     case FlightListUpdate =>
       kafkaPoller ! FlightListUpdate
-      context.system.scheduleOnce(websocketConfig.throttleDuration)(self ! FlightListUpdate)
+      context.system.scheduleOnce(webSocketConfig.throttleDuration)(self ! FlightListUpdate)
 
     case box: CoordinatesBox =>
       context.become(boxing(box))
@@ -46,7 +46,7 @@ class FlightListMessageDispatcher(
         coordinate.longitude > box.leftHighLon &&
         coordinate.longitude < box.rightLowLon
       }
-      .take(websocketConfig.maxNumberFlights)
+      .take(webSocketConfig.maxNumberFlights)
       .force
     FlightReceivedList(filteredList)
   }
@@ -62,7 +62,7 @@ object FlightListMessageDispatcher {
   def props(
       sourceActorRef: ActorRef,
       kafkaPoller: ActorRef,
-      websocketConfig: WebsocketConfig
+      webSocketConfig: WebSocketConfig
   ): Props =
-    Props(new FlightListMessageDispatcher(sourceActorRef, kafkaPoller, websocketConfig))
+    Props(new FlightListMessageDispatcher(sourceActorRef, kafkaPoller, webSocketConfig))
 }

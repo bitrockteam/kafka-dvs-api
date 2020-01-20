@@ -5,10 +5,10 @@ import scala.concurrent.duration.FiniteDuration
 final case class ServerConfig(
     host: String,
     port: Int,
-    websocket: WebsocketConfig
+    webSocket: WebSocketConfig
 )
 
-final case class WebsocketConfig(
+final case class WebSocketConfig(
     maxNumberFlights: Int,
     throttleDuration: FiniteDuration,
     pathPrefix: String,

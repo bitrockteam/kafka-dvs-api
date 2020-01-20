@@ -13,20 +13,20 @@ class TotalsMessageDispatcherSpec extends BaseTestKit {
 
     "forward a JSON to source actor" when {
       "a CountFlight is received" in ResourceLoanerDispatcher.withFixture {
-        case ResourceDispatcher(websocketConfig, kafkaConfig, consumerFactory, sourceProbe) =>
+        case ResourceDispatcher(webSocketConfig, kafkaConfig, consumerFactory, sourceProbe) =>
           val totalsKafkaPollerCache = TotalsKafkaPollerCache.build(kafkaConfig, consumerFactory)
           val messageDispatcher =
-            MessageDispatcherFactory.totalsMessageDispatcherFactory(totalsKafkaPollerCache, websocketConfig).build(sourceProbe.ref)
+            MessageDispatcherFactory.totalsMessageDispatcherFactory(totalsKafkaPollerCache, webSocketConfig).build(sourceProbe.ref)
           val msg = CountFlight(DefaultStartTimeWindow, DefaultCountFlightAmount)
           messageDispatcher ! msg
           val expectedResult = ApiEvent(msg.getClass.getSimpleName, msg).toJson.toString
           sourceProbe.expectMsg(expectedResult)
       }
       "a CountAirline is received" in ResourceLoanerDispatcher.withFixture {
-        case ResourceDispatcher(websocketConfig, kafkaConfig, consumerFactory, sourceProbe) =>
+        case ResourceDispatcher(webSocketConfig, kafkaConfig, consumerFactory, sourceProbe) =>
           val totalsKafkaPollerCache = TotalsKafkaPollerCache.build(kafkaConfig, consumerFactory)
           val messageDispatcher =
-            MessageDispatcherFactory.totalsMessageDispatcherFactory(totalsKafkaPollerCache, websocketConfig).build(sourceProbe.ref)
+            MessageDispatcherFactory.totalsMessageDispatcherFactory(totalsKafkaPollerCache, webSocketConfig).build(sourceProbe.ref)
           val msg = CountAirline(DefaultStartTimeWindow, DefaultCountAirlineAmount)
           messageDispatcher ! msg
           val expectedResult = ApiEvent(msg.getClass.getSimpleName, msg).toJson.toString
