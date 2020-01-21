@@ -1,6 +1,6 @@
 IMPORTANT: Please review the [CONTRIBUTING.md](../CONTRIBUTING.md) file for detailed contributing guidelines.
 
-Make sure to add one or more reviewers from the menu on the left.
+Make sure to add one or more reviewers from the menu on the right.
 
 **PLEASE REMOVE THIS HEADER BEFORE SUBMITTING**
 
