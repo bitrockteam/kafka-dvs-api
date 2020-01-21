@@ -2,6 +2,17 @@ IMPORTANT: Please review the [CONTRIBUTING.md](../CONTRIBUTING.md) file for deta
 
 Make sure to add one or more reviewers from the menu on the right.
 
+**Flow**
+
+- [ ] check if you are opening a PR towards the `master` branch (for `hotfix` and `release` branches).
+- [ ] check if you are opening a PR towards the `develop` branch (for `feature` branches).
+
+**Sanity checks**
+
+- [ ] I gave a meaningful title to the PR.
+- [ ] Tests have been added for new functionalities.
+- [ ] [Documentation](..docs/) has been updated accordingly.
+
 **PLEASE REMOVE THIS HEADER BEFORE SUBMITTING**
 
 **Related issue**
