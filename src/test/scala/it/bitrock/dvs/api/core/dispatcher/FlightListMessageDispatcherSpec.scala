@@ -22,9 +22,9 @@ class FlightListMessageDispatcherSpec extends BaseTestKit {
               FlightReceived(
                 DefaultIataNumber,
                 DefaultIcaoNumber,
-                GeographyInfo(DefaultInBoxLatitude, DefaultInBoxLongitude, DefaultAltitude, DefaultDirection),
+                Geography(DefaultInBoxLatitude, DefaultInBoxLongitude, DefaultAltitude, DefaultDirection),
                 DefaultSpeed,
-                AirportInfo(
+                Airport(
                   DefaultCodeAirport1,
                   DefaultNameAirport1,
                   DefaultNameCountry1,
@@ -32,7 +32,7 @@ class FlightListMessageDispatcherSpec extends BaseTestKit {
                   DefaultTimezone1,
                   DefaultGmt1
                 ),
-                AirportInfo(
+                Airport(
                   DefaultCodeAirport2,
                   DefaultNameAirport2,
                   DefaultNameCountry2,
@@ -40,8 +40,8 @@ class FlightListMessageDispatcherSpec extends BaseTestKit {
                   DefaultTimezone2,
                   DefaultGmt2
                 ),
-                AirlineInfo(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
-                AirplaneInfo(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
+                Airline(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
+                Airplane(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
                 DefaultStatus,
                 DefaultUpdated
               )
@@ -61,9 +61,9 @@ class FlightListMessageDispatcherSpec extends BaseTestKit {
               FlightReceived(
                 DefaultIataNumber,
                 DefaultIcaoNumber,
-                GeographyInfo(DefaultChangedInBoxLatitude, DefaultChangedInBoxLongitude, DefaultAltitude, DefaultDirection),
+                Geography(DefaultChangedInBoxLatitude, DefaultChangedInBoxLongitude, DefaultAltitude, DefaultDirection),
                 DefaultSpeed,
-                AirportInfo(
+                Airport(
                   DefaultCodeAirport1,
                   DefaultNameAirport1,
                   DefaultNameCountry1,
@@ -71,7 +71,7 @@ class FlightListMessageDispatcherSpec extends BaseTestKit {
                   DefaultTimezone1,
                   DefaultGmt1
                 ),
-                AirportInfo(
+                Airport(
                   DefaultCodeAirport2,
                   DefaultNameAirport2,
                   DefaultNameCountry2,
@@ -79,8 +79,8 @@ class FlightListMessageDispatcherSpec extends BaseTestKit {
                   DefaultTimezone2,
                   DefaultGmt2
                 ),
-                AirlineInfo(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
-                AirplaneInfo(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
+                Airline(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
+                Airplane(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
                 DefaultStatus,
                 DefaultUpdated
               )
@@ -103,9 +103,9 @@ class FlightListMessageDispatcherSpec extends BaseTestKit {
               FlightReceived(
                 DefaultIataNumber,
                 DefaultIcaoNumber,
-                GeographyInfo(DefaultOutBoxLatitude, DefaultOutBoxLongitude, DefaultAltitude, DefaultDirection),
+                Geography(DefaultOutBoxLatitude, DefaultOutBoxLongitude, DefaultAltitude, DefaultDirection),
                 DefaultSpeed,
-                AirportInfo(
+                Airport(
                   DefaultCodeAirport1,
                   DefaultNameAirport1,
                   DefaultNameCountry1,
@@ -113,7 +113,7 @@ class FlightListMessageDispatcherSpec extends BaseTestKit {
                   DefaultTimezone1,
                   DefaultGmt1
                 ),
-                AirportInfo(
+                Airport(
                   DefaultCodeAirport2,
                   DefaultNameAirport2,
                   DefaultNameCountry2,
@@ -121,8 +121,8 @@ class FlightListMessageDispatcherSpec extends BaseTestKit {
                   DefaultTimezone2,
                   DefaultGmt2
                 ),
-                AirlineInfo(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
-                AirplaneInfo(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
+                Airline(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
+                Airplane(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
                 DefaultStatus,
                 DefaultUpdated
               )

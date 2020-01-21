@@ -38,12 +38,12 @@ class TotalsKafkaConsumerSpec
           eventually {
             publishToKafka(kafkaConfig.totalFlightTopic, KCountFlight(DefaultStartTimeWindow, DefaultCountFlightAmount))
             pollMessages()
-            processorProbe.expectMsg(CountFlight(DefaultStartTimeWindow, DefaultCountFlightAmount))
+            processorProbe.expectMsg(TotalFlightsCount(DefaultStartTimeWindow, DefaultCountFlightAmount))
           }
           eventually {
             publishToKafka(kafkaConfig.totalAirlineTopic, KCountAirline(DefaultStartTimeWindow, DefaultCountAirlineAmount))
             pollMessages()
-            processorProbe.expectMsg(CountAirline(DefaultStartTimeWindow, DefaultCountAirlineAmount))
+            processorProbe.expectMsg(TotalAirlinesCount(DefaultStartTimeWindow, DefaultCountAirlineAmount))
           }
         }
     }

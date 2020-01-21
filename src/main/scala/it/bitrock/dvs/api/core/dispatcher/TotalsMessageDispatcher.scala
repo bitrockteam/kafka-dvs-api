@@ -27,11 +27,11 @@ class TotalsMessageDispatcher(
       kafkaPoller ! TotalAirlineUpdate
       context.system.scheduleOnce(webSocketConfig.throttleDuration)(self ! TotalAirlineUpdate)
 
-    case totalFlights: CountFlight =>
+    case totalFlights: TotalFlightsCount =>
       logger.debug(s"Got $totalFlights from Kafka Consumer")
       forwardMessage(ApiEvent(totalFlights.getClass.getSimpleName, totalFlights).toJson.toString)
 
-    case totalAirlines: CountAirline =>
+    case totalAirlines: TotalAirlinesCount =>
       logger.debug(s"Got $totalAirlines from Kafka Consumer")
       forwardMessage(ApiEvent(totalAirlines.getClass.getSimpleName, totalAirlines).toJson.toString)
 

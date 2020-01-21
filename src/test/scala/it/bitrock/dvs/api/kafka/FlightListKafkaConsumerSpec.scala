@@ -98,9 +98,9 @@ class FlightListKafkaConsumerSpec
         val expectedFlightReceived1 = FlightReceived(
           DefaultIataNumber,
           DefaultIcaoNumber,
-          GeographyInfo(DefaultLatitude, DefaultLongitude, DefaultAltitude, DefaultDirection),
+          Geography(DefaultLatitude, DefaultLongitude, DefaultAltitude, DefaultDirection),
           DefaultSpeed1,
-          AirportInfo(
+          Airport(
             DefaultCodeAirport1,
             DefaultNameAirport1,
             DefaultNameCountry1,
@@ -108,7 +108,7 @@ class FlightListKafkaConsumerSpec
             DefaultTimezone1,
             DefaultGmt1
           ),
-          AirportInfo(
+          Airport(
             DefaultCodeAirport2,
             DefaultNameAirport2,
             DefaultNameCountry2,
@@ -116,17 +116,17 @@ class FlightListKafkaConsumerSpec
             DefaultTimezone2,
             DefaultGmt2
           ),
-          AirlineInfo(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
-          AirplaneInfo(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
+          Airline(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
+          Airplane(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
           DefaultStatus,
           DefaultUpdated
         )
         val expectedFlightReceived2 = FlightReceived(
           DefaultIataNumber,
           DefaultIcaoNumber,
-          GeographyInfo(DefaultLatitude, DefaultLongitude, DefaultAltitude, DefaultDirection),
+          Geography(DefaultLatitude, DefaultLongitude, DefaultAltitude, DefaultDirection),
           DefaultSpeed2,
-          AirportInfo(
+          Airport(
             DefaultCodeAirport1,
             DefaultNameAirport1,
             DefaultNameCountry1,
@@ -134,7 +134,7 @@ class FlightListKafkaConsumerSpec
             DefaultTimezone1,
             DefaultGmt1
           ),
-          AirportInfo(
+          Airport(
             DefaultCodeAirport2,
             DefaultNameAirport2,
             DefaultNameCountry2,
@@ -142,8 +142,8 @@ class FlightListKafkaConsumerSpec
             DefaultTimezone2,
             DefaultGmt2
           ),
-          AirlineInfo(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
-          AirplaneInfo(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
+          Airline(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
+          Airplane(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
           DefaultStatus,
           DefaultUpdated
         )
