@@ -21,9 +21,9 @@ class FlightListKafkaPollerCacheSpec extends BaseTestKit {
               FlightReceived(
                 DefaultIataNumber,
                 DefaultIcaoNumber,
-                GeographyInfo(DefaultInBoxLatitude, DefaultInBoxLongitude, DefaultAltitude, DefaultDirection),
+                Geography(DefaultInBoxLatitude, DefaultInBoxLongitude, DefaultAltitude, DefaultDirection),
                 DefaultSpeed,
-                AirportInfo(
+                Airport(
                   DefaultCodeAirport1,
                   DefaultNameAirport1,
                   DefaultNameCountry1,
@@ -31,7 +31,7 @@ class FlightListKafkaPollerCacheSpec extends BaseTestKit {
                   DefaultTimezone1,
                   DefaultGmt1
                 ),
-                AirportInfo(
+                Airport(
                   DefaultCodeAirport2,
                   DefaultNameAirport2,
                   DefaultNameCountry2,
@@ -39,8 +39,8 @@ class FlightListKafkaPollerCacheSpec extends BaseTestKit {
                   DefaultTimezone2,
                   DefaultGmt2
                 ),
-                AirlineInfo(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
-                AirplaneInfo(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
+                Airline(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
+                Airplane(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
                 DefaultStatus,
                 DefaultUpdated
               )

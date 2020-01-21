@@ -22,19 +22,19 @@ class TotalsKafkaPollerCache(val kafkaConfig: KafkaConfig, kafkaConsumerWrapperF
       List(kafkaConfig.totalFlightTopic, kafkaConfig.totalAirlineTopic)
     )
 
-  override def receive: Receive = active(CountFlight("", 0), CountAirline("", 0))
+  override def receive: Receive = active(TotalFlightsCount("", 0), TotalAirlinesCount("", 0))
 
-  def active(flightCache: CountFlight, airlineCache: CountAirline): Receive = {
+  def active(flightCache: TotalFlightsCount, airlineCache: TotalAirlinesCount): Receive = {
     case NoMessage =>
       logger.debug("Got no-message notice from Kafka Consumer, going to poll again")
       kafkaConsumerWrapper.pollMessages()
 
-    case countFlight: CountFlight =>
+    case countFlight: TotalFlightsCount =>
       logger.debug(s"Got a $countFlight from Kafka Consumer")
       if (countFlight.eventCount > 0) context.become(active(countFlight, airlineCache))
       throttle(kafkaConsumerWrapper.pollMessages())
 
-    case countAirline: CountAirline =>
+    case countAirline: TotalAirlinesCount =>
       logger.debug(s"Got a $countAirline from Kafka Consumer")
       if (countAirline.eventCount > 0) context.become(active(flightCache, countAirline))
       throttle(kafkaConsumerWrapper.pollMessages())

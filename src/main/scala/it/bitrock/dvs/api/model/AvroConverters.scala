@@ -18,18 +18,18 @@ import it.bitrock.dvs.model.avro.{
   TopSpeedList => KTopSpeedList
 }
 
-object DefinitionsConversions {
+object AvroConverters {
 
   implicit class TopAirlineListOps(x: KTopAirlineList) {
-    def toTopAirlineList: TopAirlineList = TopAirlineList(x.elements.map(toAirline))
+    def toTopAirlineList: TopAirlineList = TopAirlineList(x.elements.toList.map(toAirline))
   }
 
   implicit class CountFlightOps(x: KCountFlight) {
-    def toCountFlight: CountFlight = CountFlight(x.windowStartTime, x.eventCount)
+    def toCountFlight: TotalFlightsCount = TotalFlightsCount(x.windowStartTime, x.eventCount)
   }
 
   implicit class CountAirlineOps(x: KCountAirline) {
-    def toCountAirline: CountAirline = CountAirline(x.windowStartTime, x.eventCount)
+    def toCountAirline: TotalAirlinesCount = TotalAirlinesCount(x.windowStartTime, x.eventCount)
   }
 
   implicit class FlightReceivedOps(x: KFlightReceivedEvent) {
@@ -54,33 +54,33 @@ object DefinitionsConversions {
   }
 
   implicit class TopArrivalAirportListOps(x: KTopArrivalAirportList) {
-    def toTopArrivalAirportList: TopArrivalAirportList = TopArrivalAirportList(x.elements.map(toAirport))
+    def toTopArrivalAirportList: TopArrivalAirportList = TopArrivalAirportList(x.elements.toList.map(toAirport))
   }
 
   implicit class TopDepartureAirportListOps(x: KTopDepartureAirportList) {
-    def toTopDepartureAirportList: TopDepartureAirportList = TopDepartureAirportList(x.elements.map(toAirport))
+    def toTopDepartureAirportList: TopDepartureAirportList = TopDepartureAirportList(x.elements.toList.map(toAirport))
   }
 
   implicit class TopSpeedListOps(x: KTopSpeedList) {
-    def toTopSpeedList: TopSpeedList = TopSpeedList(x.elements.map(toSpeedFlight))
+    def toTopSpeedList: TopSpeedList = TopSpeedList(x.elements.toList.map(toSpeedFlight))
   }
 
-  private def toGeographyInfo(x: KGeographyInfo): GeographyInfo =
-    GeographyInfo(x.latitude, x.longitude, x.altitude, x.direction)
+  private def toGeographyInfo(x: KGeographyInfo): Geography =
+    Geography(x.latitude, x.longitude, x.altitude, x.direction)
 
-  private def toAirportInfo(x: KAirportInfo): AirportInfo =
-    AirportInfo(x.codeAirport, x.nameAirport, x.nameCountry, x.codeIso2Country, x.timezone, x.gmt)
+  private def toAirportInfo(x: KAirportInfo): Airport =
+    Airport(x.codeAirport, x.nameAirport, x.nameCountry, x.codeIso2Country, x.timezone, x.gmt)
 
-  private def toAirlineInfo(x: KAirlineInfo): AirlineInfo =
-    AirlineInfo(x.codeAirline, x.nameAirline, x.sizeAirline)
+  private def toAirlineInfo(x: KAirlineInfo): Airline =
+    Airline(x.codeAirline, x.nameAirline, x.sizeAirline)
 
-  private def toAirplaneInfo(x: KAirplaneInfo): AirplaneInfo =
-    AirplaneInfo(x.numberRegistration, x.productionLine, x.modelCode)
+  private def toAirplaneInfo(x: KAirplaneInfo): Airplane =
+    Airplane(x.numberRegistration, x.productionLine, x.modelCode)
 
-  private def toAirport(x: KAirport): Airport = Airport(x.airportCode, x.eventCount)
+  private def toAirport(x: KAirport): AirportCount = AirportCount(x.airportCode, x.eventCount)
 
   private def toSpeedFlight(x: KSpeedFlight): SpeedFlight = SpeedFlight(x.flightCode, x.speed)
 
-  private def toAirline(x: KAirline): Airline = Airline(x.airlineName, x.eventCount)
+  private def toAirline(x: KAirline): AirlineCount = AirlineCount(x.airlineName, x.eventCount)
 
 }

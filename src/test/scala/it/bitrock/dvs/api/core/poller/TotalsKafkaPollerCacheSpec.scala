@@ -2,7 +2,7 @@ package it.bitrock.dvs.api.core.poller
 
 import it.bitrock.dvs.api.BaseTestKit
 import it.bitrock.dvs.api.BaseTestKit._
-import it.bitrock.dvs.api.model.{CountAirline, CountFlight}
+import it.bitrock.dvs.api.model.{TotalAirlinesCount, TotalFlightsCount}
 
 class TotalsKafkaPollerCacheSpec extends BaseTestKit {
 
@@ -16,7 +16,7 @@ class TotalsKafkaPollerCacheSpec extends BaseTestKit {
       "a CountFlight message is received, but only after a delay" in ResourceLoanerPoller.withFixture {
         case ResourcePoller(kafkaConfig, consumerFactory, pollProbe) =>
           val messagePollerCache = TotalsKafkaPollerCache.build(kafkaConfig, consumerFactory)
-          val countFlightMessage = CountFlight(DefaultStartTimeWindow, DefaultCountFlightAmount)
+          val countFlightMessage = TotalFlightsCount(DefaultStartTimeWindow, DefaultCountFlightAmount)
           pollProbe expectMsg PollingTriggered
           messagePollerCache ! countFlightMessage
           pollProbe expectNoMessage kafkaConfig.consumer.pollInterval
@@ -25,7 +25,7 @@ class TotalsKafkaPollerCacheSpec extends BaseTestKit {
       "a CountAirline message is received, but only after a delay" in ResourceLoanerPoller.withFixture {
         case ResourcePoller(kafkaConfig, consumerFactory, pollProbe) =>
           val messagePollerCache = TotalsKafkaPollerCache.build(kafkaConfig, consumerFactory)
-          val countFlightMessage = CountAirline(DefaultStartTimeWindow, DefaultCountAirlineAmount)
+          val countFlightMessage = TotalAirlinesCount(DefaultStartTimeWindow, DefaultCountAirlineAmount)
           pollProbe expectMsg PollingTriggered
           messagePollerCache ! countFlightMessage
           pollProbe expectNoMessage kafkaConfig.consumer.pollInterval
