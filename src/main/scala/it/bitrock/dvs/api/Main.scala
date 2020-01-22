@@ -30,9 +30,13 @@ object Main extends App with LazyLogging {
   implicit private val ec: ExecutionContextExecutor = system.dispatcher
 
   private val flightListKafkaConsumerWrapperFactory = flightListKafkaConsumerFactory(config.kafka)
-  private val flightListKafkaMessagePollerCache     = FlightListKafkaPollerCache.build(config.kafka, flightListKafkaConsumerWrapperFactory)
+  private val flightListKafkaMessagePollerCache =
+    FlightListKafkaPollerCache.build(config.kafka, flightListKafkaConsumerWrapperFactory)
   private val flightListMessageDispatcherFactory =
-    MessageDispatcherFactory.flightListMessageDispatcherFactory(flightListKafkaMessagePollerCache, config.server.webSocket)
+    MessageDispatcherFactory.flightListMessageDispatcherFactory(
+      flightListKafkaMessagePollerCache,
+      config.server.webSocket
+    )
   private val flightListFlowFactory = FlowFactory.flightListFlowFactory(flightListMessageDispatcherFactory)
 
   private val topsKafkaConsumerWrapperFactory = topsKafkaConsumerFactory(config.kafka)

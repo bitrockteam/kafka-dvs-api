@@ -16,7 +16,9 @@ class TotalsMessageDispatcherSpec extends BaseTestKit {
         case ResourceDispatcher(webSocketConfig, kafkaConfig, consumerFactory, sourceProbe) =>
           val totalsKafkaPollerCache = TotalsKafkaPollerCache.build(kafkaConfig, consumerFactory)
           val messageDispatcher =
-            MessageDispatcherFactory.totalsMessageDispatcherFactory(totalsKafkaPollerCache, webSocketConfig).build(sourceProbe.ref)
+            MessageDispatcherFactory
+              .totalsMessageDispatcherFactory(totalsKafkaPollerCache, webSocketConfig)
+              .build(sourceProbe.ref)
           val msg = TotalFlightsCount(DefaultStartTimeWindow, DefaultCountFlightAmount)
           messageDispatcher ! msg
           val expectedResult = ApiEvent(msg.getClass.getSimpleName, msg).toJson.toString
@@ -26,7 +28,9 @@ class TotalsMessageDispatcherSpec extends BaseTestKit {
         case ResourceDispatcher(webSocketConfig, kafkaConfig, consumerFactory, sourceProbe) =>
           val totalsKafkaPollerCache = TotalsKafkaPollerCache.build(kafkaConfig, consumerFactory)
           val messageDispatcher =
-            MessageDispatcherFactory.totalsMessageDispatcherFactory(totalsKafkaPollerCache, webSocketConfig).build(sourceProbe.ref)
+            MessageDispatcherFactory
+              .totalsMessageDispatcherFactory(totalsKafkaPollerCache, webSocketConfig)
+              .build(sourceProbe.ref)
           val msg = TotalAirlinesCount(DefaultStartTimeWindow, DefaultCountAirlineAmount)
           messageDispatcher ! msg
           val expectedResult = ApiEvent(msg.getClass.getSimpleName, msg).toJson.toString

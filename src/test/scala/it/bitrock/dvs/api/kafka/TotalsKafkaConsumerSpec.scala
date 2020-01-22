@@ -41,7 +41,10 @@ class TotalsKafkaConsumerSpec
             processorProbe.expectMsg(TotalFlightsCount(DefaultStartTimeWindow, DefaultCountFlightAmount))
           }
           eventually {
-            publishToKafka(kafkaConfig.totalAirlineTopic, KCountAirline(DefaultStartTimeWindow, DefaultCountAirlineAmount))
+            publishToKafka(
+              kafkaConfig.totalAirlineTopic,
+              KCountAirline(DefaultStartTimeWindow, DefaultCountAirlineAmount)
+            )
             pollMessages()
             processorProbe.expectMsg(TotalAirlinesCount(DefaultStartTimeWindow, DefaultCountAirlineAmount))
           }
@@ -67,7 +70,8 @@ class TotalsKafkaConsumerSpec
           val (_, expectedValue) = consumeFirstKeyedMessageFrom[String, KCountFlight](kafkaConfig.totalFlightTopic)
           expectedValue shouldBe kCountFlightStatus
 
-          val (_, expectedAirlineCountValue) = consumeFirstKeyedMessageFrom[String, KCountAirline](kafkaConfig.totalAirlineTopic)
+          val (_, expectedAirlineCountValue) =
+            consumeFirstKeyedMessageFrom[String, KCountAirline](kafkaConfig.totalAirlineTopic)
           expectedAirlineCountValue shouldBe kCountAirline
         }
     }

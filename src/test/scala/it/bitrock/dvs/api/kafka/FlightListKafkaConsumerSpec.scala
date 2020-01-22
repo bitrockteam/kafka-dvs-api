@@ -203,7 +203,8 @@ class FlightListKafkaConsumerSpec
             processorProbe.expectMsg(NoMessage)
           }
 
-          val (_, response) = consumeFirstKeyedMessageFrom[String, KFlightReceivedList](kafkaConfig.flightReceivedListTopic)
+          val (_, response) =
+            consumeFirstKeyedMessageFrom[String, KFlightReceivedList](kafkaConfig.flightReceivedListTopic)
 
           response shouldBe kFlightReceivedList
         }
