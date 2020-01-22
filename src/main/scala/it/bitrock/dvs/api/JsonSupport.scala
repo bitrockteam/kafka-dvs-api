@@ -15,18 +15,25 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
   implicit val flightReceivedJsonFormat: RootJsonFormat[FlightReceived]         = jsonFormat10(FlightReceived.apply)
   implicit val flightReceivedListJsonFormat: RootJsonFormat[FlightReceivedList] = jsonFormat1(FlightReceivedList.apply)
 
-  implicit val airportCountJsonFormat: RootJsonFormat[AirportCount]                   = jsonFormat2(AirportCount.apply)
-  implicit val topArrivalAirportListJsonFormat: RootJsonFormat[TopArrivalAirportList] = jsonFormat1(TopArrivalAirportList.apply)
-  implicit val topDepartureAirportJsonFormat: RootJsonFormat[TopDepartureAirportList] = jsonFormat1(TopDepartureAirportList.apply)
-  implicit val speedFlghtJsonFormat: RootJsonFormat[SpeedFlight]                      = jsonFormat2(SpeedFlight.apply)
-  implicit val topSpeedListJsonFormat: RootJsonFormat[TopSpeedList]                   = jsonFormat1(TopSpeedList.apply)
-  implicit val airlineCountJsonFormat: RootJsonFormat[AirlineCount]                   = jsonFormat2(AirlineCount.apply)
-  implicit val topAirlineListJsonFormat: RootJsonFormat[TopAirlineList]               = jsonFormat1(TopAirlineList.apply)
+  implicit val airportCountJsonFormat: RootJsonFormat[AirportCount] = jsonFormat2(AirportCount.apply)
+  implicit val topArrivalAirportListJsonFormat: RootJsonFormat[TopArrivalAirportList] = jsonFormat1(
+    TopArrivalAirportList.apply
+  )
+  implicit val topDepartureAirportJsonFormat: RootJsonFormat[TopDepartureAirportList] = jsonFormat1(
+    TopDepartureAirportList.apply
+  )
+  implicit val speedFlghtJsonFormat: RootJsonFormat[SpeedFlight]        = jsonFormat2(SpeedFlight.apply)
+  implicit val topSpeedListJsonFormat: RootJsonFormat[TopSpeedList]     = jsonFormat1(TopSpeedList.apply)
+  implicit val airlineCountJsonFormat: RootJsonFormat[AirlineCount]     = jsonFormat2(AirlineCount.apply)
+  implicit val topAirlineListJsonFormat: RootJsonFormat[TopAirlineList] = jsonFormat1(TopAirlineList.apply)
 
-  implicit val totalFlightsCountStatusJsonFormat: RootJsonFormat[TotalFlightsCount] = jsonFormat2(TotalFlightsCount.apply)
-  implicit val totalAirlinesCountJsonFormat: RootJsonFormat[TotalAirlinesCount]     = jsonFormat2(TotalAirlinesCount.apply)
+  implicit val totalFlightsCountStatusJsonFormat: RootJsonFormat[TotalFlightsCount] = jsonFormat2(
+    TotalFlightsCount.apply
+  )
+  implicit val totalAirlinesCountJsonFormat: RootJsonFormat[TotalAirlinesCount] = jsonFormat2(TotalAirlinesCount.apply)
 
-  implicit def apiEventJsonFormat[T <: EventPayload: JsonFormat]: RootJsonFormat[ApiEvent[T]] = jsonFormat2(ApiEvent.apply[T])
+  implicit def apiEventJsonFormat[T <: EventPayload: JsonFormat]: RootJsonFormat[ApiEvent[T]] =
+    jsonFormat2(ApiEvent.apply[T])
 
 }
 

@@ -14,7 +14,8 @@ object TotalsKafkaPollerCache {
 
 }
 
-class TotalsKafkaPollerCache(val kafkaConfig: KafkaConfig, kafkaConsumerWrapperFactory: KafkaConsumerWrapperFactory) extends KafkaPoller {
+class TotalsKafkaPollerCache(val kafkaConfig: KafkaConfig, kafkaConsumerWrapperFactory: KafkaConsumerWrapperFactory)
+    extends KafkaPoller {
 
   override val kafkaConsumerWrapper: KafkaConsumerWrapper =
     kafkaConsumerWrapperFactory.build(
