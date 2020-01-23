@@ -48,7 +48,7 @@ trait TestValues {
   final val DefaultIcaoNumber = Random.nextString(10)
   final val DefaultSpeed      = Random.nextDouble
   final val DefaultStatus     = Random.nextString(10)
-  final val DefaultUpdated    = Instant.now
+  final val DefaultUpdated    = Instant.now()
 
   final val DefaultArrivalAirport1Name     = Random.nextString(10)
   final val DefaultArrivalAirport1Amount   = Random.nextLong
