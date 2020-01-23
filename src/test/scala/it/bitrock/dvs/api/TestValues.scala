@@ -1,5 +1,7 @@
 package it.bitrock.dvs.api
 
+import java.time.Instant
+
 import it.bitrock.dvs.api.model.CoordinatesBox
 
 import scala.util.Random
@@ -36,7 +38,7 @@ trait TestValues {
 
   final val DefaultCodeAirline = Random.nextString(10)
   final val DefaultNameAirline = Random.nextString(10)
-  final val DefaultSizeAirline = Random.nextString(10)
+  final val DefaultSizeAirline = Random.nextLong
 
   final val DefaultNumberRegistration = Random.nextString(10)
   final val DefaultProductionLine     = Random.nextString(10)
@@ -46,7 +48,7 @@ trait TestValues {
   final val DefaultIcaoNumber = Random.nextString(10)
   final val DefaultSpeed      = Random.nextDouble
   final val DefaultStatus     = Random.nextString(10)
-  final val DefaultUpdated    = Random.nextString(10)
+  final val DefaultUpdated    = Instant.now
 
   final val DefaultArrivalAirport1Name     = Random.nextString(10)
   final val DefaultArrivalAirport1Amount   = Random.nextLong

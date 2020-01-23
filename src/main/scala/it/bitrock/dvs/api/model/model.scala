@@ -11,7 +11,7 @@ final case class Airport(
     timezone: String,
     gmt: String
 )
-final case class Airline(codeAirline: String, nameAirline: String, sizeAirline: String)
+final case class Airline(codeAirline: String, nameAirline: String, sizeAirline: Long)
 final case class Airplane(numberRegistration: String, productionLine: String, modelCode: String)
 final case class FlightReceived(
     iataNumber: String,
@@ -23,7 +23,7 @@ final case class FlightReceived(
     airline: Airline,
     airplane: Airplane,
     status: String,
-    updated: String
+    updated: Long
 )
 final case class FlightReceivedList(elements: Seq[FlightReceived])
 

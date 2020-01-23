@@ -42,7 +42,7 @@ class FlightListKafkaPollerCacheSpec extends BaseTestKit {
                 Airline(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
                 Airplane(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
                 DefaultStatus,
-                DefaultUpdated
+                DefaultUpdated.toEpochMilli
               )
             )
           )

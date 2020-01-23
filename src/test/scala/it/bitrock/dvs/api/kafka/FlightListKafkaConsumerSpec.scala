@@ -119,7 +119,7 @@ class FlightListKafkaConsumerSpec
           Airline(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
           Airplane(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
           DefaultStatus,
-          DefaultUpdated
+          DefaultUpdated.toEpochMilli
         )
         val expectedFlightReceived2 = FlightReceived(
           DefaultIataNumber,
@@ -145,7 +145,7 @@ class FlightListKafkaConsumerSpec
           Airline(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
           Airplane(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
           DefaultStatus,
-          DefaultUpdated
+          DefaultUpdated.toEpochMilli
         )
         val expectedFlightReceivedList = FlightReceivedList(Seq(expectedFlightReceived1, expectedFlightReceived2))
 
