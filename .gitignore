@@ -104,6 +104,8 @@ project/plugins/project/
 # End of https://www.gitignore.io/api/sbt,scala,intellij+all
 
 ### Begin custom section ###
+.ivy2/
 .sbt/
+.DS_Store
 ### End custom section ###
 
