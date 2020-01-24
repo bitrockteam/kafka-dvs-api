@@ -119,7 +119,7 @@ class FlightListKafkaConsumerSpec
           Airline(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
           Airplane(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
           DefaultStatus,
-          DefaultUpdated
+          DefaultUpdated.toEpochMilli
         )
         val expectedFlightReceived2 = FlightReceived(
           DefaultIataNumber,
@@ -145,7 +145,7 @@ class FlightListKafkaConsumerSpec
           Airline(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
           Airplane(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
           DefaultStatus,
-          DefaultUpdated
+          DefaultUpdated.toEpochMilli
         )
         val expectedFlightReceivedList = FlightReceivedList(Seq(expectedFlightReceived1, expectedFlightReceived2))
 
@@ -203,7 +203,8 @@ class FlightListKafkaConsumerSpec
             processorProbe.expectMsg(NoMessage)
           }
 
-          val (_, response) = consumeFirstKeyedMessageFrom[String, KFlightReceivedList](kafkaConfig.flightReceivedListTopic)
+          val (_, response) =
+            consumeFirstKeyedMessageFrom[String, KFlightReceivedList](kafkaConfig.flightReceivedListTopic)
 
           response shouldBe kFlightReceivedList
         }

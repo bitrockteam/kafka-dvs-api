@@ -16,7 +16,8 @@ class TopsKafkaPollerCacheSpec extends BaseTestKit {
       "a TopArrivalAirportList is received, but only after a delay" in ResourceLoanerPoller.withFixture {
         case ResourcePoller(kafkaConfig, consumerFactory, pollProbe) =>
           val topsKafkaPollerCache = TopsKafkaPollerCache.build(kafkaConfig, consumerFactory)
-          val topArrivalMessage    = TopArrivalAirportList(List(AirportCount(DefaultArrivalAirport1Name, DefaultArrivalAirport1Amount)))
+          val topArrivalMessage =
+            TopArrivalAirportList(List(AirportCount(DefaultArrivalAirport1Name, DefaultArrivalAirport1Amount)))
 
           pollProbe expectMsg PollingTriggered
           topsKafkaPollerCache ! topArrivalMessage

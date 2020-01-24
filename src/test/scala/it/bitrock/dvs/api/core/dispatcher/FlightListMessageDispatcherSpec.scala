@@ -16,7 +16,9 @@ class FlightListMessageDispatcherSpec extends BaseTestKit {
         case ResourceDispatcher(webSocketConfig, kafkaConfig, consumerFactory, sourceProbe) =>
           val flightListKafkaPollerCache = FlightListKafkaPollerCache.build(kafkaConfig, consumerFactory)
           val messageProcessor =
-            MessageDispatcherFactory.flightListMessageDispatcherFactory(flightListKafkaPollerCache, webSocketConfig).build(sourceProbe.ref)
+            MessageDispatcherFactory
+              .flightListMessageDispatcherFactory(flightListKafkaPollerCache, webSocketConfig)
+              .build(sourceProbe.ref)
           val msg = FlightReceivedList(
             Seq(
               FlightReceived(
@@ -43,7 +45,7 @@ class FlightListMessageDispatcherSpec extends BaseTestKit {
                 Airline(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
                 Airplane(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
                 DefaultStatus,
-                DefaultUpdated
+                DefaultUpdated.toEpochMilli
               )
             )
           )
@@ -55,7 +57,9 @@ class FlightListMessageDispatcherSpec extends BaseTestKit {
         case ResourceDispatcher(webSocketConfig, kafkaConfig, consumerFactory, sourceProbe) =>
           val flightListKafkaPollerCache = FlightListKafkaPollerCache.build(kafkaConfig, consumerFactory)
           val messageProcessor =
-            MessageDispatcherFactory.flightListMessageDispatcherFactory(flightListKafkaPollerCache, webSocketConfig).build(sourceProbe.ref)
+            MessageDispatcherFactory
+              .flightListMessageDispatcherFactory(flightListKafkaPollerCache, webSocketConfig)
+              .build(sourceProbe.ref)
           val msg = FlightReceivedList(
             Seq(
               FlightReceived(
@@ -82,7 +86,7 @@ class FlightListMessageDispatcherSpec extends BaseTestKit {
                 Airline(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
                 Airplane(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
                 DefaultStatus,
-                DefaultUpdated
+                DefaultUpdated.toEpochMilli
               )
             )
           )
@@ -97,7 +101,9 @@ class FlightListMessageDispatcherSpec extends BaseTestKit {
         case ResourceDispatcher(webSocketConfig, kafkaConfig, consumerFactory, sourceProbe) =>
           val flightListKafkaPollerCache = FlightListKafkaPollerCache.build(kafkaConfig, consumerFactory)
           val messageProcessor =
-            MessageDispatcherFactory.flightListMessageDispatcherFactory(flightListKafkaPollerCache, webSocketConfig).build(sourceProbe.ref)
+            MessageDispatcherFactory
+              .flightListMessageDispatcherFactory(flightListKafkaPollerCache, webSocketConfig)
+              .build(sourceProbe.ref)
           messageProcessor ! FlightReceivedList(
             Seq(
               FlightReceived(
@@ -124,7 +130,7 @@ class FlightListMessageDispatcherSpec extends BaseTestKit {
                 Airline(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
                 Airplane(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
                 DefaultStatus,
-                DefaultUpdated
+                DefaultUpdated.toEpochMilli
               )
             )
           )

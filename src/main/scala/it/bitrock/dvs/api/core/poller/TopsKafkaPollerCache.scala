@@ -12,12 +12,18 @@ object TopsKafkaPollerCache {
   ): ActorRef = parentSystem.actorOf(Props(new TopsKafkaPollerCache(kafkaConfig, kafkaConsumerWrapperFactory)))
 }
 
-class TopsKafkaPollerCache(val kafkaConfig: KafkaConfig, kafkaConsumerWrapperFactory: KafkaConsumerWrapperFactory) extends KafkaPoller {
+class TopsKafkaPollerCache(val kafkaConfig: KafkaConfig, kafkaConsumerWrapperFactory: KafkaConsumerWrapperFactory)
+    extends KafkaPoller {
 
   override val kafkaConsumerWrapper: KafkaConsumerWrapper =
     kafkaConsumerWrapperFactory.build(
       self,
-      List(kafkaConfig.topArrivalAirportTopic, kafkaConfig.topDepartureAirportTopic, kafkaConfig.topSpeedTopic, kafkaConfig.topAirlineTopic)
+      List(
+        kafkaConfig.topArrivalAirportTopic,
+        kafkaConfig.topDepartureAirportTopic,
+        kafkaConfig.topSpeedTopic,
+        kafkaConfig.topAirlineTopic
+      )
     )
 
   override def receive: Receive = active(

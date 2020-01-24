@@ -16,19 +16,6 @@ The application references the following environment variables:
 - `SERVER.WEBSOCKET.MAX.NUMBER.FLIGHTS`: max number of elements returned by API
 - `SERVER.WEBSOCKET.THROTTLE.DURATION`: time interval between each update
 
-## Dependencies
-
-### Resolvers
-
-Some dependencies are downloaded from a private Nexus repository. Make sure to provide a `~/.sbt/.credentials.bitrock` file containing valid credentials:
-
-```properties
-realm=Sonatype Nexus Repository Manager
-host=nexus.reactive-labs.io
-user=<your-username>
-password=<your-password>
-```
-
 ## API documentation
 
 Web-socket APIs are documented using [AsyncAPI](https://www.asyncapi.com) standard in [this descriptor](src/main/resources/asyncapi.yaml).

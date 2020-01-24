@@ -32,29 +32,26 @@ class RoutesSpec extends BaseAsyncSpec with ScalatestRouteTest {
 
   "Routes" should {
 
-    "open a web-socket channel and stream messages with flight list events on it for WS requests on the streams path" in ResourceLoaner
-      .withFixture {
-        case Resource(routes, wsProbe, webSocketConfig) =>
-          WS(Uri(path = Uri.Path./(webSocketConfig.pathPrefix)./(webSocketConfig.flightListPath)), wsProbe.flow) ~> routes ~> check {
-            checkWebsocketAndSendTestMessage(wsProbe)
-          }
-      }
+    "open a web-socket channel and stream messages with flight list events on it for WS requests on the streams path" in ResourceLoaner.withFixture {
+      case Resource(routes, wsProbe, webSocketConfig) =>
+        WS(Uri(path = Uri.Path./(webSocketConfig.pathPrefix)./(webSocketConfig.flightListPath)), wsProbe.flow) ~> routes ~> check {
+          checkWebsocketAndSendTestMessage(wsProbe)
+        }
+    }
 
-    "open a web-socket channel and stream messages with top events on it for WS requests on the streams path" in ResourceLoaner
-      .withFixture {
-        case Resource(routes, wsProbe, webSocketConfig) =>
-          WS(Uri(path = Uri.Path./(webSocketConfig.pathPrefix)./(webSocketConfig.topElementsPath)), wsProbe.flow) ~> routes ~> check {
-            checkWebsocketAndSendTestMessage(wsProbe)
-          }
-      }
+    "open a web-socket channel and stream messages with top events on it for WS requests on the streams path" in ResourceLoaner.withFixture {
+      case Resource(routes, wsProbe, webSocketConfig) =>
+        WS(Uri(path = Uri.Path./(webSocketConfig.pathPrefix)./(webSocketConfig.topElementsPath)), wsProbe.flow) ~> routes ~> check {
+          checkWebsocketAndSendTestMessage(wsProbe)
+        }
+    }
 
-    "open a web-socket channel and stream messages with total events on it for WS requests on the streams path" in ResourceLoaner
-      .withFixture {
-        case Resource(routes, wsProbe, webSocketConfig) =>
-          WS(Uri(path = Uri.Path./(webSocketConfig.pathPrefix)./(webSocketConfig.totalElementsPath)), wsProbe.flow) ~> routes ~> check {
-            checkWebsocketAndSendTestMessage(wsProbe)
-          }
-      }
+    "open a web-socket channel and stream messages with total events on it for WS requests on the streams path" in ResourceLoaner.withFixture {
+      case Resource(routes, wsProbe, webSocketConfig) =>
+        WS(Uri(path = Uri.Path./(webSocketConfig.pathPrefix)./(webSocketConfig.totalElementsPath)), wsProbe.flow) ~> routes ~> check {
+          checkWebsocketAndSendTestMessage(wsProbe)
+        }
+    }
 
   }
 

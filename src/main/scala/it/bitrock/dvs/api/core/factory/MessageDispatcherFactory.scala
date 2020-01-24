@@ -12,15 +12,18 @@ object MessageDispatcherFactory {
   def flightListMessageDispatcherFactory(kafkaMessageDispatcher: ActorRef, webSocketConfig: WebSocketConfig)(
       implicit system: ActorRefFactory
   ): MessageDispatcherFactory =
-    (sourceActorRef: ActorRef) => system.actorOf(FlightListMessageDispatcher.props(sourceActorRef, kafkaMessageDispatcher, webSocketConfig))
+    (sourceActorRef: ActorRef) =>
+      system.actorOf(FlightListMessageDispatcher.props(sourceActorRef, kafkaMessageDispatcher, webSocketConfig))
 
   def topsMessageDispatcherFactory(kafkaMessageDispatcher: ActorRef, webSocketConfig: WebSocketConfig)(
       implicit system: ActorRefFactory
   ): MessageDispatcherFactory =
-    (sourceActorRef: ActorRef) => system.actorOf(TopsMessageDispatcher.props(sourceActorRef, kafkaMessageDispatcher, webSocketConfig))
+    (sourceActorRef: ActorRef) =>
+      system.actorOf(TopsMessageDispatcher.props(sourceActorRef, kafkaMessageDispatcher, webSocketConfig))
 
   def totalsMessageDispatcherFactory(kafkaMessageDispatcher: ActorRef, webSocketConfig: WebSocketConfig)(
       implicit system: ActorRefFactory
   ): MessageDispatcherFactory =
-    (sourceActorRef: ActorRef) => system.actorOf(TotalsMessageDispatcher.props(sourceActorRef, kafkaMessageDispatcher, webSocketConfig))
+    (sourceActorRef: ActorRef) =>
+      system.actorOf(TotalsMessageDispatcher.props(sourceActorRef, kafkaMessageDispatcher, webSocketConfig))
 }
