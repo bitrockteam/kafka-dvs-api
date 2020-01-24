@@ -1,9 +1,10 @@
 package it.bitrock.dvs.api.core.dispatcher
 
 import it.bitrock.dvs.api.BaseTestKit
-import it.bitrock.dvs.api.core.factory.FlightListMessageDispatcherFactoryImpl
+import it.bitrock.dvs.api.BaseTestKit._
+import it.bitrock.dvs.api.core.factory.MessageDispatcherFactory
 import it.bitrock.dvs.api.core.poller.FlightListKafkaPollerCache
-import it.bitrock.dvs.api.definitions._
+import it.bitrock.dvs.api.model._
 import spray.json._
 
 class FlightListMessageDispatcherSpec extends BaseTestKit {
@@ -12,18 +13,20 @@ class FlightListMessageDispatcherSpec extends BaseTestKit {
 
     "forward a JSON to source actor" when {
       "a correct FlightReceivedList message is received" in ResourceLoanerDispatcher.withFixture {
-        case ResourceDispatcher(websocketConfig, kafkaConfig, consumerFactory, sourceProbe) =>
+        case ResourceDispatcher(webSocketConfig, kafkaConfig, consumerFactory, sourceProbe) =>
           val flightListKafkaPollerCache = FlightListKafkaPollerCache.build(kafkaConfig, consumerFactory)
           val messageProcessor =
-            new FlightListMessageDispatcherFactoryImpl(websocketConfig, flightListKafkaPollerCache).build(sourceProbe.ref)
+            MessageDispatcherFactory
+              .flightListMessageDispatcherFactory(flightListKafkaPollerCache, webSocketConfig)
+              .build(sourceProbe.ref)
           val msg = FlightReceivedList(
             Seq(
               FlightReceived(
                 DefaultIataNumber,
                 DefaultIcaoNumber,
-                GeographyInfo(DefaultInBoxLatitude, DefaultInBoxLongitude, DefaultAltitude, DefaultDirection),
+                Geography(DefaultInBoxLatitude, DefaultInBoxLongitude, DefaultAltitude, DefaultDirection),
                 DefaultSpeed,
-                AirportInfo(
+                Airport(
                   DefaultCodeAirport1,
                   DefaultNameAirport1,
                   DefaultNameCountry1,
@@ -31,7 +34,7 @@ class FlightListMessageDispatcherSpec extends BaseTestKit {
                   DefaultTimezone1,
                   DefaultGmt1
                 ),
-                AirportInfo(
+                Airport(
                   DefaultCodeAirport2,
                   DefaultNameAirport2,
                   DefaultNameCountry2,
@@ -39,29 +42,32 @@ class FlightListMessageDispatcherSpec extends BaseTestKit {
                   DefaultTimezone2,
                   DefaultGmt2
                 ),
-                AirlineInfo(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
-                AirplaneInfo(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
+                Airline(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
+                Airplane(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
                 DefaultStatus,
                 DefaultUpdated.toEpochMilli
               )
             )
           )
+          messageProcessor ! CoordinatesBox(49.8, -3.7, 39.7, 23.6)
           messageProcessor ! msg
           sourceProbe expectMsg msg.toJson.toString
       }
       "the flights in the list are inside the box after its change" in ResourceLoanerDispatcher.withFixture {
-        case ResourceDispatcher(websocketConfig, kafkaConfig, consumerFactory, sourceProbe) =>
+        case ResourceDispatcher(webSocketConfig, kafkaConfig, consumerFactory, sourceProbe) =>
           val flightListKafkaPollerCache = FlightListKafkaPollerCache.build(kafkaConfig, consumerFactory)
           val messageProcessor =
-            new FlightListMessageDispatcherFactoryImpl(websocketConfig, flightListKafkaPollerCache).build(sourceProbe.ref)
+            MessageDispatcherFactory
+              .flightListMessageDispatcherFactory(flightListKafkaPollerCache, webSocketConfig)
+              .build(sourceProbe.ref)
           val msg = FlightReceivedList(
             Seq(
               FlightReceived(
                 DefaultIataNumber,
                 DefaultIcaoNumber,
-                GeographyInfo(DefaultChangedInBoxLatitude, DefaultChangedInBoxLongitude, DefaultAltitude, DefaultDirection),
+                Geography(DefaultChangedInBoxLatitude, DefaultChangedInBoxLongitude, DefaultAltitude, DefaultDirection),
                 DefaultSpeed,
-                AirportInfo(
+                Airport(
                   DefaultCodeAirport1,
                   DefaultNameAirport1,
                   DefaultNameCountry1,
@@ -69,7 +75,7 @@ class FlightListMessageDispatcherSpec extends BaseTestKit {
                   DefaultTimezone1,
                   DefaultGmt1
                 ),
-                AirportInfo(
+                Airport(
                   DefaultCodeAirport2,
                   DefaultNameAirport2,
                   DefaultNameCountry2,
@@ -77,8 +83,8 @@ class FlightListMessageDispatcherSpec extends BaseTestKit {
                   DefaultTimezone2,
                   DefaultGmt2
                 ),
-                AirlineInfo(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
-                AirplaneInfo(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
+                Airline(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
+                Airplane(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
                 DefaultStatus,
                 DefaultUpdated.toEpochMilli
               )
@@ -92,18 +98,20 @@ class FlightListMessageDispatcherSpec extends BaseTestKit {
 
     "forward an empty message to source actor" when {
       "the flights in the list are out of the box" in ResourceLoanerDispatcher.withFixture {
-        case ResourceDispatcher(websocketConfig, kafkaConfig, consumerFactory, sourceProbe) =>
+        case ResourceDispatcher(webSocketConfig, kafkaConfig, consumerFactory, sourceProbe) =>
           val flightListKafkaPollerCache = FlightListKafkaPollerCache.build(kafkaConfig, consumerFactory)
           val messageProcessor =
-            new FlightListMessageDispatcherFactoryImpl(websocketConfig, flightListKafkaPollerCache).build(sourceProbe.ref)
+            MessageDispatcherFactory
+              .flightListMessageDispatcherFactory(flightListKafkaPollerCache, webSocketConfig)
+              .build(sourceProbe.ref)
           messageProcessor ! FlightReceivedList(
             Seq(
               FlightReceived(
                 DefaultIataNumber,
                 DefaultIcaoNumber,
-                GeographyInfo(DefaultOutBoxLatitude, DefaultOutBoxLongitude, DefaultAltitude, DefaultDirection),
+                Geography(DefaultOutBoxLatitude, DefaultOutBoxLongitude, DefaultAltitude, DefaultDirection),
                 DefaultSpeed,
-                AirportInfo(
+                Airport(
                   DefaultCodeAirport1,
                   DefaultNameAirport1,
                   DefaultNameCountry1,
@@ -111,7 +119,7 @@ class FlightListMessageDispatcherSpec extends BaseTestKit {
                   DefaultTimezone1,
                   DefaultGmt1
                 ),
-                AirportInfo(
+                Airport(
                   DefaultCodeAirport2,
                   DefaultNameAirport2,
                   DefaultNameCountry2,
@@ -119,13 +127,14 @@ class FlightListMessageDispatcherSpec extends BaseTestKit {
                   DefaultTimezone2,
                   DefaultGmt2
                 ),
-                AirlineInfo(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
-                AirplaneInfo(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
+                Airline(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
+                Airplane(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
                 DefaultStatus,
                 DefaultUpdated.toEpochMilli
               )
             )
           )
+          messageProcessor ! CoordinatesBox(49.8, -3.7, 39.7, 23.6)
           sourceProbe expectMsg FlightReceivedList(Seq()).toJson.toString
       }
     }

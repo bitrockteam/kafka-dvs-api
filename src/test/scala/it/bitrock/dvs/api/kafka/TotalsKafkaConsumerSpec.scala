@@ -5,8 +5,9 @@ import java.net.URI
 import akka.actor.ActorSystem
 import akka.testkit.{TestKit, TestProbe}
 import it.bitrock.dvs.api.config.{AppConfig, KafkaConfig}
-import it.bitrock.dvs.api.definitions._
 import it.bitrock.dvs.api.kafka.KafkaConsumerWrapper.NoMessage
+import it.bitrock.dvs.api.kafka.TotalsKafkaConsumerSpec.Resource
+import it.bitrock.dvs.api.model._
 import it.bitrock.dvs.api.{BaseSpec, TestValues}
 import it.bitrock.dvs.model.avro.{CountAirline => KCountAirline, CountFlight => KCountFlight}
 import it.bitrock.kafkacommons.serialization.ImplicitConversions._
@@ -37,12 +38,15 @@ class TotalsKafkaConsumerSpec
           eventually {
             publishToKafka(kafkaConfig.totalFlightTopic, KCountFlight(DefaultStartTimeWindow, DefaultCountFlightAmount))
             pollMessages()
-            processorProbe.expectMsg(CountFlight(DefaultStartTimeWindow, DefaultCountFlightAmount))
+            processorProbe.expectMsg(TotalFlightsCount(DefaultStartTimeWindow, DefaultCountFlightAmount))
           }
           eventually {
-            publishToKafka(kafkaConfig.totalAirlineTopic, KCountAirline(DefaultStartTimeWindow, DefaultCountAirlineAmount))
+            publishToKafka(
+              kafkaConfig.totalAirlineTopic,
+              KCountAirline(DefaultStartTimeWindow, DefaultCountAirlineAmount)
+            )
             pollMessages()
-            processorProbe.expectMsg(CountAirline(DefaultStartTimeWindow, DefaultCountAirlineAmount))
+            processorProbe.expectMsg(TotalAirlinesCount(DefaultStartTimeWindow, DefaultCountAirlineAmount))
           }
         }
     }
@@ -58,8 +62,7 @@ class TotalsKafkaConsumerSpec
           publishToKafka(kafkaConfig.totalFlightTopic, kCountFlightStatus)
           publishToKafka(kafkaConfig.totalAirlineTopic, kCountAirline)
 
-          val deadline = patienceConfig.interval.fromNow
-          while (deadline.hasTimeLeft) {
+          eventually {
             pollMessages()
             processorProbe.expectMsg(NoMessage)
           }
@@ -67,7 +70,8 @@ class TotalsKafkaConsumerSpec
           val (_, expectedValue) = consumeFirstKeyedMessageFrom[String, KCountFlight](kafkaConfig.totalFlightTopic)
           expectedValue shouldBe kCountFlightStatus
 
-          val (_, expectedAirlineCountValue) = consumeFirstKeyedMessageFrom[String, KCountAirline](kafkaConfig.totalAirlineTopic)
+          val (_, expectedAirlineCountValue) =
+            consumeFirstKeyedMessageFrom[String, KCountAirline](kafkaConfig.totalAirlineTopic)
           expectedAirlineCountValue shouldBe kCountAirline
         }
     }
@@ -110,6 +114,9 @@ class TotalsKafkaConsumerSpec
     super.afterAll()
   }
 
+}
+
+object TotalsKafkaConsumerSpec {
   final case class Resource(
       embeddedKafkaConfig: EmbeddedKafkaConfig,
       kafkaConfig: KafkaConfig,

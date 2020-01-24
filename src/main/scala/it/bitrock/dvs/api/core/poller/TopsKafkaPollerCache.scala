@@ -2,9 +2,9 @@ package it.bitrock.dvs.api.core.poller
 
 import akka.actor._
 import it.bitrock.dvs.api.config.KafkaConfig
-import it.bitrock.dvs.api.definitions._
-import it.bitrock.dvs.api.kafka.{KafkaConsumerWrapper, KafkaConsumerWrapperFactory}
 import it.bitrock.dvs.api.kafka.KafkaConsumerWrapper._
+import it.bitrock.dvs.api.kafka.{KafkaConsumerWrapper, KafkaConsumerWrapperFactory}
+import it.bitrock.dvs.api.model._
 
 object TopsKafkaPollerCache {
   def build(kafkaConfig: KafkaConfig, kafkaConsumerWrapperFactory: KafkaConsumerWrapperFactory)(
@@ -12,12 +12,18 @@ object TopsKafkaPollerCache {
   ): ActorRef = parentSystem.actorOf(Props(new TopsKafkaPollerCache(kafkaConfig, kafkaConsumerWrapperFactory)))
 }
 
-class TopsKafkaPollerCache(val kafkaConfig: KafkaConfig, kafkaConsumerWrapperFactory: KafkaConsumerWrapperFactory) extends KafkaPoller {
+class TopsKafkaPollerCache(val kafkaConfig: KafkaConfig, kafkaConsumerWrapperFactory: KafkaConsumerWrapperFactory)
+    extends KafkaPoller {
 
   override val kafkaConsumerWrapper: KafkaConsumerWrapper =
     kafkaConsumerWrapperFactory.build(
       self,
-      List(kafkaConfig.topArrivalAirportTopic, kafkaConfig.topDepartureAirportTopic, kafkaConfig.topSpeedTopic, kafkaConfig.topAirlineTopic)
+      List(
+        kafkaConfig.topArrivalAirportTopic,
+        kafkaConfig.topDepartureAirportTopic,
+        kafkaConfig.topSpeedTopic,
+        kafkaConfig.topAirlineTopic
+      )
     )
 
   override def receive: Receive = active(

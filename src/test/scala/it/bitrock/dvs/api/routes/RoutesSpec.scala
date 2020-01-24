@@ -3,11 +3,12 @@ package it.bitrock.dvs.api.routes
 import akka.NotUsed
 import akka.http.scaladsl.model.Uri
 import akka.http.scaladsl.model.ws.{Message, TextMessage}
+import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.testkit.{ScalatestRouteTest, WSProbe}
 import akka.stream.scaladsl.Flow
 import it.bitrock.dvs.api.BaseAsyncSpec
-import it.bitrock.dvs.api.config.WebsocketConfig
-import it.bitrock.dvs.tags.TaggedTypes._
+import it.bitrock.dvs.api.config.WebSocketConfig
+import it.bitrock.dvs.api.routes.Routes.FlowFactories
 import it.bitrock.testcommons.AsyncFixtureLoaner
 import org.scalatest.Assertion
 
@@ -31,54 +32,52 @@ class RoutesSpec extends BaseAsyncSpec with ScalatestRouteTest {
 
   "Routes" should {
 
-    "open a web-socket channel and stream messages with flight list events on it for WS requests on the streams path" in ResourceLoaner
-      .withFixture {
-        case Resource(routes, wsProbe, websocketConfig) =>
-          WS(Uri(path = Uri.Path./(websocketConfig.pathPrefix)./(websocketConfig.flightListPath)), wsProbe.flow) ~> routes.streams ~> check {
-            checkWebsocketAndSendTestMessage(wsProbe)
-          }
-      }
+    "open a web-socket channel and stream messages with flight list events on it for WS requests on the streams path" in ResourceLoaner.withFixture {
+      case Resource(routes, wsProbe, webSocketConfig) =>
+        WS(Uri(path = Uri.Path./(webSocketConfig.pathPrefix)./(webSocketConfig.flightListPath)), wsProbe.flow) ~> routes ~> check {
+          checkWebsocketAndSendTestMessage(wsProbe)
+        }
+    }
 
-    "open a web-socket channel and stream messages with top events on it for WS requests on the streams path" in ResourceLoaner
-      .withFixture {
-        case Resource(routes, wsProbe, websocketConfig) =>
-          WS(Uri(path = Uri.Path./(websocketConfig.pathPrefix)./(websocketConfig.topElementsPath)), wsProbe.flow) ~> routes.streams ~> check {
-            checkWebsocketAndSendTestMessage(wsProbe)
-          }
-      }
+    "open a web-socket channel and stream messages with top events on it for WS requests on the streams path" in ResourceLoaner.withFixture {
+      case Resource(routes, wsProbe, webSocketConfig) =>
+        WS(Uri(path = Uri.Path./(webSocketConfig.pathPrefix)./(webSocketConfig.topElementsPath)), wsProbe.flow) ~> routes ~> check {
+          checkWebsocketAndSendTestMessage(wsProbe)
+        }
+    }
 
-    "open a web-socket channel and stream messages with total events on it for WS requests on the streams path" in ResourceLoaner
-      .withFixture {
-        case Resource(routes, wsProbe, websocketConfig) =>
-          WS(Uri(path = Uri.Path./(websocketConfig.pathPrefix)./(websocketConfig.totalElementsPath)), wsProbe.flow) ~> routes.streams ~> check {
-            checkWebsocketAndSendTestMessage(wsProbe)
-          }
-      }
+    "open a web-socket channel and stream messages with total events on it for WS requests on the streams path" in ResourceLoaner.withFixture {
+      case Resource(routes, wsProbe, webSocketConfig) =>
+        WS(Uri(path = Uri.Path./(webSocketConfig.pathPrefix)./(webSocketConfig.totalElementsPath)), wsProbe.flow) ~> routes ~> check {
+          checkWebsocketAndSendTestMessage(wsProbe)
+        }
+    }
 
   }
 
   object ResourceLoaner extends AsyncFixtureLoaner[RoutesSpec.Resource] {
     override def withFixture(body: RoutesSpec.Resource => Future[Assertion]): Future[Assertion] = {
       val wsProbe = WSProbe()
-      val flowFactories = Map(
-        flightListFlowFactoryKey -> new TestFlowFactory,
-        topsFlowFactoryKey       -> new TestFlowFactory,
-        totalsFlowFactoryKey     -> new TestFlowFactory
+      val flowFactories = FlowFactories(
+        flightListFlowFactory = new TestFlowFactory,
+        topsFlowFactory = new TestFlowFactory,
+        totalsFlowFactory = new TestFlowFactory
       )
-      val websocketConfig = WebsocketConfig(
+      val webSocketConfig = WebSocketConfig(
+        maxNumberFlights = 1000,
         throttleDuration = 1.second,
         pathPrefix = "path",
         flightListPath = "flight-list",
         topElementsPath = "tops",
         totalElementsPath = "totals"
       )
-      val routes = new Routes(flowFactories, websocketConfig)
+      val routes = Routes.webSocketRoutes(webSocketConfig, flowFactories)
 
       body(
         Resource(
           routes,
           wsProbe,
-          websocketConfig
+          webSocketConfig
         )
       )
     }
@@ -88,7 +87,7 @@ class RoutesSpec extends BaseAsyncSpec with ScalatestRouteTest {
 
 object RoutesSpec {
 
-  final case class Resource(route: Routes, wsProbe: WSProbe, websocketConfig: WebsocketConfig)
+  final case class Resource(route: Route, wsProbe: WSProbe, webSocketConfig: WebSocketConfig)
 
   class TestFlowFactory extends FlowFactory {
     override def flow: Flow[Message, Message, NotUsed] = Flow[Message].map(identity)

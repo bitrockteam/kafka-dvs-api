@@ -1,14 +1,14 @@
 package it.bitrock.dvs.api.routes
 
 import akka.NotUsed
-import akka.actor.{ActorRef, PoisonPill, Terminated}
+import akka.actor.{ActorRef, PoisonPill, Status, Terminated}
 import akka.http.scaladsl.model.ws.{Message, TextMessage}
 import akka.stream.scaladsl.{BroadcastHub, Flow, Keep, Sink, Source}
-import akka.stream.{ActorMaterializer, OverflowStrategy}
+import akka.stream.{CompletionStrategy, Materializer, OverflowStrategy}
 import com.typesafe.scalalogging.LazyLogging
+import it.bitrock.dvs.api.JsonSupport.coordinatesBoxJsonFormat
 import it.bitrock.dvs.api.core.factory.MessageDispatcherFactory
-import it.bitrock.dvs.api.definitions.CoordinatesBox
-import it.bitrock.dvs.api.definitions.JsonSupport.coordinatesBoxJsonFormat
+import it.bitrock.dvs.api.model.CoordinatesBox
 import spray.json._
 
 import scala.concurrent.ExecutionContext
@@ -24,7 +24,7 @@ object FlowFactory extends LazyLogging {
 
   def flightFlowFactory(
       processorFactory: MessageDispatcherFactory
-  )(implicit ec: ExecutionContext, materializer: ActorMaterializer): FlowFactory = new FlowFactory {
+  )(implicit ec: ExecutionContext, materializer: Materializer): FlowFactory = new FlowFactory {
     override def flow: Flow[Message, Message, NotUsed] = {
       val (sourceActorRef, publisher) = publisherAndActorRef()
       val processor                   = processorFactory.build(sourceActorRef)
@@ -34,7 +34,7 @@ object FlowFactory extends LazyLogging {
 
   def flightListFlowFactory(
       processorFactory: MessageDispatcherFactory
-  )(implicit ec: ExecutionContext, materializer: ActorMaterializer): FlowFactory = new FlowFactory {
+  )(implicit ec: ExecutionContext, materializer: Materializer): FlowFactory = new FlowFactory {
     override def flow: Flow[Message, Message, NotUsed] = {
       val (sourceActorRef, publisher) = publisherAndActorRef()
       val processor                   = processorFactory.build(sourceActorRef)
@@ -45,22 +45,36 @@ object FlowFactory extends LazyLogging {
           .collect {
             case Some(x) => x
           }
-          .to(Sink.actorRef(processor, Terminated))
+          .to(Sink.actorRef(processor, Terminated, Status.Failure))
 
       buildFlow(sink, publisher, processor)
     }
   }
 
-  private def publisherAndActorRef()(implicit materializer: ActorMaterializer): (ActorRef, Source[String, NotUsed]) =
+  private def publisherAndActorRef()(implicit materializer: Materializer): (ActorRef, Source[String, NotUsed]) =
     Source
-      .actorRef[String](SourceActorBufferSize, SourceActorOverflowStrategy)
+      .actorRef[String](
+        onSuccess,
+        onFailure,
+        SourceActorBufferSize,
+        SourceActorOverflowStrategy
+      )
       .toMat(BroadcastHub.sink)(Keep.both)
       .run()
 
+  private def onFailure = {
+    case Status.Failure(cause) => cause
+  }: PartialFunction[Any, Throwable]
+
+  private def onSuccess = {
+    case Status.Success(s: CompletionStrategy) => s
+    case akka.actor.Status.Success(_)          => CompletionStrategy.draining
+    case akka.actor.Status.Success             => CompletionStrategy.draining
+  }: PartialFunction[Any, CompletionStrategy]
+
   private def buildFlow(sink: Sink[Message, Any], source: Source[String, NotUsed], processor: ActorRef)(
       implicit ec: ExecutionContext
-  ): Flow[Message, Message, NotUsed] = {
-
+  ): Flow[Message, Message, NotUsed] =
     Flow
       .fromSinkAndSourceCoupled(sink, source.map(TextMessage(_)))
       .watchTermination() { (termWatchBefore, termWatchAfter) =>
@@ -74,7 +88,6 @@ object FlowFactory extends LazyLogging {
         }
         termWatchBefore
       }
-  }
 
   private def parseMessage: Message => Option[CoordinatesBox] = {
     case TextMessage.Strict(txt) =>

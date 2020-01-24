@@ -4,15 +4,15 @@ import akka.NotUsed
 import akka.actor.ActorRef
 import akka.http.scaladsl.model.Uri
 import akka.http.scaladsl.model.ws.{Message, TextMessage}
+import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.testkit.{ScalatestRouteTest, WSProbe}
 import akka.stream.scaladsl.Flow
-import it.bitrock.dvs.api.config.WebsocketConfig
-import it.bitrock.dvs.api.core.factory.FlightListMessageDispatcherFactoryImpl
-import it.bitrock.dvs.api.definitions.JsonSupport
+import it.bitrock.dvs.api.config.WebSocketConfig
+import it.bitrock.dvs.api.core.factory.MessageDispatcherFactory
 import it.bitrock.dvs.api.kafka.{KafkaConsumerWrapper, KafkaConsumerWrapperFactory}
 import it.bitrock.dvs.api.routes.FlowFactorySpec.{Resource, TestFlowFactory}
-import it.bitrock.dvs.api.{BaseAsyncSpec, TestValues}
-import it.bitrock.dvs.tags.TaggedTypes._
+import it.bitrock.dvs.api.routes.Routes.FlowFactories
+import it.bitrock.dvs.api.{BaseAsyncSpec, JsonSupport, TestValues}
 import it.bitrock.testcommons.AsyncFixtureLoaner
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito.when
@@ -30,7 +30,7 @@ class FlowFactorySpec
     with JsonSupport
     with TestValues {
 
-  private implicit val ec: ExecutionContextExecutor = system.dispatcher
+  implicit private val ec: ExecutionContextExecutor = system.dispatcher
 
   private val kafkaConsumerWrapper        = mock[KafkaConsumerWrapper]
   private val kafkaConsumerWrapperFactory = mock[KafkaConsumerWrapperFactory]
@@ -41,12 +41,12 @@ class FlowFactorySpec
     isWebSocketUpgrade shouldBe true
 
     val msg = TextMessage.Strict("""
-                |{
-                |    "leftHighLat": 1,
-                |    "leftHighLon": 1,
-                |    "rightLowLat": 2,
-                |    "rightLowLon": 2
-                |}
+                                   |{
+                                   |    "leftHighLat": 1,
+                                   |    "leftHighLon": 1,
+                                   |    "rightLowLat": 2,
+                                   |    "rightLowLon": 2
+                                   |}
               """.stripMargin)
     wsProbe.sendMessage(msg)
     1 shouldBe 1
@@ -54,8 +54,8 @@ class FlowFactorySpec
 
   "flow" should {
     "change the box" ignore withFixture {
-      case Resource(routes, wsProbe, config) =>
-        WS(Uri(path = Uri.Path./(config.pathPrefix)./(config.flightListPath)), wsProbe.flow) ~> routes.streams ~> check {
+      case Resource(webSocketRoutes, wsProbe, config) =>
+        WS(Uri(path = Uri.Path./(config.pathPrefix)./(config.flightListPath)), wsProbe.flow) ~> webSocketRoutes ~> check {
           checkWebsocketAndSendTestMessage(wsProbe)
         }
     }
@@ -63,7 +63,8 @@ class FlowFactorySpec
 
   override def withFixture(body: FlowFactorySpec.Resource => Future[Assertion]): Future[Assertion] = {
 
-    val websocketConfig = WebsocketConfig(
+    val webSocketConfig = WebSocketConfig(
+      maxNumberFlights = 1000,
       throttleDuration = 1.second,
       pathPrefix = "path",
       flightListPath = "flight-list",
@@ -76,19 +77,19 @@ class FlowFactorySpec
     when(kafkaConsumerWrapperFactory.build(any[ActorRef], any[Seq[String]])).thenReturn(kafkaConsumerWrapper)
 
     val flightListMessageProcessorFactory =
-      new FlightListMessageDispatcherFactoryImpl(websocketConfig, mock[ActorRef])
+      MessageDispatcherFactory.flightListMessageDispatcherFactory(mock[ActorRef], webSocketConfig)
 
-    val flowFactories = Map(
-      flightListFlowFactoryKey -> FlowFactory.flightFlowFactory(flightListMessageProcessorFactory),
-      topsFlowFactoryKey       -> new TestFlowFactory,
-      totalsFlowFactoryKey     -> new TestFlowFactory
+    val flowFactories = FlowFactories(
+      flightListFlowFactory = FlowFactory.flightFlowFactory(flightListMessageProcessorFactory),
+      topsFlowFactory = new TestFlowFactory,
+      totalsFlowFactory = new TestFlowFactory
     )
 
     body(
       Resource(
-        new Routes(flowFactories, websocketConfig),
+        Routes.webSocketRoutes(webSocketConfig, flowFactories),
         WSProbe(),
-        websocketConfig
+        webSocketConfig
       )
     )
   }
@@ -96,7 +97,7 @@ class FlowFactorySpec
 
 object FlowFactorySpec {
 
-  final case class Resource(route: Routes, wsProbe: WSProbe, websocketConfig: WebsocketConfig)
+  final case class Resource(webSocketRoutes: Route, wsProbe: WSProbe, webSocketConfig: WebSocketConfig)
 
   class TestFlowFactory extends FlowFactory {
     override def flow: Flow[Message, Message, NotUsed] = Flow[Message].map(identity)

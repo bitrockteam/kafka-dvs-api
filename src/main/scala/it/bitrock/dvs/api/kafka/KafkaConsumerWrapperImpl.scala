@@ -2,8 +2,8 @@ package it.bitrock.dvs.api.kafka
 
 import akka.actor.ActorRef
 import com.typesafe.scalalogging.LazyLogging
-import it.bitrock.dvs.api.config.KafkaConfig
 import it.bitrock.dvs.api._
+import it.bitrock.dvs.api.config.KafkaConfig
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.serialization.Deserializer
@@ -47,6 +47,7 @@ class KafkaConsumerWrapperImpl[K: Deserializer, V: Deserializer](
     }
   }
 
+  @SuppressWarnings(Array("scalafix:DisableSyntax.null"))
   override def moveTo(epoch: Long): Unit = {
     @tailrec
     def waitForAssignment(retries: Int): Map[TopicPartition, Long] = {

@@ -1,15 +1,16 @@
 package it.bitrock.dvs.api.core.dispatcher
 
 import akka.actor.{ActorRef, PoisonPill, Props, Terminated}
-import it.bitrock.dvs.api.config.WebsocketConfig
-import it.bitrock.dvs.api.definitions._
+import it.bitrock.dvs.api.ActorSystemOps
+import it.bitrock.dvs.api.config.WebSocketConfig
 import it.bitrock.dvs.api.kafka.KafkaConsumerWrapper.{TotalAirlineUpdate, TotalFlightUpdate}
+import it.bitrock.dvs.api.model._
 import spray.json._
 
 class TotalsMessageDispatcher(
     val sourceActorRef: ActorRef,
     kafkaPoller: ActorRef,
-    val websocketConfig: WebsocketConfig
+    val webSocketConfig: WebSocketConfig
 ) extends MessageDispatcher {
 
   import context.dispatcher
@@ -20,17 +21,17 @@ class TotalsMessageDispatcher(
 
     case TotalFlightUpdate =>
       kafkaPoller ! TotalFlightUpdate
-      context.system.scheduler.scheduleOnce(websocketConfig.throttleDuration)(self ! TotalFlightUpdate)
+      context.system.scheduleOnce(webSocketConfig.throttleDuration)(self ! TotalFlightUpdate)
 
     case TotalAirlineUpdate =>
       kafkaPoller ! TotalAirlineUpdate
-      context.system.scheduler.scheduleOnce(websocketConfig.throttleDuration)(self ! TotalAirlineUpdate)
+      context.system.scheduleOnce(webSocketConfig.throttleDuration)(self ! TotalAirlineUpdate)
 
-    case totalFlights: CountFlight =>
+    case totalFlights: TotalFlightsCount =>
       logger.debug(s"Got $totalFlights from Kafka Consumer")
       forwardMessage(ApiEvent(totalFlights.getClass.getSimpleName, totalFlights).toJson.toString)
 
-    case totalAirlines: CountAirline =>
+    case totalAirlines: TotalAirlinesCount =>
       logger.debug(s"Got $totalAirlines from Kafka Consumer")
       forwardMessage(ApiEvent(totalAirlines.getClass.getSimpleName, totalAirlines).toJson.toString)
 
@@ -48,6 +49,6 @@ object TotalsMessageDispatcher {
   def props(
       sourceActorRef: ActorRef,
       kafkaPoller: ActorRef,
-      websocketConfig: WebsocketConfig
-  ): Props = Props(new TotalsMessageDispatcher(sourceActorRef, kafkaPoller, websocketConfig))
+      webSocketConfig: WebSocketConfig
+  ): Props = Props(new TotalsMessageDispatcher(sourceActorRef, kafkaPoller, webSocketConfig))
 }

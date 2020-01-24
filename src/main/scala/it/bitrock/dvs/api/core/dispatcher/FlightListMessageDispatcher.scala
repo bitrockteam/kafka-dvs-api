@@ -1,52 +1,50 @@
 package it.bitrock.dvs.api.core.dispatcher
 
 import akka.actor.{ActorRef, PoisonPill, Props, Terminated}
-import it.bitrock.dvs.api.config.WebsocketConfig
-import it.bitrock.dvs.api.definitions._
+import it.bitrock.dvs.api.ActorSystemOps
+import it.bitrock.dvs.api.config.WebSocketConfig
 import it.bitrock.dvs.api.kafka.KafkaConsumerWrapper.FlightListUpdate
+import it.bitrock.dvs.api.model._
 import spray.json._
 
 class FlightListMessageDispatcher(
     val sourceActorRef: ActorRef,
     kafkaPoller: ActorRef,
-    val websocketConfig: WebsocketConfig
+    val webSocketConfig: WebSocketConfig
 ) extends MessageDispatcher {
 
   import context.dispatcher
-  private val maxNumberFlights = 1000
-  private val initialBox       = CoordinatesBox(49.8, -3.7, 39.7, 23.6)
 
-  override def receive: Receive = boxing(initialBox)
+  override def receive: Receive = commands
 
-  def boxing(box: CoordinatesBox): Receive = {
+  private def boxing(box: CoordinatesBox): Receive = commands.orElse(query(box))
 
+  private def commands: Receive = {
     case Terminated => self ! PoisonPill
 
     case FlightListUpdate =>
       kafkaPoller ! FlightListUpdate
-      context.system.scheduler.scheduleOnce(websocketConfig.throttleDuration)(self ! FlightListUpdate)
-
-    case flights: FlightReceivedList =>
-      logger.debug(s"Got a $flights from Kafka Consumer")
-      forwardMessage(getBoxedFlights(flights, box).toJson.toString)
+      context.system.scheduleOnce(webSocketConfig.throttleDuration)(self ! FlightListUpdate)
 
     case box: CoordinatesBox =>
       context.become(boxing(box))
       kafkaPoller ! FlightListUpdate
+  }
 
+  private def query(box: CoordinatesBox): Receive = {
+    case flights: FlightReceivedList =>
+      logger.debug(s"Got a $flights from Kafka Consumer")
+      forwardMessage(getBoxedFlights(flights, box).toJson.toString)
   }
 
   private def getBoxedFlights(flights: FlightReceivedList, box: CoordinatesBox): FlightReceivedList = {
-    val filteredList = flights.elements.view
-      .filter { flight =>
-        val coordinate = flight.geography
-        coordinate.latitude < box.leftHighLat &&
-        coordinate.latitude > box.rightLowLat &&
-        coordinate.longitude > box.leftHighLon &&
-        coordinate.longitude < box.rightLowLon
-      }
-      .take(maxNumberFlights)
-      .force
+    val filteredList = flights.elements.view.filter { flight =>
+      val coordinate = flight.geography
+      coordinate.latitude < box.leftHighLat &&
+      coordinate.latitude > box.rightLowLat &&
+      coordinate.longitude > box.leftHighLon &&
+      coordinate.longitude < box.rightLowLon
+    }.take(webSocketConfig.maxNumberFlights).force
     FlightReceivedList(filteredList)
   }
 
@@ -61,7 +59,7 @@ object FlightListMessageDispatcher {
   def props(
       sourceActorRef: ActorRef,
       kafkaPoller: ActorRef,
-      websocketConfig: WebsocketConfig
+      webSocketConfig: WebSocketConfig
   ): Props =
-    Props(new FlightListMessageDispatcher(sourceActorRef, kafkaPoller, websocketConfig))
+    Props(new FlightListMessageDispatcher(sourceActorRef, kafkaPoller, webSocketConfig))
 }

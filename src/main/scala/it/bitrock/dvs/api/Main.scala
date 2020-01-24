@@ -1,22 +1,18 @@
 package it.bitrock.dvs.api
 
-import akka.actor.{ActorSystem, Scheduler}
+import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
 import akka.http.scaladsl.server.Route
-import akka.stream.ActorMaterializer
+import akka.http.scaladsl.server.RouteConcatenation._
 import com.typesafe.scalalogging.LazyLogging
 import it.bitrock.dvs.api.config.AppConfig
-import it.bitrock.dvs.api.core.factory.{
-  FlightListMessageDispatcherFactoryImpl,
-  TopsMessageDispatcherFactoryImpl,
-  TotalsMessageDispatcherFactoryImpl
-}
+import it.bitrock.dvs.api.core.factory.MessageDispatcherFactory
 import it.bitrock.dvs.api.core.poller._
-import it.bitrock.dvs.api.routes._
 import it.bitrock.dvs.api.kafka.KafkaConsumerWrapperFactory._
-import it.bitrock.dvs.tags.FlowFactoryKey
-import it.bitrock.dvs.tags.TaggedTypes._
+import it.bitrock.dvs.api.routes.Routes.FlowFactories
+import it.bitrock.dvs.api.routes._
+import HealthRoute._
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContextExecutor, Future}
@@ -24,42 +20,47 @@ import scala.concurrent.{Await, ExecutionContextExecutor, Future}
 object Main extends App with LazyLogging {
   logger.info("Starting up")
 
-  val config = AppConfig.load
+  private val config = AppConfig.load
   logger.debug(s"Loaded configuration: $config")
 
-  val host: String = config.server.host
-  val port: Int    = config.server.port
+  private val host: String = config.server.host
+  private val port: Int    = config.server.port
 
-  implicit val system: ActorSystem             = ActorSystem("KafkaDVSApi")
-  implicit val ec: ExecutionContextExecutor    = system.dispatcher
-  implicit val materializer: ActorMaterializer = ActorMaterializer()
-  lazy val scheduler: Scheduler                = system.scheduler
+  implicit private val system: ActorSystem          = ActorSystem("KafkaDVSApi")
+  implicit private val ec: ExecutionContextExecutor = system.dispatcher
 
-  val flightListKafkaConsumerWrapperFactory = flightListKafkaConsumerFactory(config.kafka)
-  val flightListKafkaMessagePollerCache     = FlightListKafkaPollerCache.build(config.kafka, flightListKafkaConsumerWrapperFactory)
-  val flightListMessageDispatcherFactory =
-    new FlightListMessageDispatcherFactoryImpl(config.server.websocket, flightListKafkaMessagePollerCache)
-  val flightListFlowFactory = FlowFactory.flightListFlowFactory(flightListMessageDispatcherFactory)
+  private val flightListKafkaConsumerWrapperFactory = flightListKafkaConsumerFactory(config.kafka)
+  private val flightListKafkaMessagePollerCache =
+    FlightListKafkaPollerCache.build(config.kafka, flightListKafkaConsumerWrapperFactory)
+  private val flightListMessageDispatcherFactory =
+    MessageDispatcherFactory.flightListMessageDispatcherFactory(
+      flightListKafkaMessagePollerCache,
+      config.server.webSocket
+    )
+  private val flightListFlowFactory = FlowFactory.flightListFlowFactory(flightListMessageDispatcherFactory)
 
-  val topsKafkaConsumerWrapperFactory = topsKafkaConsumerFactory(config.kafka)
-  val topsKafkaPollerCache            = TopsKafkaPollerCache.build(config.kafka, topsKafkaConsumerWrapperFactory)
-  val topsMessageDispatcherFactory    = new TopsMessageDispatcherFactoryImpl(config.server.websocket, topsKafkaPollerCache)
-  val topsFlowFactory                 = FlowFactory.flightFlowFactory(topsMessageDispatcherFactory)
+  private val topsKafkaConsumerWrapperFactory = topsKafkaConsumerFactory(config.kafka)
+  private val topsKafkaPollerCache            = TopsKafkaPollerCache.build(config.kafka, topsKafkaConsumerWrapperFactory)
+  private val topsMessageDispatcherFactory =
+    MessageDispatcherFactory.topsMessageDispatcherFactory(topsKafkaPollerCache, config.server.webSocket)
+  private val topsFlowFactory = FlowFactory.flightFlowFactory(topsMessageDispatcherFactory)
 
-  val totalsKafkaConsumerWrapperFactory = totalsKafkaConsumerFactory(config.kafka)
-  val totalsKafkaPollerCache            = TotalsKafkaPollerCache.build(config.kafka, totalsKafkaConsumerWrapperFactory)
-  val totalsMessageDispatcherFactory    = new TotalsMessageDispatcherFactoryImpl(config.server.websocket, totalsKafkaPollerCache)
-  val totalsFlowFactory                 = FlowFactory.flightFlowFactory(totalsMessageDispatcherFactory)
+  private val totalsKafkaConsumerWrapperFactory = totalsKafkaConsumerFactory(config.kafka)
+  private val totalsKafkaPollerCache            = TotalsKafkaPollerCache.build(config.kafka, totalsKafkaConsumerWrapperFactory)
+  private val totalsMessageDispatcherFactory =
+    MessageDispatcherFactory.totalsMessageDispatcherFactory(totalsKafkaPollerCache, config.server.webSocket)
+  private val totalsFlowFactory = FlowFactory.flightFlowFactory(totalsMessageDispatcherFactory)
 
-  val flowFactories: Map[FlowFactoryKey, FlowFactory] =
-    Map(
-      flightListFlowFactoryKey -> flightListFlowFactory,
-      topsFlowFactoryKey       -> topsFlowFactory,
-      totalsFlowFactoryKey     -> totalsFlowFactory
+  private val flowFactories =
+    FlowFactories(
+      flightListFlowFactory = flightListFlowFactory,
+      topsFlowFactory = topsFlowFactory,
+      totalsFlowFactory = totalsFlowFactory
     )
 
-  val api: Route                           = new Routes(flowFactories, config.server.websocket).routes
-  val bindingFuture: Future[ServerBinding] = Http().bindAndHandle(api, host, port)
+  private val webSocketRoutes                      = Routes.webSocketRoutes(config.server.webSocket, flowFactories)
+  private val api: Route                           = webSocketRoutes ~ healthCheckRoute
+  private val bindingFuture: Future[ServerBinding] = Http().bindAndHandle(api, host, port)
 
   bindingFuture.map { serverBinding =>
     logger.info(s"Exposing to ${serverBinding.localAddress}")
@@ -71,8 +72,8 @@ object Main extends App with LazyLogging {
     val resourcesClosed = for {
       binding <- bindingFuture
       _       <- binding.terminate(hardDeadline = 3.seconds)
-      t       <- system.terminate()
-    } yield t
+      _       <- system.terminate()
+    } yield ()
 
     Await.result(resourcesClosed, 10.seconds)
   }

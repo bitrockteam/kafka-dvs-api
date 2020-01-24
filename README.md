@@ -1,6 +1,7 @@
 # DVS server API
 
-[![Build Status](https://iproject-jenkins.reactive-labs.io/buildStatus/icon?job=kafka-dvs-api%2Fmaster)](https://iproject-jenkins.reactive-labs.io/view/DVS/job/kafka-dvs-api/job/master/)
+[![Build Status](https://iproject-jenkins.reactive-labs.io/buildStatus/icon?job=kafka-dvs-api%2Fmaster)](https://iproject-jenkins.reactive-labs.io/job/kafka-dvs-api/job/master/)
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)
 
 Scala application with ReST and web-socket APIs serving aggregated flight events. Part of the [DVS project](https://github.com/search?q=topic%3Advs+org%3Abitrockteam&type=Repositories).
 
@@ -12,36 +13,12 @@ The application references the following environment variables:
 - `PORT`: server port
 - `KAFKA.BOOTSTRAP.SERVERS`: valid `bootstrap.servers` value (see [Confluent docs](https://docs.confluent.io/current/clients/consumer.html#configuration))
 - `SCHEMAREGISTRY.URL`: valid `schema.registry.url` value (see [Confluent docs](https://docs.confluent.io/current/schema-registry/docs/schema_registry_tutorial.html#java-consumers))
-
-## Dependencies
-
-### Resolvers
-
-Some dependencies are downloaded from a private Nexus repository. Make sure to provide a `~/.sbt/.credentials.bitrock` file containing valid credentials:
-
-```properties
-realm=Sonatype Nexus Repository Manager
-host=nexus.reactive-labs.io
-user=<your-username>
-password=<your-password>
-```
-
-### Kafka topics
-
-The application references the following Kafka topics:
-
-- `flight_received`
-- `top_arrival_airport`
-- `top_departure_airport`
-- `top_speed`
-- `top_airline`
-- `total_flight`
+- `SERVER.WEBSOCKET.MAX.NUMBER.FLIGHTS`: max number of elements returned by API
+- `SERVER.WEBSOCKET.THROTTLE.DURATION`: time interval between each update
 
 ## API documentation
 
-Web-socket APIs are documented using [AsyncAPI](https://www.asyncapi.com) standard in [this descriptor](api-models/src/main/resources/asyncapi.yaml).
-
-ReST APIs are documented using [OpenAPI v3](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md) standard in [this descriptor](api-models/src/main/resources/api.yaml).
+Web-socket APIs are documented using [AsyncAPI](https://www.asyncapi.com) standard in [this descriptor](src/main/resources/asyncapi.yaml).
 
 ## How to test
 
@@ -69,3 +46,6 @@ sbt docker:publish
 
 Architectural diagram is available [here](docs/diagram.puml). It can be rendered using [PlantText](https://www.planttext.com).
 
+## Contribution
+
+If you'd like to contribute to the project, make sure to review our [recommendations](CONTRIBUTING.md).

@@ -2,18 +2,17 @@ package it.bitrock.dvs.api.core.dispatcher
 
 import akka.actor.{Actor, ActorRef}
 import com.typesafe.scalalogging.LazyLogging
-import it.bitrock.dvs.api.config.WebsocketConfig
-import it.bitrock.dvs.api.definitions.JsonSupport
+import it.bitrock.dvs.api.JsonSupport
+import it.bitrock.dvs.api.config.WebSocketConfig
 
 trait MessageDispatcher extends Actor with JsonSupport with LazyLogging {
 
   val sourceActorRef: ActorRef
 
-  val websocketConfig: WebsocketConfig
+  val webSocketConfig: WebSocketConfig
 
-  def forwardMessage(event: String): Unit = {
+  def forwardMessage(event: String): Unit =
     sourceActorRef ! event
-  }
 
   override def preStart(): Unit = {
     super.preStart()

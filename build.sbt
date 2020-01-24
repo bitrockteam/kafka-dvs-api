@@ -1,16 +1,12 @@
 import Dependencies._
 import sbtrelease.ReleasePlugin.autoImport.ReleaseTransformations._
 
+addCommandAlias("fix", "all compile:scalafix test:scalafix")
+addCommandAlias("fixCheck", "; compile:scalafix --check ; test:scalafix --check")
+
 lazy val commonSettings = Seq(
   organization := "it.bitrock.dvs",
   scalaVersion := Versions.Scala
-)
-
-lazy val apiModelsCompileSettings = Seq(
-  Compile / guardrailTasks := List(
-    ScalaServer((Compile / resourceDirectory).value / "api.yaml", pkg = "it.bitrock.dvs.api.routes"),
-    ScalaClient((Compile / resourceDirectory).value / "api.yaml", pkg = "it.bitrock.dvs.api.routes")
-  )
 )
 
 lazy val compileSettings = Seq(
@@ -20,6 +16,8 @@ lazy val compileSettings = Seq(
       Compile / scalafmtAll
     )
     .value,
+  addCompilerPlugin(scalafixSemanticdb),
+  scalafixDependencies in ThisBuild += "org.scalatest" %% "autofix" % Versions.ScalaTestAutofix,
   scalacOptions ++= Seq(
     "-deprecation",
     "-encoding",
@@ -29,17 +27,13 @@ lazy val compileSettings = Seq(
     "-Xlint:type-parameter-shadow",
     "-Ywarn-dead-code",
     "-Ywarn-unused",
-    "-Ypartial-unification"
-  )
+    "-Ypartial-unification",
+    "-Yrangepos"
+  ),
+  scalacOptions -= "-Xfatal-warnings"
 )
 
 lazy val dependenciesSettings = Seq(
-  credentials ++= Seq(
-    baseDirectory.value / ".sbt" / ".credentials",
-    Path.userHome / ".sbt" / ".credentials.bitrock"
-  ).collect {
-    case c if c.exists => Credentials(c)
-  },
   excludeDependencies ++= excludeDeps,
   libraryDependencies ++= prodDeps ++ testDeps,
   resolvers ++= CustomResolvers.resolvers
@@ -67,20 +61,6 @@ lazy val testSettings = Seq(
   Test / parallelExecution := false
 )
 
-lazy val integrationTestSettings = Defaults.itSettings ++ Seq(
-  IntegrationTest / logBuffered := false,
-  IntegrationTest / parallelExecution := false
-) ++ inConfig(IntegrationTest)(org.scalafmt.sbt.ScalafmtPlugin.scalafmtConfigSettings)
-
-lazy val apiModels = (project in file("api-models"))
-  .settings(
-    name := "kafka-dvs-api-models",
-    libraryDependencies ++= ApiModelsDependencies.prodDeps,
-    Compile / logLevel := Level.Error
-  )
-  .settings(commonSettings: _*)
-  .settings(apiModelsCompileSettings: _*)
-
 lazy val root = (project in file("."))
   .settings(
     name := "kafka-dvs-api"
@@ -91,8 +71,6 @@ lazy val root = (project in file("."))
   .settings(publishSettings: _*)
   .settings(testSettings: _*)
   .configs(IntegrationTest)
-  .settings(integrationTestSettings: _*)
-  .dependsOn(apiModels)
 
 /**
   * sbt-native-packager plugin

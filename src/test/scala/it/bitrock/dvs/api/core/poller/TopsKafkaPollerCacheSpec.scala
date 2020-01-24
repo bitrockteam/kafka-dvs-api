@@ -1,7 +1,8 @@
 package it.bitrock.dvs.api.core.poller
 
 import it.bitrock.dvs.api.BaseTestKit
-import it.bitrock.dvs.api.definitions._
+import it.bitrock.dvs.api.BaseTestKit._
+import it.bitrock.dvs.api.model._
 
 class TopsKafkaPollerCacheSpec extends BaseTestKit {
 
@@ -15,7 +16,8 @@ class TopsKafkaPollerCacheSpec extends BaseTestKit {
       "a TopArrivalAirportList is received, but only after a delay" in ResourceLoanerPoller.withFixture {
         case ResourcePoller(kafkaConfig, consumerFactory, pollProbe) =>
           val topsKafkaPollerCache = TopsKafkaPollerCache.build(kafkaConfig, consumerFactory)
-          val topArrivalMessage    = TopArrivalAirportList(Seq(Airport(DefaultArrivalAirport1Name, DefaultArrivalAirport1Amount)))
+          val topArrivalMessage =
+            TopArrivalAirportList(List(AirportCount(DefaultArrivalAirport1Name, DefaultArrivalAirport1Amount)))
 
           pollProbe expectMsg PollingTriggered
           topsKafkaPollerCache ! topArrivalMessage
@@ -25,7 +27,8 @@ class TopsKafkaPollerCacheSpec extends BaseTestKit {
       "a TopDepartureAirportList is received, but only after a delay" in ResourceLoanerPoller.withFixture {
         case ResourcePoller(kafkaConfig, consumerFactory, pollProbe) =>
           val topsKafkaPollerCache = TopsKafkaPollerCache.build(kafkaConfig, consumerFactory)
-          val topDepartureMessage  = TopDepartureAirportList(Seq(Airport(DefaultDepartureAirport1Name, DefaultDepartureAirport1Amount)))
+          val topDepartureMessage =
+            TopDepartureAirportList(List(AirportCount(DefaultDepartureAirport1Name, DefaultDepartureAirport1Amount)))
 
           pollProbe expectMsg PollingTriggered
           topsKafkaPollerCache ! topDepartureMessage
@@ -35,7 +38,7 @@ class TopsKafkaPollerCacheSpec extends BaseTestKit {
       "a TopSpeedList is received, but only after a delay" in ResourceLoanerPoller.withFixture {
         case ResourcePoller(kafkaConfig, consumerFactory, pollProbe) =>
           val topsKafkaPollerCache = TopsKafkaPollerCache.build(kafkaConfig, consumerFactory)
-          val topSpeedMessage      = TopSpeedList(Seq(SpeedFlight(DefaultFlightCode1, DefaultSpeed)))
+          val topSpeedMessage      = TopSpeedList(List(SpeedFlight(DefaultFlightCode1, DefaultSpeed)))
 
           pollProbe expectMsg PollingTriggered
           topsKafkaPollerCache ! topSpeedMessage
@@ -45,7 +48,7 @@ class TopsKafkaPollerCacheSpec extends BaseTestKit {
       "a TopAirlineList is received, but only after a delay" in ResourceLoanerPoller.withFixture {
         case ResourcePoller(kafkaConfig, consumerFactory, pollProbe) =>
           val topsKafkaPollerCache = TopsKafkaPollerCache.build(kafkaConfig, consumerFactory)
-          val topAirlineMessage    = TopAirlineList(Seq(Airline(DefaultAirline1Name, DefaultAirline1Amount)))
+          val topAirlineMessage    = TopAirlineList(List(AirlineCount(DefaultAirline1Name, DefaultAirline1Amount)))
 
           pollProbe expectMsg PollingTriggered
           topsKafkaPollerCache ! topAirlineMessage

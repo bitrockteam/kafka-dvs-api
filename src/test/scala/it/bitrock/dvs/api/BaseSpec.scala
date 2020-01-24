@@ -4,11 +4,12 @@ import java.net.URI
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{ImplicitSender, TestKit, TestProbe}
-import it.bitrock.dvs.api.config.{ConsumerConfig, KafkaConfig, WebsocketConfig}
-import it.bitrock.dvs.api.definitions.JsonSupport
+import it.bitrock.dvs.api.BaseTestKit._
+import it.bitrock.dvs.api.config.{ConsumerConfig, KafkaConfig, WebSocketConfig}
 import it.bitrock.dvs.api.kafka.{KafkaConsumerWrapper, KafkaConsumerWrapperFactory}
 import it.bitrock.testcommons.{AsyncSuite, FixtureLoanerAnyResult, Suite}
-import org.scalatest.{AsyncWordSpecLike, BeforeAndAfterAll, WordSpecLike}
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.wordspec.{AnyWordSpecLike, AsyncWordSpecLike}
 
 import scala.concurrent.duration._
 import scala.util.Random
@@ -16,7 +17,7 @@ import scala.util.Random
 /**
   * Base trait to test classes.
   */
-trait BaseSpec extends Suite with WordSpecLike
+trait BaseSpec extends Suite with AnyWordSpecLike
 
 /**
   * Base trait to test asynchronous assertions.
@@ -31,18 +32,44 @@ abstract class BaseTestKit
     with JsonSupport
     with TestValues {
 
-  case object PollingTriggered
-  class TestKafkaConsumerWrapperFactory(pollActorRef: ActorRef) extends KafkaConsumerWrapperFactory {
-    override def build(processor: ActorRef, topics: Seq[String] = List()): KafkaConsumerWrapper = new KafkaConsumerWrapper {
-      override def pollMessages(): Unit      = pollActorRef ! PollingTriggered
-      override def close(): Unit             = ()
-      override val maxPollRecords: Int       = 1
-      override def moveTo(epoch: Long): Unit = ()
-      override def pause(): Unit             = ()
-      override def resume(): Unit            = ()
+  object ResourceLoanerPoller extends FixtureLoanerAnyResult[ResourcePoller] {
+    override def withFixture(body: ResourcePoller => Any): Any = {
+      val pollProbe       = TestProbe(s"poll-probe-${Random.nextInt()}")
+      val consumerFactory = new TestKafkaConsumerWrapperFactory(pollProbe.ref)
+      body(
+        ResourcePoller(
+          kafkaConfig,
+          consumerFactory,
+          pollProbe
+        )
+      )
     }
   }
 
+  object ResourceLoanerDispatcher extends FixtureLoanerAnyResult[ResourceDispatcher] {
+    override def withFixture(body: ResourceDispatcher => Any): Any = {
+      val pollProbe       = TestProbe(s"poll-probe-${Random.nextInt()}")
+      val sourceProbe     = TestProbe(s"source-probe-${Random.nextInt()}")
+      val consumerFactory = new TestKafkaConsumerWrapperFactory(pollProbe.ref)
+      body(
+        ResourceDispatcher(
+          webSocketConfig,
+          kafkaConfig,
+          consumerFactory,
+          sourceProbe
+        )
+      )
+    }
+  }
+
+  override def afterAll: Unit = {
+    shutdown()
+    super.afterAll()
+  }
+
+}
+
+object BaseTestKit {
   val kafkaConfig: KafkaConfig =
     KafkaConfig(
       "",
@@ -58,8 +85,9 @@ abstract class BaseTestKit
       ConsumerConfig(1.second, Duration.Zero)
     )
 
-  val websocketConfig: WebsocketConfig =
-    WebsocketConfig(
+  val webSocketConfig: WebSocketConfig =
+    WebSocketConfig(
+      1000,
       0.second,
       "not-used",
       "not-used",
@@ -67,50 +95,30 @@ abstract class BaseTestKit
       "not-used"
     )
 
-  final case class ResourceDispatcher(
-      websocketConfig: WebsocketConfig,
-      kafkaConfig: KafkaConfig,
-      consumerFactory: KafkaConsumerWrapperFactory,
-      sourceProbe: TestProbe
-  )
-  object ResourceLoanerDispatcher extends FixtureLoanerAnyResult[ResourceDispatcher] {
-    override def withFixture(body: ResourceDispatcher => Any): Any = {
-      val pollProbe       = TestProbe(s"poll-probe-${Random.nextInt()}")
-      val sourceProbe     = TestProbe(s"source-probe-${Random.nextInt()}")
-      val consumerFactory = new TestKafkaConsumerWrapperFactory(pollProbe.ref)
-      body(
-        ResourceDispatcher(
-          websocketConfig,
-          kafkaConfig,
-          consumerFactory,
-          sourceProbe
-        )
-      )
-    }
-  }
+  case object PollingTriggered
 
   final case class ResourcePoller(
       kafkaConfig: KafkaConfig,
       consumerFactory: KafkaConsumerWrapperFactory,
       pollProbe: TestProbe
   )
-  object ResourceLoanerPoller extends FixtureLoanerAnyResult[ResourcePoller] {
-    override def withFixture(body: ResourcePoller => Any): Any = {
-      val pollProbe       = TestProbe(s"poll-probe-${Random.nextInt()}")
-      val consumerFactory = new TestKafkaConsumerWrapperFactory(pollProbe.ref)
-      body(
-        ResourcePoller(
-          kafkaConfig,
-          consumerFactory,
-          pollProbe
-        )
-      )
-    }
-  }
 
-  override def afterAll: Unit = {
-    shutdown()
-    super.afterAll()
-  }
+  final case class ResourceDispatcher(
+      webSocketConfig: WebSocketConfig,
+      kafkaConfig: KafkaConfig,
+      consumerFactory: KafkaConsumerWrapperFactory,
+      sourceProbe: TestProbe
+  )
 
+  class TestKafkaConsumerWrapperFactory(pollActorRef: ActorRef) extends KafkaConsumerWrapperFactory {
+    override def build(processor: ActorRef, topics: Seq[String] = List()): KafkaConsumerWrapper =
+      new KafkaConsumerWrapper {
+        override def pollMessages(): Unit      = pollActorRef ! PollingTriggered
+        override def close(): Unit             = ()
+        override val maxPollRecords: Int       = 1
+        override def moveTo(epoch: Long): Unit = ()
+        override def pause(): Unit             = ()
+        override def resume(): Unit            = ()
+      }
+  }
 }
