@@ -22,7 +22,7 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
   implicit val topDepartureAirportJsonFormat: RootJsonFormat[TopDepartureAirportList] = jsonFormat1(
     TopDepartureAirportList.apply
   )
-  implicit val speedFlghtJsonFormat: RootJsonFormat[SpeedFlight]        = jsonFormat2(SpeedFlight.apply)
+  implicit val speedFlightJsonFormat: RootJsonFormat[SpeedFlight]       = jsonFormat2(SpeedFlight.apply)
   implicit val topSpeedListJsonFormat: RootJsonFormat[TopSpeedList]     = jsonFormat1(TopSpeedList.apply)
   implicit val airlineCountJsonFormat: RootJsonFormat[AirlineCount]     = jsonFormat2(AirlineCount.apply)
   implicit val topAirlineListJsonFormat: RootJsonFormat[TopAirlineList] = jsonFormat1(TopAirlineList.apply)

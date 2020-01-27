@@ -7,6 +7,7 @@ import scala.concurrent.duration.FiniteDuration
 final case class KafkaConfig(
     bootstrapServers: String,
     schemaRegistryUrl: URI,
+    enableInterceptors: Boolean,
     groupId: String,
     flightReceivedListTopic: String,
     topArrivalAirportTopic: String,

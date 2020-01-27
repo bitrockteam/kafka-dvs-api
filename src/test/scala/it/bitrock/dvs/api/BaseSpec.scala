@@ -74,6 +74,7 @@ object BaseTestKit {
     KafkaConfig(
       "",
       URI.create("http://localhost:8080"),
+      enableInterceptors = false,
       "",
       "",
       "",

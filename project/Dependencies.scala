@@ -57,7 +57,8 @@ object Dependencies {
     "io.confluent"          % "kafka-avro-serializer"   % Versions.ConfluentPlatform,
     "it.bitrock.dvs"        %% "kafka-dvs-avro-schemas" % Versions.KafkaDVS,
     "it.bitrock"            %% "kafka-commons"          % Versions.KafkaCommons,
-    "org.apache.kafka"      % "kafka-clients"           % Versions.Kafka
+    "org.apache.kafka"      % "kafka-clients"           % Versions.Kafka,
+    "io.confluent"          % "monitoring-interceptors" % Versions.ConfluentPlatform exclude ("org.apache.kafka", "kafka-clients")
   ) ++ Logging.prodDeps
 
   lazy val testDeps: Seq[ModuleID] = Seq(
