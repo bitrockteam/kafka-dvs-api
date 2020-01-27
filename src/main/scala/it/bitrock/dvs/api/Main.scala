@@ -37,7 +37,7 @@ object Main extends App with LazyLogging {
       flightListKafkaMessagePollerCache,
       config.server.webSocket
     )
-  private val flightListFlowFactory = FlowFactory.flightListFlowFactory(flightListMessageDispatcherFactory)
+  private val flightListFlowFactory = FlowFactory.messageExchangeFlowFactory(flightListMessageDispatcherFactory)
 
   private val topsKafkaConsumerWrapperFactory = topsKafkaConsumerFactory(config.kafka)
   private val topsKafkaPollerCache            = TopsKafkaPollerCache.build(config.kafka, topsKafkaConsumerWrapperFactory)

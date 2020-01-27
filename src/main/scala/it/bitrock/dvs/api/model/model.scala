@@ -1,6 +1,13 @@
 package it.bitrock.dvs.api.model
 
+sealed abstract class WebSocketIncomeMessage(val `@type`: String)
 final case class CoordinatesBox(leftHighLat: Double, leftHighLon: Double, rightLowLat: Double, rightLowLon: Double)
+    extends WebSocketIncomeMessage("startFlightList")
+case object StopFlightList extends WebSocketIncomeMessage("stopFlightList")
+case object StartTop       extends WebSocketIncomeMessage("startTop")
+case object StopTop        extends WebSocketIncomeMessage("stopTop")
+case object StartTotal     extends WebSocketIncomeMessage("startTotal")
+case object StopTotal      extends WebSocketIncomeMessage("stopTotal")
 
 final case class Geography(latitude: Double, longitude: Double, altitude: Double, direction: Double)
 final case class Airport(
