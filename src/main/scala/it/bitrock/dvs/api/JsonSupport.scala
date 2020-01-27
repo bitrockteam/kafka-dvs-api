@@ -2,7 +2,7 @@ package it.bitrock.dvs.api
 
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import it.bitrock.dvs.api.model._
-import spray.json.{DefaultJsonProtocol, JsonFormat, RootJsonFormat}
+import spray.json.{serializationError, DefaultJsonProtocol, JsString, JsValue, JsonFormat, RootJsonFormat, RootJsonReader}
 
 trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
 
@@ -35,6 +35,18 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
   implicit def apiEventJsonFormat[T <: EventPayload: JsonFormat]: RootJsonFormat[ApiEvent[T]] =
     jsonFormat2(ApiEvent.apply[T])
 
+  implicit object WebSocketIncomeMessageFormat extends RootJsonReader[WebSocketIncomeMessage] {
+    override def read(json: JsValue): WebSocketIncomeMessage =
+      json.asJsObject.getFields("@type") match {
+        case Seq(JsString("startFlightList")) => json.convertTo[CoordinatesBox]
+        case Seq(JsString("stopFlightList"))  => StopFlightList
+        case Seq(JsString("startTop"))        => StartTop
+        case Seq(JsString("stopTop"))         => StopTop
+        case Seq(JsString("startTotal"))      => StartTotal
+        case Seq(JsString("stopTotal"))       => StopTotal
+        case unrecognized                     => serializationError(s"json serialization error $unrecognized")
+      }
+  }
 }
 
 object JsonSupport extends JsonSupport

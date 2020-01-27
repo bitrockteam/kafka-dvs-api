@@ -2,6 +2,7 @@ package it.bitrock.dvs.api.core.dispatcher
 
 import akka.actor._
 import it.bitrock.dvs.api.ActorSystemOps
+import it.bitrock.dvs.api.JsonSupport._
 import it.bitrock.dvs.api.config.WebSocketConfig
 import it.bitrock.dvs.api.kafka.KafkaConsumerWrapper._
 import it.bitrock.dvs.api.model._
