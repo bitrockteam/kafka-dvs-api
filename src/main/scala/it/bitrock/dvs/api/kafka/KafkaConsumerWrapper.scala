@@ -38,6 +38,12 @@ trait KafkaConsumerWrapper {
     properties.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, maxPollRecords.toString)
     properties.put(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, conf.schemaRegistryUrl.toString)
     properties.put(KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG, true.toString)
+    if (conf.enableInterceptors) {
+      properties.put(
+        ConsumerConfig.INTERCEPTOR_CLASSES_CONFIG,
+        "io.confluent.monitoring.clients.interceptor.MonitoringConsumerInterceptor"
+      )
+    }
     val kafkaConsumer = new KafkaConsumer[K, V](properties)
 
     kafkaConsumer.subscribe(topics.asJava)
