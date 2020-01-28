@@ -84,3 +84,6 @@ maintainer in Docker := "Alessio Nisini"
 // Fix for sbt-native-packager 1.3.19
 daemonUserUid in Docker := None
 daemonUser in Docker := "root"
+
+// Remove the top level directory for universal package
+topLevelDirectory := None
