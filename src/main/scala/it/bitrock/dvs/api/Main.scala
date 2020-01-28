@@ -10,9 +10,9 @@ import it.bitrock.dvs.api.config.AppConfig
 import it.bitrock.dvs.api.core.factory.MessageDispatcherFactory
 import it.bitrock.dvs.api.core.poller._
 import it.bitrock.dvs.api.kafka.KafkaConsumerWrapperFactory._
+import it.bitrock.dvs.api.routes.HealthRoute._
 import it.bitrock.dvs.api.routes.Routes.FlowFactories
 import it.bitrock.dvs.api.routes._
-import HealthRoute._
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContextExecutor, Future}
