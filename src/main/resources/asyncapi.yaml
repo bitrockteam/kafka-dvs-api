@@ -104,12 +104,17 @@ components:
         properties:
           eventType:
             type: string
+            enum:
+              - TopAirlineList
+              - TopArrivalAirportList
+              - TopDepartureAirportList
+              - TopSpeedList
           eventPayload:
             oneOf:
+              - $ref: '#/components/schemas/TopAirlineList'
               - $ref: '#/components/schemas/TopArrivalAirportList'
               - $ref: '#/components/schemas/TopDepartureAirportList'
               - $ref: '#/components/schemas/TopSpeedList'
-              - $ref: '#/components/schemas/TopAirlineList'
     TotalElementsChangedStreamEvent:
       tags:
         - name: totalElementsChanged
@@ -121,10 +126,13 @@ components:
         properties:
           eventType:
             type: string
+            enum:
+              - TotalAirlinesCount
+              - TotalFlightsCount
           eventPayload:
             oneOf:
-              - $ref: '#/components/schemas/TotalFlights'
               - $ref: '#/components/schemas/TotalAirline'
+              - $ref: '#/components/schemas/TotalFlights'
 
   schemas:
     coordinatesBox:
