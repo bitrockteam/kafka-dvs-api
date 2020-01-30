@@ -22,16 +22,6 @@ object FlowFactory extends LazyLogging {
   private val SourceActorBufferSize       = 1000
   private val SourceActorOverflowStrategy = OverflowStrategy.dropHead
 
-  def flightFlowFactory(
-      processorFactory: MessageDispatcherFactory
-  )(implicit ec: ExecutionContext, materializer: Materializer): FlowFactory = new FlowFactory {
-    override def flow: Flow[Message, Message, NotUsed] = {
-      val (sourceActorRef, publisher) = publisherAndActorRef()
-      val processor                   = processorFactory.build(sourceActorRef)
-      buildFlow(Sink.ignore, publisher, processor)
-    }
-  }
-
   def messageExchangeFlowFactory(
       processorFactory: MessageDispatcherFactory
   )(implicit ec: ExecutionContext, materializer: Materializer): FlowFactory = new FlowFactory {
