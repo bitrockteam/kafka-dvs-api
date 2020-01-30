@@ -392,10 +392,9 @@ components:
       properties:
         "@type":
           type: string
-          enum: [
-            startTop,
-            startTotal
-          ]
+          enum:
+            - startTop
+            - startTotal
     StopCommand:
       type: object
       required:
@@ -403,8 +402,7 @@ components:
       properties:
         "@type":
           type: string
-          enum: [
-            stopFlightList,
-            stopTop,
-            stopTotal
-          ]
+          enum:
+            - stopFlightList
+            - stopTop
+            - stopTotal
