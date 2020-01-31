@@ -5,7 +5,7 @@ import it.bitrock.dvs.api.ActorSystemOps
 import it.bitrock.dvs.api.JsonSupport._
 import it.bitrock.dvs.api.config.WebSocketConfig
 import it.bitrock.dvs.api.kafka.KafkaConsumerWrapper._
-import it.bitrock.dvs.api.model.{ApiEvent, CoordinatesBox, EventPayload, FlightReceivedList, KafkaPollerHub}
+import it.bitrock.dvs.api.model.{ApiEvent, CoordinatesBox, EventPayload, EventType, FlightReceivedList, KafkaPollerHub}
 import spray.json._
 
 class GlobalMessageDispatcher(val sourceActorRef: ActorRef, kafkaPollerHub: KafkaPollerHub, val webSocketConfig: WebSocketConfig)
@@ -36,7 +36,7 @@ class GlobalMessageDispatcher(val sourceActorRef: ActorRef, kafkaPollerHub: Kafk
 
     case e: EventPayload =>
       logger.debug(s"Got a $e from Kafka Consumer")
-      forwardMessage(ApiEvent(e.getClass.getSimpleName, e).toJson.toString)
+      forwardMessage(ApiEvent(EventType.from(e), e).toJson.toString)
   }
 
   private def boxedBehavior(box: CoordinatesBox): Receive = unboxedBehavior.orElse {

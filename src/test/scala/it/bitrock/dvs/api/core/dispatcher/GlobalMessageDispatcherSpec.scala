@@ -168,7 +168,7 @@ class GlobalMessageDispatcherSpec extends BaseTestKit with Eventually {
               .build(sourceProbe.ref)
           val msg = TopArrivalAirportList(List(AirportCount(DefaultArrivalAirport1Name, DefaultArrivalAirport1Amount)))
           messageProcessor ! msg
-          val expectedResult = ApiEvent(msg.getClass.getSimpleName, msg).toJson.toString
+          val expectedResult = ApiEvent("TopArrivalAirportList", msg).toJson.toString
           eventually {
             sourceProbe.expectMsg(expectedResult)
           }
@@ -186,7 +186,7 @@ class GlobalMessageDispatcherSpec extends BaseTestKit with Eventually {
           val msg =
             TopDepartureAirportList(List(AirportCount(DefaultDepartureAirport1Name, DefaultDepartureAirport1Amount)))
           messageProcessor ! msg
-          val expectedResult = ApiEvent(msg.getClass.getSimpleName, msg).toJson.toString
+          val expectedResult = ApiEvent("TopDepartureAirportList", msg).toJson.toString
           eventually {
             sourceProbe.expectMsg(expectedResult)
           }
@@ -203,7 +203,7 @@ class GlobalMessageDispatcherSpec extends BaseTestKit with Eventually {
               .build(sourceProbe.ref)
           val msg = TopSpeedList(List(SpeedFlight(DefaultFlightCode1, DefaultSpeed)))
           messageProcessor ! msg
-          val expectedResult = ApiEvent(msg.getClass.getSimpleName, msg).toJson.toString
+          val expectedResult = ApiEvent("TopSpeedList", msg).toJson.toString
           eventually {
             sourceProbe.expectMsg(expectedResult)
           }
@@ -220,7 +220,7 @@ class GlobalMessageDispatcherSpec extends BaseTestKit with Eventually {
               .build(sourceProbe.ref)
           val msg = TopAirlineList(List(AirlineCount(DefaultAirline1Name, DefaultAirline1Amount)))
           messageProcessor ! msg
-          val expectedResult = ApiEvent(msg.getClass.getSimpleName, msg).toJson.toString
+          val expectedResult = ApiEvent("TopAirlineList", msg).toJson.toString
           eventually {
             sourceProbe.expectMsg(expectedResult)
           }
@@ -240,7 +240,7 @@ class GlobalMessageDispatcherSpec extends BaseTestKit with Eventually {
               .build(sourceProbe.ref)
           val msg = TotalFlightsCount(DefaultStartTimeWindow, DefaultCountFlightAmount)
           messageProcessor ! msg
-          val expectedResult = ApiEvent(msg.getClass.getSimpleName, msg).toJson.toString
+          val expectedResult = ApiEvent("TotalFlightsCount", msg).toJson.toString
           eventually {
             sourceProbe.expectMsg(expectedResult)
           }
@@ -257,7 +257,7 @@ class GlobalMessageDispatcherSpec extends BaseTestKit with Eventually {
               .build(sourceProbe.ref)
           val msg = TotalAirlinesCount(DefaultStartTimeWindow, DefaultCountAirlineAmount)
           messageProcessor ! msg
-          val expectedResult = ApiEvent(msg.getClass.getSimpleName, msg).toJson.toString
+          val expectedResult = ApiEvent("TotalAirlinesCount", msg).toJson.toString
           eventually {
             sourceProbe.expectMsg(expectedResult)
           }
