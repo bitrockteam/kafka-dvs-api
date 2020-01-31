@@ -35,6 +35,18 @@ channels:
 components:
   messages:
     # commands
+    StartCommand:
+      name: StartCommand
+      title: Start to receive events
+      summary: The command to signal the websocket to start sending events
+      payload:
+        $ref: '#/components/schemas/StartCommand'
+    StopCommand:
+      name: StopCommand
+      title: Stop to receive events
+      summary: The command to signal the websocket to stop sending events
+      payload:
+        $ref: '#/components/schemas/StopCommand'
     coordinatesBox:
       name: coordinatesBox
       title: Coordinates box
@@ -138,11 +150,15 @@ components:
     coordinatesBox:
       type: object
       required:
+        - "@type"
         - leftHighLat
         - leftHighLon
         - rightLowLat
         - rightLowLon
       properties:
+        "@type":
+          type: string
+          const: startFlightList
         leftHighLat:
           type: number
           format: double
@@ -369,3 +385,24 @@ components:
           type: integer
           format: int64
           default: 0
+    StartCommand:
+      type: object
+      required:
+        - "@type"
+      properties:
+        "@type":
+          type: string
+          enum:
+            - startTop
+            - startTotal
+    StopCommand:
+      type: object
+      required:
+        - "@type"
+      properties:
+        "@type":
+          type: string
+          enum:
+            - stopFlightList
+            - stopTop
+            - stopTotal
