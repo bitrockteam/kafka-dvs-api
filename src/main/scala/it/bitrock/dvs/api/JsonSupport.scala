@@ -2,7 +2,9 @@ package it.bitrock.dvs.api
 
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import it.bitrock.dvs.api.model._
-import spray.json.{serializationError, DefaultJsonProtocol, JsString, JsValue, JsonFormat, RootJsonFormat, RootJsonReader}
+import spray.json._
+
+import scala.util.Try
 
 trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
 
@@ -31,6 +33,27 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
     TotalFlightsCount.apply
   )
   implicit val totalAirlinesCountJsonFormat: RootJsonFormat[TotalAirlinesCount] = jsonFormat2(TotalAirlinesCount.apply)
+
+  implicit val eventPayloadWriter: RootJsonFormat[EventPayload] = new RootJsonFormat[EventPayload] {
+    override def write(eventPayload: EventPayload): JsValue =
+      eventPayload match {
+        case e: TopArrivalAirportList   => e.toJson
+        case e: TopDepartureAirportList => e.toJson
+        case e: TopSpeedList            => e.toJson
+        case e: TopAirlineList          => e.toJson
+        case e: TotalFlightsCount       => e.toJson
+        case e: TotalAirlinesCount      => e.toJson
+      }
+
+    override def read(json: JsValue): EventPayload =
+      Try[EventPayload](json.convertTo[TopArrivalAirportList])
+        .recover[EventPayload] { case _ => json.convertTo[TopDepartureAirportList] }
+        .recover[EventPayload] { case _ => json.convertTo[TopSpeedList] }
+        .recover[EventPayload] { case _ => json.convertTo[TopAirlineList] }
+        .recover[EventPayload] { case _ => json.convertTo[TotalFlightsCount] }
+        .recover[EventPayload] { case _ => json.convertTo[TotalAirlinesCount] }
+        .getOrElse(serializationError(s"json serialization error $json"))
+  }
 
   implicit def apiEventJsonFormat[T <: EventPayload: JsonFormat]: RootJsonFormat[ApiEvent[T]] =
     jsonFormat2(ApiEvent.apply[T])

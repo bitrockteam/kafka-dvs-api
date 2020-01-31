@@ -10,8 +10,8 @@ import it.bitrock.dvs.api.config.AppConfig
 import it.bitrock.dvs.api.core.factory.MessageDispatcherFactory
 import it.bitrock.dvs.api.core.poller._
 import it.bitrock.dvs.api.kafka.KafkaConsumerWrapperFactory._
+import it.bitrock.dvs.api.model.KafkaPollerHub
 import it.bitrock.dvs.api.routes.HealthRoute._
-import it.bitrock.dvs.api.routes.Routes.FlowFactories
 import it.bitrock.dvs.api.routes._
 
 import scala.concurrent.duration._
@@ -32,33 +32,20 @@ object Main extends App with LazyLogging {
   private val flightListKafkaConsumerWrapperFactory = flightListKafkaConsumerFactory(config.kafka)
   private val flightListKafkaMessagePollerCache =
     FlightListKafkaPollerCache.build(config.kafka, flightListKafkaConsumerWrapperFactory)
-  private val flightListMessageDispatcherFactory =
-    MessageDispatcherFactory.flightListMessageDispatcherFactory(
-      flightListKafkaMessagePollerCache,
-      config.server.webSocket
-    )
-  private val flightListFlowFactory = FlowFactory.messageExchangeFlowFactory(flightListMessageDispatcherFactory)
 
   private val topsKafkaConsumerWrapperFactory = topsKafkaConsumerFactory(config.kafka)
   private val topsKafkaPollerCache            = TopsKafkaPollerCache.build(config.kafka, topsKafkaConsumerWrapperFactory)
-  private val topsMessageDispatcherFactory =
-    MessageDispatcherFactory.topsMessageDispatcherFactory(topsKafkaPollerCache, config.server.webSocket)
-  private val topsFlowFactory = FlowFactory.flightFlowFactory(topsMessageDispatcherFactory)
 
   private val totalsKafkaConsumerWrapperFactory = totalsKafkaConsumerFactory(config.kafka)
   private val totalsKafkaPollerCache            = TotalsKafkaPollerCache.build(config.kafka, totalsKafkaConsumerWrapperFactory)
-  private val totalsMessageDispatcherFactory =
-    MessageDispatcherFactory.totalsMessageDispatcherFactory(totalsKafkaPollerCache, config.server.webSocket)
-  private val totalsFlowFactory = FlowFactory.flightFlowFactory(totalsMessageDispatcherFactory)
 
-  private val flowFactories =
-    FlowFactories(
-      flightListFlowFactory = flightListFlowFactory,
-      topsFlowFactory = topsFlowFactory,
-      totalsFlowFactory = totalsFlowFactory
-    )
+  private val kafkaPollerHub = KafkaPollerHub(flightListKafkaMessagePollerCache, topsKafkaPollerCache, totalsKafkaPollerCache)
 
-  private val webSocketRoutes                      = Routes.webSocketRoutes(config.server.webSocket, flowFactories)
+  private val globalMessageDispatcherFactory =
+    MessageDispatcherFactory.globalMessageDispatcherFactory(kafkaPollerHub, config.server.webSocket)
+  private val globalFlowFactory = FlowFactory.messageExchangeFlowFactory(globalMessageDispatcherFactory)
+
+  private val webSocketRoutes                      = Routes.webSocketRoutes(config.server.webSocket, globalFlowFactory)
   private val api: Route                           = webSocketRoutes ~ healthCheckRoute
   private val bindingFuture: Future[ServerBinding] = Http().bindAndHandle(api, host, port)
 

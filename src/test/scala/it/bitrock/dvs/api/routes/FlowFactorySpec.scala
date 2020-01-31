@@ -10,8 +10,8 @@ import akka.stream.scaladsl.Flow
 import it.bitrock.dvs.api.config.WebSocketConfig
 import it.bitrock.dvs.api.core.factory.MessageDispatcherFactory
 import it.bitrock.dvs.api.kafka.{KafkaConsumerWrapper, KafkaConsumerWrapperFactory}
-import it.bitrock.dvs.api.routes.FlowFactorySpec.{Resource, TestFlowFactory}
-import it.bitrock.dvs.api.routes.Routes.FlowFactories
+import it.bitrock.dvs.api.model.KafkaPollerHub
+import it.bitrock.dvs.api.routes.FlowFactorySpec.Resource
 import it.bitrock.dvs.api.{BaseAsyncSpec, JsonSupport, TestValues}
 import it.bitrock.testcommons.AsyncFixtureLoaner
 import org.mockito.ArgumentMatchers._
@@ -22,7 +22,7 @@ import org.scalatestplus.mockito.MockitoSugar._
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
-class FlowFactorySpec
+abstract class FlowFactorySpec
     extends AsyncFixtureLoaner[FlowFactorySpec.Resource]
     with BaseAsyncSpec
     with ScalatestRouteTest
@@ -55,7 +55,7 @@ class FlowFactorySpec
   "flow" should {
     "change the box" ignore withFixture {
       case Resource(webSocketRoutes, wsProbe, config) =>
-        WS(Uri(path = Uri.Path./(config.pathPrefix)./(config.flightListPath)), wsProbe.flow) ~> webSocketRoutes ~> check {
+        WS(Uri(path = Uri.Path./(config.pathPrefix)./(config.dvsPath)), wsProbe.flow) ~> webSocketRoutes ~> check {
           checkWebsocketAndSendTestMessage(wsProbe)
         }
     }
@@ -67,27 +67,23 @@ class FlowFactorySpec
       maxNumberFlights = 1000,
       throttleDuration = 1.second,
       pathPrefix = "path",
-      flightListPath = "flight-list",
-      topElementsPath = "tops",
-      totalElementsPath = "totals"
+      dvsPath = "dvs"
     )
 
     val kafkaConsumerWrapper        = mock[KafkaConsumerWrapper]
     val kafkaConsumerWrapperFactory = mock[KafkaConsumerWrapperFactory]
     when(kafkaConsumerWrapperFactory.build(any[ActorRef], any[Seq[String]])).thenReturn(kafkaConsumerWrapper)
 
-    val flightListMessageProcessorFactory =
-      MessageDispatcherFactory.flightListMessageDispatcherFactory(mock[ActorRef], webSocketConfig)
+    val kafkaPollerHub = KafkaPollerHub(mock[ActorRef], mock[ActorRef], mock[ActorRef])
 
-    val flowFactories = FlowFactories(
-      flightListFlowFactory = FlowFactory.flightFlowFactory(flightListMessageProcessorFactory),
-      topsFlowFactory = new TestFlowFactory,
-      totalsFlowFactory = new TestFlowFactory
-    )
+    val globalMessageDispatcherFactory =
+      MessageDispatcherFactory.globalMessageDispatcherFactory(kafkaPollerHub, webSocketConfig)
+
+    val flowFactory = FlowFactory.messageExchangeFlowFactory(globalMessageDispatcherFactory)
 
     body(
       Resource(
-        Routes.webSocketRoutes(webSocketConfig, flowFactories),
+        Routes.webSocketRoutes(webSocketConfig, flowFactory),
         WSProbe(),
         webSocketConfig
       )

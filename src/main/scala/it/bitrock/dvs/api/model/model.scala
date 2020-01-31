@@ -50,3 +50,16 @@ final case class TotalFlightsCount(windowStartTime: String, eventCount: Long)  e
 final case class TotalAirlinesCount(windowStartTime: String, eventCount: Long) extends EventPayload
 
 final case class ApiEvent[T <: EventPayload](eventType: String, eventPayload: T)
+
+object EventType {
+
+  def from(eventPayload: EventPayload): String =
+    eventPayload match {
+      case _: TopArrivalAirportList   => "TopArrivalAirportList"
+      case _: TopDepartureAirportList => "TopDepartureAirportList"
+      case _: TopSpeedList            => "TopSpeedList"
+      case _: TopAirlineList          => "TopAirlineList"
+      case _: TotalFlightsCount       => "TotalFlightsCount"
+      case _: TotalAirlinesCount      => "TotalAirlinesCount"
+    }
+}
