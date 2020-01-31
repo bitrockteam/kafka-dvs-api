@@ -80,7 +80,7 @@ enablePlugins(JavaAppPackaging, DockerPlugin, AshScriptPlugin)
 
 dockerBaseImage := "openjdk:8-jre-alpine"
 dockerRepository := Option(sys.env.getOrElse("DOCKER_REPOSITORY", "local"))
-maintainer in Docker := "Alessio Nisini"
+maintainer in Docker := "Bitrock DVS team dvs@bitrock.it"
 
 // Fix for sbt-native-packager 1.3.19
 daemonUserUid in Docker := None
