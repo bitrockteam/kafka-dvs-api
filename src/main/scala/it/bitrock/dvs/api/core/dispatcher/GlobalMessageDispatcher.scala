@@ -34,15 +34,22 @@ class GlobalMessageDispatcher(val sourceActorRef: ActorRef, kafkaPollerHub: Kafk
       context.become(boxedBehavior(box))
       kafkaPollerHub.flightListPoller ! FlightListUpdate
 
+    case _: FlightReceivedList =>
+    // When is unboxed, ignore all flights
+
     case e: EventPayload =>
       logger.debug(s"Got a $e from Kafka Consumer")
       forwardMessage(ApiEvent(EventType.from(e), e).toJson.toString)
   }
 
-  private def boxedBehavior(box: CoordinatesBox): Receive = unboxedBehavior.orElse {
+  private def boxedBehavior(box: CoordinatesBox): Receive =
+    handleFlights(box).orElse(unboxedBehavior)
+
+  private def handleFlights(box: CoordinatesBox): Receive = {
     case flights: FlightReceivedList =>
       logger.debug(s"Got a $flights from Kafka Consumer")
-      forwardMessage(getBoxedFlights(flights, box).toJson.toString)
+      val event = getBoxedFlights(flights, box)
+      forwardMessage(ApiEvent(EventType.from(event), event).toJson.toString)
   }
 
   private def getBoxedFlights(flights: FlightReceivedList, box: CoordinatesBox): FlightReceivedList = {

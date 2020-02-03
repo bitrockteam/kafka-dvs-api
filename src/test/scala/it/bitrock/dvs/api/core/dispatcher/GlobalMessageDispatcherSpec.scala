@@ -56,7 +56,7 @@ class GlobalMessageDispatcherSpec extends BaseTestKit with Eventually {
           messageProcessor ! CoordinatesBox(49.8, -3.7, 39.7, 23.6)
           messageProcessor ! msg
           eventually {
-            sourceProbe expectMsg msg.toJson.toString
+            sourceProbe expectMsg ApiEvent("FlightList", msg).toJson.toString
           }
       }
       "the flights in the list are inside the box after its change" in ResourceLoanerDispatcher.withFixture {
@@ -102,7 +102,7 @@ class GlobalMessageDispatcherSpec extends BaseTestKit with Eventually {
           messageProcessor ! changedBox
           messageProcessor ! msg
           eventually {
-            sourceProbe expectMsg msg.toJson.toString
+            sourceProbe expectMsg ApiEvent("FlightList", msg).toJson.toString
           }
       }
     }
@@ -150,7 +150,7 @@ class GlobalMessageDispatcherSpec extends BaseTestKit with Eventually {
           )
           messageProcessor ! CoordinatesBox(49.8, -3.7, 39.7, 23.6)
           eventually {
-            sourceProbe expectMsg FlightReceivedList(Seq()).toJson.toString
+            sourceProbe expectMsg ApiEvent("FlightList", FlightReceivedList(Seq())).toJson.toString
           }
       }
     }

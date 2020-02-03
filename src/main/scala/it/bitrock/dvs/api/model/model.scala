@@ -32,9 +32,9 @@ final case class FlightReceived(
     status: String,
     updated: Long
 )
-final case class FlightReceivedList(elements: Seq[FlightReceived])
-
 sealed trait EventPayload
+
+final case class FlightReceivedList(elements: Seq[FlightReceived]) extends EventPayload
 
 final case class AirportCount(airportCode: String, eventCount: Long)
 final case class TopArrivalAirportList(elements: List[AirportCount])   extends EventPayload
@@ -61,5 +61,6 @@ object EventType {
       case _: TopAirlineList          => "TopAirlineList"
       case _: TotalFlightsCount       => "TotalFlightsCount"
       case _: TotalAirlinesCount      => "TotalAirlinesCount"
+      case _: FlightReceivedList      => "FlightList"
     }
 }

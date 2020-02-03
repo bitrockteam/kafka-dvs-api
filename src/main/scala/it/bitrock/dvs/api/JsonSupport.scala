@@ -43,6 +43,7 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
         case e: TopAirlineList          => e.toJson
         case e: TotalFlightsCount       => e.toJson
         case e: TotalAirlinesCount      => e.toJson
+        case e: FlightReceivedList      => e.toJson
       }
 
     override def read(json: JsValue): EventPayload =
@@ -52,6 +53,7 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
         .recover[EventPayload] { case _ => json.convertTo[TopAirlineList] }
         .recover[EventPayload] { case _ => json.convertTo[TotalFlightsCount] }
         .recover[EventPayload] { case _ => json.convertTo[TotalAirlinesCount] }
+        .recover[EventPayload] { case _ => json.convertTo[FlightReceivedList] }
         .getOrElse(serializationError(s"json serialization error $json"))
   }
 
