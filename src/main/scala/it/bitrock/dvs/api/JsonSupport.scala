@@ -37,6 +37,7 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
   implicit val eventPayloadWriter: RootJsonFormat[EventPayload] = new RootJsonFormat[EventPayload] {
     override def write(eventPayload: EventPayload): JsValue =
       eventPayload match {
+        case e: FlightReceivedList      => e.toJson
         case e: TopArrivalAirportList   => e.toJson
         case e: TopDepartureAirportList => e.toJson
         case e: TopSpeedList            => e.toJson
