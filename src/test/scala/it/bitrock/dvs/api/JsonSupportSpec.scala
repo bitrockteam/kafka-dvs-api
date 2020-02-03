@@ -49,7 +49,7 @@ class JsonSupportSpec extends BaseSpec {
           | }
           |""".stripMargin
 
-      read(json) { result: StartTop.type =>
+      read(json) { result: StartTops.type =>
         result.`@type` shouldBe "startTop"
       }
     }
@@ -62,7 +62,7 @@ class JsonSupportSpec extends BaseSpec {
           | }
           |""".stripMargin
 
-      read(json) { result: StopTop.type =>
+      read(json) { result: StopTops.type =>
         result.`@type` shouldBe "stopTop"
       }
     }
@@ -75,7 +75,7 @@ class JsonSupportSpec extends BaseSpec {
           | }
           |""".stripMargin
 
-      read(json) { result: StartTotal.type =>
+      read(json) { result: StartTotals.type =>
         result.`@type` shouldBe "startTotal"
       }
     }
@@ -88,7 +88,7 @@ class JsonSupportSpec extends BaseSpec {
           | }
           |""".stripMargin
 
-      read(json) { result: StopTotal.type =>
+      read(json) { result: StopTotals.type =>
         result.`@type` shouldBe "stopTotal"
       }
     }

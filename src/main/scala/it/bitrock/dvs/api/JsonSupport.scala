@@ -64,10 +64,10 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
       json.asJsObject.getFields("@type") match {
         case Seq(JsString("startFlightList")) => json.convertTo[CoordinatesBox]
         case Seq(JsString("stopFlightList"))  => StopFlightList
-        case Seq(JsString("startTop"))        => StartTop
-        case Seq(JsString("stopTop"))         => StopTop
-        case Seq(JsString("startTotal"))      => StartTotal
-        case Seq(JsString("stopTotal"))       => StopTotal
+        case Seq(JsString("startTop"))        => StartTops
+        case Seq(JsString("stopTop"))         => StopTops
+        case Seq(JsString("startTotal"))      => StartTotals
+        case Seq(JsString("stopTotal"))       => StopTotals
         case unrecognized                     => serializationError(s"json serialization error $unrecognized")
       }
   }

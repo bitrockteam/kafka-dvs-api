@@ -186,7 +186,7 @@ class GlobalMessageDispatcherSpec extends BaseTestKit {
               .globalMessageDispatcherFactory(kafkaPollerHub, webSocketConfig)
               .build(sourceProbe.ref)
           val msg = TopArrivalAirportList(List(AirportCount(DefaultArrivalAirport1Name, DefaultArrivalAirport1Amount)))
-          messageProcessor ! StartTop
+          messageProcessor ! StartTops
           messageProcessor ! msg
           val expectedResult = ApiEvent("TopArrivalAirportList", msg).toJson.toString
           sourceProbe.fishForMessage(timeout) {
@@ -205,7 +205,7 @@ class GlobalMessageDispatcherSpec extends BaseTestKit {
               .build(sourceProbe.ref)
           val msg =
             TopDepartureAirportList(List(AirportCount(DefaultDepartureAirport1Name, DefaultDepartureAirport1Amount)))
-          messageProcessor ! StartTop
+          messageProcessor ! StartTops
           messageProcessor ! msg
           val expectedResult = ApiEvent("TopDepartureAirportList", msg).toJson.toString
           sourceProbe.fishForMessage(timeout) {
@@ -223,7 +223,7 @@ class GlobalMessageDispatcherSpec extends BaseTestKit {
               .globalMessageDispatcherFactory(kafkaPollerHub, webSocketConfig)
               .build(sourceProbe.ref)
           val msg = TopSpeedList(List(SpeedFlight(DefaultFlightCode1, DefaultSpeed)))
-          messageProcessor ! StartTop
+          messageProcessor ! StartTops
           messageProcessor ! msg
           val expectedResult = ApiEvent("TopSpeedList", msg).toJson.toString
           sourceProbe.fishForMessage(timeout) {
@@ -241,7 +241,7 @@ class GlobalMessageDispatcherSpec extends BaseTestKit {
               .globalMessageDispatcherFactory(kafkaPollerHub, webSocketConfig)
               .build(sourceProbe.ref)
           val msg = TopAirlineList(List(AirlineCount(DefaultAirline1Name, DefaultAirline1Amount)))
-          messageProcessor ! StartTop
+          messageProcessor ! StartTops
           messageProcessor ! msg
           val expectedResult = ApiEvent("TopAirlineList", msg).toJson.toString
           sourceProbe.fishForMessage(timeout) {
@@ -262,7 +262,7 @@ class GlobalMessageDispatcherSpec extends BaseTestKit {
               .globalMessageDispatcherFactory(kafkaPollerHub, webSocketConfig)
               .build(sourceProbe.ref)
           val msg = TotalFlightsCount(DefaultStartTimeWindow, DefaultCountFlightAmount)
-          messageProcessor ! StartTotal
+          messageProcessor ! StartTotals
           messageProcessor ! msg
           val expectedResult = ApiEvent("TotalFlightsCount", msg).toJson.toString
           sourceProbe.fishForMessage(timeout) {
@@ -280,7 +280,7 @@ class GlobalMessageDispatcherSpec extends BaseTestKit {
               .globalMessageDispatcherFactory(kafkaPollerHub, webSocketConfig)
               .build(sourceProbe.ref)
           val msg = TotalAirlinesCount(DefaultStartTimeWindow, DefaultCountAirlineAmount)
-          messageProcessor ! StartTotal
+          messageProcessor ! StartTotals
           messageProcessor ! msg
           val expectedResult = ApiEvent("TotalAirlinesCount", msg).toJson.toString
           sourceProbe.fishForMessage(timeout) {
