@@ -1,101 +1,191 @@
 package it.bitrock.dvs.api.routes
 
-import akka.NotUsed
-import akka.actor.ActorRef
-import akka.http.scaladsl.model.Uri
-import akka.http.scaladsl.model.ws.{Message, TextMessage}
-import akka.http.scaladsl.server.Route
-import akka.http.scaladsl.testkit.{ScalatestRouteTest, WSProbe}
-import akka.stream.scaladsl.Flow
-import it.bitrock.dvs.api.config.WebSocketConfig
+import akka.actor.{Actor, ActorRef, Props}
+import akka.http.scaladsl.model.ws.TextMessage
+import akka.http.scaladsl.testkit.ScalatestRouteTest
+import akka.stream.scaladsl.{Sink, Source}
+import it.bitrock.dvs.api.BaseSpec
 import it.bitrock.dvs.api.core.factory.MessageDispatcherFactory
-import it.bitrock.dvs.api.kafka.{KafkaConsumerWrapper, KafkaConsumerWrapperFactory}
-import it.bitrock.dvs.api.model.KafkaPollerHub
-import it.bitrock.dvs.api.routes.FlowFactorySpec.Resource
-import it.bitrock.dvs.api.{BaseAsyncSpec, JsonSupport, TestValues}
-import it.bitrock.testcommons.AsyncFixtureLoaner
-import org.mockito.ArgumentMatchers._
-import org.mockito.Mockito.when
-import org.scalatest.{Assertion, BeforeAndAfterAll}
-import org.scalatestplus.mockito.MockitoSugar._
+import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 
-import scala.concurrent.duration._
-import scala.concurrent.{ExecutionContextExecutor, Future}
+import scala.concurrent.ExecutionContextExecutor
 
-abstract class FlowFactorySpec
-    extends AsyncFixtureLoaner[FlowFactorySpec.Resource]
-    with BaseAsyncSpec
-    with ScalatestRouteTest
-    with BeforeAndAfterAll
-    with JsonSupport
-    with TestValues {
+class FlowFactorySpec extends BaseSpec with ScalatestRouteTest with ScalaFutures with IntegrationPatience {
 
   implicit private val ec: ExecutionContextExecutor = system.dispatcher
 
-  private val kafkaConsumerWrapper        = mock[KafkaConsumerWrapper]
-  private val kafkaConsumerWrapperFactory = mock[KafkaConsumerWrapperFactory]
+  "FlowFactory" should {
+    "create a flow linked to a processor that evaluate only valid messages" in {
+      val flow = FlowFactory.messageExchangeFlowFactory(dummyEchoProcessor).flow
+      val validMessage1 =
+        """
+          | {
+          |   "@type": "startTotal"
+          | }
+          |""".stripMargin
 
-  when(kafkaConsumerWrapperFactory.build(any[ActorRef], any[Seq[String]])).thenReturn(kafkaConsumerWrapper)
+      val validMessage2 =
+        """
+          | {
+          |   "@type": "stopTotal"
+          | }
+          |""".stripMargin
 
-  private val checkWebsocketAndSendTestMessage = { wsProbe: WSProbe =>
-    isWebSocketUpgrade shouldBe true
+      val invalidMessage = "invalid"
 
-    val msg = TextMessage.Strict("""
-                                   |{
-                                   |    "leftHighLat": 1,
-                                   |    "leftHighLon": 1,
-                                   |    "rightLowLat": 2,
-                                   |    "rightLowLon": 2
-                                   |}
-              """.stripMargin)
-    wsProbe.sendMessage(msg)
-    1 shouldBe 1
-  }
+      val result = Source(List(TextMessage(validMessage1), TextMessage(invalidMessage), TextMessage(validMessage2)))
+        .concat(Source.repeat(TextMessage(invalidMessage)))
+        .via(flow)
+        .take(2)
+        .runWith(Sink.seq)
+      whenReady(result) { messages =>
+        messages shouldBe Vector(TextMessage("received StartTotals"), TextMessage("received StopTotals"))
+      }
+    }
 
-  "flow" should {
-    "change the box" ignore withFixture {
-      case Resource(webSocketRoutes, wsProbe, config) =>
-        WS(Uri(path = Uri.Path./(config.pathPrefix)./(config.dvsPath)), wsProbe.flow) ~> webSocketRoutes ~> check {
-          checkWebsocketAndSendTestMessage(wsProbe)
-        }
+    "parse CoordinatesBox messages" in {
+      val flow = FlowFactory.messageExchangeFlowFactory(dummyEchoProcessor).flow
+      val validMessage =
+        """
+          | {
+          |   "@type": "startFlightList",
+          |   "leftHighLat": 1.0,
+          |   "leftHighLon": 1.0,
+          |   "rightLowLat": 1.0,
+          |   "rightLowLon": 1.0
+          | }
+          |""".stripMargin
+
+      val invalidMessage = "invalid"
+
+      val result = Source
+        .single(TextMessage(validMessage))
+        .concat(Source.repeat(TextMessage(invalidMessage)))
+        .via(flow)
+        .take(1)
+        .runWith(Sink.head)
+      whenReady(result) { messages =>
+        messages shouldBe TextMessage("received CoordinatesBox(1.0,1.0,1.0,1.0)")
+      }
+    }
+
+    "parse StopFlightList messages" in {
+      val flow = FlowFactory.messageExchangeFlowFactory(dummyEchoProcessor).flow
+      val validMessage =
+        """
+          | {
+          |   "@type": "stopFlightList"
+          | }
+          |""".stripMargin
+
+      val invalidMessage = "invalid"
+
+      val result = Source
+        .single(TextMessage(validMessage))
+        .concat(Source.repeat(TextMessage(invalidMessage)))
+        .via(flow)
+        .take(1)
+        .runWith(Sink.head)
+      whenReady(result) { messages =>
+        messages shouldBe TextMessage("received StopFlightList")
+      }
+    }
+
+    "parse StartTotals messages" in {
+      val flow = FlowFactory.messageExchangeFlowFactory(dummyEchoProcessor).flow
+      val validMessage =
+        """
+          | {
+          |   "@type": "startTotal"
+          | }
+          |""".stripMargin
+
+      val invalidMessage = "invalid"
+
+      val result = Source
+        .single(TextMessage(validMessage))
+        .concat(Source.repeat(TextMessage(invalidMessage)))
+        .via(flow)
+        .take(1)
+        .runWith(Sink.head)
+      whenReady(result) { messages =>
+        messages shouldBe TextMessage("received StartTotals")
+      }
+    }
+
+    "parse StopTotals messages" in {
+      val flow = FlowFactory.messageExchangeFlowFactory(dummyEchoProcessor).flow
+      val validMessage =
+        """
+          | {
+          |   "@type": "stopTotal"
+          | }
+          |""".stripMargin
+
+      val invalidMessage = "invalid"
+
+      val result = Source
+        .single(TextMessage(validMessage))
+        .concat(Source.repeat(TextMessage(invalidMessage)))
+        .via(flow)
+        .take(1)
+        .runWith(Sink.head)
+      whenReady(result) { messages =>
+        messages shouldBe TextMessage("received StopTotals")
+      }
+    }
+
+    "parse StartTops messages" in {
+      val flow = FlowFactory.messageExchangeFlowFactory(dummyEchoProcessor).flow
+      val validMessage =
+        """
+          | {
+          |   "@type": "startTop"
+          | }
+          |""".stripMargin
+
+      val invalidMessage = "invalid"
+
+      val result = Source
+        .single(TextMessage(validMessage))
+        .concat(Source.repeat(TextMessage(invalidMessage)))
+        .via(flow)
+        .take(1)
+        .runWith(Sink.head)
+      whenReady(result) { messages =>
+        messages shouldBe TextMessage("received StartTops")
+      }
+    }
+
+    "parse StopTops messages" in {
+      val flow = FlowFactory.messageExchangeFlowFactory(dummyEchoProcessor).flow
+      val validMessage =
+        """
+          | {
+          |   "@type": "stopTop"
+          | }
+          |""".stripMargin
+
+      val invalidMessage = "invalid"
+
+      val result = Source
+        .single(TextMessage(validMessage))
+        .concat(Source.repeat(TextMessage(invalidMessage)))
+        .via(flow)
+        .take(1)
+        .runWith(Sink.head)
+      whenReady(result) { messages =>
+        messages shouldBe TextMessage("received StopTops")
+      }
     }
   }
 
-  override def withFixture(body: FlowFactorySpec.Resource => Future[Assertion]): Future[Assertion] = {
-
-    val webSocketConfig = WebSocketConfig(
-      maxNumberFlights = 1000,
-      throttleDuration = 1.second,
-      pathPrefix = "path",
-      dvsPath = "dvs"
-    )
-
-    val kafkaConsumerWrapper        = mock[KafkaConsumerWrapper]
-    val kafkaConsumerWrapperFactory = mock[KafkaConsumerWrapperFactory]
-    when(kafkaConsumerWrapperFactory.build(any[ActorRef], any[Seq[String]])).thenReturn(kafkaConsumerWrapper)
-
-    val kafkaPollerHub = KafkaPollerHub(mock[ActorRef], mock[ActorRef], mock[ActorRef])
-
-    val globalMessageDispatcherFactory =
-      MessageDispatcherFactory.globalMessageDispatcherFactory(kafkaPollerHub, webSocketConfig)
-
-    val flowFactory = FlowFactory.messageExchangeFlowFactory(globalMessageDispatcherFactory)
-
-    body(
-      Resource(
-        Routes.webSocketRoutes(webSocketConfig, flowFactory),
-        WSProbe(),
-        webSocketConfig
-      )
-    )
-  }
-}
-
-object FlowFactorySpec {
-
-  final case class Resource(webSocketRoutes: Route, wsProbe: WSProbe, webSocketConfig: WebSocketConfig)
-
-  class TestFlowFactory extends FlowFactory {
-    override def flow: Flow[Message, Message, NotUsed] = Flow[Message].map(identity)
+  private def dummyEchoProcessor: MessageDispatcherFactory = new MessageDispatcherFactory {
+    override def build(sourceActorRef: ActorRef): ActorRef =
+      system.actorOf(Props(new Actor {
+        override def receive: Receive = {
+          case m => sourceActorRef ! s"received $m"
+        }
+      }))
   }
 }
