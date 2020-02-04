@@ -2,7 +2,7 @@ package it.bitrock.dvs.api
 
 import it.bitrock.dvs.api.JsonSupport.WebSocketIncomeMessageFormat
 import it.bitrock.dvs.api.model._
-import org.scalacheck.{Arbitrary, Gen}
+import org.scalacheck.Arbitrary
 import org.scalacheck.ScalacheckShapeless._
 import org.scalatest.Assertion
 import spray.json._
@@ -133,6 +133,9 @@ class JsonSupportSpec extends BaseSpec {
   private def read[A <: WebSocketIncomeMessage](message: String)(test: A => Any): Any =
     test(WebSocketIncomeMessageFormat.read(message.parseJson).asInstanceOf[A])
 
-  private def writeReadEquals[A <: EventPayload: ClassTag](implicit value: Arbitrary[A]): Gen[Assertion] =
-    value.arbitrary.flatMap(v => JsonSupport.eventPayloadWriter.read(JsonSupport.eventPayloadWriter.write(v)) shouldBe a[A])
+  private def writeReadEquals[A <: EventPayload: ClassTag](implicit value: Arbitrary[A]): Assertion =
+    value.arbitrary
+      .flatMap(v => JsonSupport.eventPayloadWriter.read(JsonSupport.eventPayloadWriter.write(v)) should not be a[Exception])
+      .sample
+      .get
 }
