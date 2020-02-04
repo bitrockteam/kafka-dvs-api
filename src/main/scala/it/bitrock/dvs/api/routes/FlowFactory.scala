@@ -6,9 +6,9 @@ import akka.http.scaladsl.model.ws.{Message, TextMessage}
 import akka.stream.scaladsl.{BroadcastHub, Flow, Keep, Sink, Source}
 import akka.stream.{CompletionStrategy, Materializer, OverflowStrategy}
 import com.typesafe.scalalogging.LazyLogging
-import it.bitrock.dvs.api.JsonSupport.coordinatesBoxJsonFormat
+import it.bitrock.dvs.api.JsonSupport.WebSocketIncomeMessageFormat
 import it.bitrock.dvs.api.core.factory.MessageDispatcherFactory
-import it.bitrock.dvs.api.model.CoordinatesBox
+import it.bitrock.dvs.api.model.WebSocketIncomeMessage
 import spray.json._
 
 import scala.concurrent.ExecutionContext
@@ -22,17 +22,7 @@ object FlowFactory extends LazyLogging {
   private val SourceActorBufferSize       = 1000
   private val SourceActorOverflowStrategy = OverflowStrategy.dropHead
 
-  def flightFlowFactory(
-      processorFactory: MessageDispatcherFactory
-  )(implicit ec: ExecutionContext, materializer: Materializer): FlowFactory = new FlowFactory {
-    override def flow: Flow[Message, Message, NotUsed] = {
-      val (sourceActorRef, publisher) = publisherAndActorRef()
-      val processor                   = processorFactory.build(sourceActorRef)
-      buildFlow(Sink.ignore, publisher, processor)
-    }
-  }
-
-  def flightListFlowFactory(
+  def messageExchangeFlowFactory(
       processorFactory: MessageDispatcherFactory
   )(implicit ec: ExecutionContext, materializer: Materializer): FlowFactory = new FlowFactory {
     override def flow: Flow[Message, Message, NotUsed] = {
@@ -89,10 +79,10 @@ object FlowFactory extends LazyLogging {
         termWatchBefore
       }
 
-  private def parseMessage: Message => Option[CoordinatesBox] = {
+  private def parseMessage: Message => Option[WebSocketIncomeMessage] = {
     case TextMessage.Strict(txt) =>
       logger.debug(s"Got message: $txt")
-      Try(txt.parseJson.convertTo[CoordinatesBox])
+      Try(txt.parseJson.convertTo[WebSocketIncomeMessage])
         .fold(e => {
           logger.warn(s"Failed to parse JSON message $txt", e)
           None

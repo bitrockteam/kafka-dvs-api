@@ -1,17 +1,17 @@
 package it.bitrock.dvs.api.model
 
 import it.bitrock.dvs.model.avro.{
-  Airline => KAirline,
   AirlineInfo => KAirlineInfo,
   AirplaneInfo => KAirplaneInfo,
-  Airport => KAirport,
   AirportInfo => KAirportInfo,
   CountAirline => KCountAirline,
   CountFlight => KCountFlight,
   FlightReceived => KFlightReceivedEvent,
   FlightReceivedList => KFlightReceivedListEvent,
   GeographyInfo => KGeographyInfo,
-  SpeedFlight => KSpeedFlight,
+  TopAirline => KTopAirline,
+  TopAirport => KTopAirport,
+  TopSpeed => KTopSpeed,
   TopAirlineList => KTopAirlineList,
   TopArrivalAirportList => KTopArrivalAirportList,
   TopDepartureAirportList => KTopDepartureAirportList,
@@ -77,10 +77,10 @@ object AvroConverters {
   private def toAirplaneInfo(x: KAirplaneInfo): Airplane =
     Airplane(x.numberRegistration, x.productionLine, x.modelCode)
 
-  private def toAirport(x: KAirport): AirportCount = AirportCount(x.airportCode, x.eventCount)
+  private def toAirport(x: KTopAirport): AirportCount = AirportCount(x.airportCode, x.eventCount)
 
-  private def toSpeedFlight(x: KSpeedFlight): SpeedFlight = SpeedFlight(x.flightCode, x.speed)
+  private def toSpeedFlight(x: KTopSpeed): SpeedFlight = SpeedFlight(x.flightCode, x.speed)
 
-  private def toAirline(x: KAirline): AirlineCount = AirlineCount(x.airlineName, x.eventCount)
+  private def toAirline(x: KTopAirline): AirlineCount = AirlineCount(x.airlineName, x.eventCount)
 
 }

@@ -74,6 +74,7 @@ object BaseTestKit {
     KafkaConfig(
       "",
       URI.create("http://localhost:8080"),
+      enableInterceptors = false,
       "",
       "",
       "",
@@ -89,8 +90,6 @@ object BaseTestKit {
     WebSocketConfig(
       1000,
       0.second,
-      "not-used",
-      "not-used",
       "not-used",
       "not-used"
     )

@@ -10,14 +10,15 @@ import org.apache.kafka.common.serialization.Deserializer
 import scala.collection.JavaConverters._
 
 object KafkaConsumerWrapper {
-  final case object NoMessage
-  final case object FlightListUpdate
-  final case object TotalFlightUpdate
-  final case object TotalAirlineUpdate
-  final case object TopArrivalAirportUpdate
-  final case object TopDepartureAirportUpdate
-  final case object TopSpeedUpdate
-  final case object TopAirlineUpdate
+  sealed trait MessageUpdate
+  final case object NoMessage                 extends MessageUpdate
+  final case object FlightListUpdate          extends MessageUpdate
+  final case object TotalFlightUpdate         extends MessageUpdate
+  final case object TotalAirlineUpdate        extends MessageUpdate
+  final case object TopArrivalAirportUpdate   extends MessageUpdate
+  final case object TopDepartureAirportUpdate extends MessageUpdate
+  final case object TopSpeedUpdate            extends MessageUpdate
+  final case object TopAirlineUpdate          extends MessageUpdate
 }
 
 trait KafkaConsumerWrapper {
@@ -38,6 +39,12 @@ trait KafkaConsumerWrapper {
     properties.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, maxPollRecords.toString)
     properties.put(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, conf.schemaRegistryUrl.toString)
     properties.put(KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG, true.toString)
+    if (conf.enableInterceptors) {
+      properties.put(
+        ConsumerConfig.INTERCEPTOR_CLASSES_CONFIG,
+        "io.confluent.monitoring.clients.interceptor.MonitoringConsumerInterceptor"
+      )
+    }
     val kafkaConsumer = new KafkaConsumer[K, V](properties)
 
     kafkaConsumer.subscribe(topics.asJava)

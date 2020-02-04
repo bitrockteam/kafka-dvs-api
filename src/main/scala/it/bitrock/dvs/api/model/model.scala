@@ -1,6 +1,13 @@
 package it.bitrock.dvs.api.model
 
+sealed abstract class WebSocketIncomeMessage(val `@type`: String)
 final case class CoordinatesBox(leftHighLat: Double, leftHighLon: Double, rightLowLat: Double, rightLowLon: Double)
+    extends WebSocketIncomeMessage("startFlightList")
+case object StopFlightList extends WebSocketIncomeMessage("stopFlightList")
+case object StartTops      extends WebSocketIncomeMessage("startTop")
+case object StopTops       extends WebSocketIncomeMessage("stopTop")
+case object StartTotals    extends WebSocketIncomeMessage("startTotal")
+case object StopTotals     extends WebSocketIncomeMessage("stopTotal")
 
 final case class Geography(latitude: Double, longitude: Double, altitude: Double, direction: Double)
 final case class Airport(
@@ -25,21 +32,38 @@ final case class FlightReceived(
     status: String,
     updated: Long
 )
-final case class FlightReceivedList(elements: Seq[FlightReceived])
-
 sealed trait EventPayload
 
+final case class FlightReceivedList(elements: Seq[FlightReceived]) extends EventPayload
+
 final case class AirportCount(airportCode: String, eventCount: Long)
-final case class TopArrivalAirportList(elements: List[AirportCount])   extends EventPayload
-final case class TopDepartureAirportList(elements: List[AirportCount]) extends EventPayload
+
+sealed trait TopEventPayload                                           extends EventPayload
+final case class TopArrivalAirportList(elements: List[AirportCount])   extends TopEventPayload
+final case class TopDepartureAirportList(elements: List[AirportCount]) extends TopEventPayload
 
 final case class SpeedFlight(flightCode: String, speed: Double)
-final case class TopSpeedList(elements: List[SpeedFlight]) extends EventPayload
+final case class TopSpeedList(elements: List[SpeedFlight]) extends TopEventPayload
 
 final case class AirlineCount(airlineName: String, eventCount: Long)
-final case class TopAirlineList(elements: List[AirlineCount]) extends EventPayload
+final case class TopAirlineList(elements: List[AirlineCount]) extends TopEventPayload
 
-final case class TotalFlightsCount(windowStartTime: String, eventCount: Long)  extends EventPayload
-final case class TotalAirlinesCount(windowStartTime: String, eventCount: Long) extends EventPayload
+sealed trait TotalEventPayload                                                 extends EventPayload
+final case class TotalFlightsCount(windowStartTime: String, eventCount: Long)  extends TotalEventPayload
+final case class TotalAirlinesCount(windowStartTime: String, eventCount: Long) extends TotalEventPayload
 
 final case class ApiEvent[T <: EventPayload](eventType: String, eventPayload: T)
+
+object EventType {
+
+  def from(eventPayload: EventPayload): String =
+    eventPayload match {
+      case _: FlightReceivedList      => "FlightList"
+      case _: TopArrivalAirportList   => "TopArrivalAirportList"
+      case _: TopDepartureAirportList => "TopDepartureAirportList"
+      case _: TopSpeedList            => "TopSpeedList"
+      case _: TopAirlineList          => "TopAirlineList"
+      case _: TotalFlightsCount       => "TotalFlightsCount"
+      case _: TotalAirlinesCount      => "TotalAirlinesCount"
+    }
+}

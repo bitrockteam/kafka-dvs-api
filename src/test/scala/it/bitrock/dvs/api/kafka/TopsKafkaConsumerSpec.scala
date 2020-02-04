@@ -10,9 +10,9 @@ import it.bitrock.dvs.api.kafka.TopsKafkaConsumerSpec.Resource
 import it.bitrock.dvs.api.model._
 import it.bitrock.dvs.api.{BaseSpec, TestValues}
 import it.bitrock.dvs.model.avro.{
-  Airline => KAirline,
-  Airport => KAirport,
-  SpeedFlight => KSpeedFlight,
+  TopAirline => KTopAirline,
+  TopAirport => KTopAirport,
+  TopSpeed => KTopSpeed,
   TopAirlineList => KTopAirlineList,
   TopArrivalAirportList => KTopArrivalAirportList,
   TopDepartureAirportList => KTopDepartureAirportList,
@@ -45,38 +45,38 @@ class TopsKafkaConsumerSpec
 
         val kTopArrivalAirportList = KTopArrivalAirportList(
           List(
-            KAirport(DefaultArrivalAirport1Name, DefaultArrivalAirport1Amount),
-            KAirport(DefaultArrivalAirport2Name, DefaultArrivalAirport2Amount),
-            KAirport(DefaultArrivalAirport3Name, DefaultArrivalAirport3Amount),
-            KAirport(DefaultArrivalAirport4Name, DefaultArrivalAirport4Amount),
-            KAirport(DefaultArrivalAirport5Name, DefaultArrivalAirport5Amount)
+            KTopAirport(DefaultArrivalAirport1Name, DefaultArrivalAirport1Amount),
+            KTopAirport(DefaultArrivalAirport2Name, DefaultArrivalAirport2Amount),
+            KTopAirport(DefaultArrivalAirport3Name, DefaultArrivalAirport3Amount),
+            KTopAirport(DefaultArrivalAirport4Name, DefaultArrivalAirport4Amount),
+            KTopAirport(DefaultArrivalAirport5Name, DefaultArrivalAirport5Amount)
           )
         )
         val kTopDepartureAirportList = KTopDepartureAirportList(
           List(
-            KAirport(DefaultDepartureAirport1Name, DefaultDepartureAirport1Amount),
-            KAirport(DefaultDepartureAirport2Name, DefaultDepartureAirport2Amount),
-            KAirport(DefaultDepartureAirport3Name, DefaultDepartureAirport3Amount),
-            KAirport(DefaultDepartureAirport4Name, DefaultDepartureAirport4Amount),
-            KAirport(DefaultDepartureAirport5Name, DefaultDepartureAirport5Amount)
+            KTopAirport(DefaultDepartureAirport1Name, DefaultDepartureAirport1Amount),
+            KTopAirport(DefaultDepartureAirport2Name, DefaultDepartureAirport2Amount),
+            KTopAirport(DefaultDepartureAirport3Name, DefaultDepartureAirport3Amount),
+            KTopAirport(DefaultDepartureAirport4Name, DefaultDepartureAirport4Amount),
+            KTopAirport(DefaultDepartureAirport5Name, DefaultDepartureAirport5Amount)
           )
         )
         val kTopSpeedList = KTopSpeedList(
           List(
-            KSpeedFlight(DefaultFlightCode1, DefaultSpeed1),
-            KSpeedFlight(DefaultFlightCode2, DefaultSpeed2),
-            KSpeedFlight(DefaultFlightCode3, DefaultSpeed3),
-            KSpeedFlight(DefaultFlightCode4, DefaultSpeed4),
-            KSpeedFlight(DefaultFlightCode5, DefaultSpeed5)
+            KTopSpeed(DefaultFlightCode1, DefaultSpeed1),
+            KTopSpeed(DefaultFlightCode2, DefaultSpeed2),
+            KTopSpeed(DefaultFlightCode3, DefaultSpeed3),
+            KTopSpeed(DefaultFlightCode4, DefaultSpeed4),
+            KTopSpeed(DefaultFlightCode5, DefaultSpeed5)
           )
         )
         val kTopAirlineList = KTopAirlineList(
           List(
-            KAirline(DefaultAirline1Name, DefaultAirline1Amount),
-            KAirline(DefaultAirline2Name, DefaultAirline2Amount),
-            KAirline(DefaultAirline3Name, DefaultAirline3Amount),
-            KAirline(DefaultAirline4Name, DefaultAirline4Amount),
-            KAirline(DefaultAirline5Name, DefaultAirline5Amount)
+            KTopAirline(DefaultAirline1Name, DefaultAirline1Amount),
+            KTopAirline(DefaultAirline2Name, DefaultAirline2Amount),
+            KTopAirline(DefaultAirline3Name, DefaultAirline3Amount),
+            KTopAirline(DefaultAirline4Name, DefaultAirline4Amount),
+            KTopAirline(DefaultAirline5Name, DefaultAirline5Amount)
           )
         )
 
@@ -148,38 +148,38 @@ class TopsKafkaConsumerSpec
 
         val kTopArrivalAirportList = KTopArrivalAirportList(
           List(
-            KAirport(DefaultArrivalAirport1Name, DefaultArrivalAirport1Amount),
-            KAirport(DefaultArrivalAirport2Name, DefaultArrivalAirport2Amount),
-            KAirport(DefaultArrivalAirport3Name, DefaultArrivalAirport3Amount),
-            KAirport(DefaultArrivalAirport4Name, DefaultArrivalAirport4Amount),
-            KAirport(DefaultArrivalAirport5Name, DefaultArrivalAirport5Amount)
+            KTopAirport(DefaultArrivalAirport1Name, DefaultArrivalAirport1Amount),
+            KTopAirport(DefaultArrivalAirport2Name, DefaultArrivalAirport2Amount),
+            KTopAirport(DefaultArrivalAirport3Name, DefaultArrivalAirport3Amount),
+            KTopAirport(DefaultArrivalAirport4Name, DefaultArrivalAirport4Amount),
+            KTopAirport(DefaultArrivalAirport5Name, DefaultArrivalAirport5Amount)
           )
         )
         val kTopDepartureAirportList = KTopDepartureAirportList(
           List(
-            KAirport(DefaultDepartureAirport1Name, DefaultDepartureAirport1Amount),
-            KAirport(DefaultDepartureAirport2Name, DefaultDepartureAirport2Amount),
-            KAirport(DefaultDepartureAirport3Name, DefaultDepartureAirport3Amount),
-            KAirport(DefaultDepartureAirport4Name, DefaultDepartureAirport4Amount),
-            KAirport(DefaultDepartureAirport5Name, DefaultDepartureAirport5Amount)
+            KTopAirport(DefaultDepartureAirport1Name, DefaultDepartureAirport1Amount),
+            KTopAirport(DefaultDepartureAirport2Name, DefaultDepartureAirport2Amount),
+            KTopAirport(DefaultDepartureAirport3Name, DefaultDepartureAirport3Amount),
+            KTopAirport(DefaultDepartureAirport4Name, DefaultDepartureAirport4Amount),
+            KTopAirport(DefaultDepartureAirport5Name, DefaultDepartureAirport5Amount)
           )
         )
         val kTopSpeedList = KTopSpeedList(
           List(
-            KSpeedFlight(DefaultFlightCode1, DefaultSpeed1),
-            KSpeedFlight(DefaultFlightCode2, DefaultSpeed2),
-            KSpeedFlight(DefaultFlightCode3, DefaultSpeed3),
-            KSpeedFlight(DefaultFlightCode4, DefaultSpeed4),
-            KSpeedFlight(DefaultFlightCode5, DefaultSpeed5)
+            KTopSpeed(DefaultFlightCode1, DefaultSpeed1),
+            KTopSpeed(DefaultFlightCode2, DefaultSpeed2),
+            KTopSpeed(DefaultFlightCode3, DefaultSpeed3),
+            KTopSpeed(DefaultFlightCode4, DefaultSpeed4),
+            KTopSpeed(DefaultFlightCode5, DefaultSpeed5)
           )
         )
         val kTopAirlineList = KTopAirlineList(
           List(
-            KAirline(DefaultAirline1Name, DefaultAirline1Amount),
-            KAirline(DefaultAirline2Name, DefaultAirline2Amount),
-            KAirline(DefaultAirline3Name, DefaultAirline3Amount),
-            KAirline(DefaultAirline4Name, DefaultAirline4Amount),
-            KAirline(DefaultAirline5Name, DefaultAirline5Amount)
+            KTopAirline(DefaultAirline1Name, DefaultAirline1Amount),
+            KTopAirline(DefaultAirline2Name, DefaultAirline2Amount),
+            KTopAirline(DefaultAirline3Name, DefaultAirline3Amount),
+            KTopAirline(DefaultAirline4Name, DefaultAirline4Amount),
+            KTopAirline(DefaultAirline5Name, DefaultAirline5Amount)
           )
         )
 
