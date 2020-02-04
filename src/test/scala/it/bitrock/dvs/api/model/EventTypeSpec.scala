@@ -9,6 +9,10 @@ class EventTypeSpec extends AnyWordSpec with Matchers {
 
     "crete the right event type" when {
 
+      "event payload is FlightReceivedList" in {
+        EventType.from(FlightReceivedList(List.empty)) shouldBe "FlightList"
+      }
+
       "event payload is TopArrivalAirportList" in {
         EventType.from(TopArrivalAirportList(List.empty)) shouldBe "TopArrivalAirportList"
       }
