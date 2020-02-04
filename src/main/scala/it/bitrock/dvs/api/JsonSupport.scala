@@ -53,6 +53,7 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
         .recover[EventPayload] { case _ => json.convertTo[TopAirlineList] }
         .recover[EventPayload] { case _ => json.convertTo[TotalFlightsCount] }
         .recover[EventPayload] { case _ => json.convertTo[TotalAirlinesCount] }
+        .recover[EventPayload] { case _ => json.convertTo[FlightReceivedList] }
         .getOrElse(serializationError(s"json serialization error $json"))
   }
 

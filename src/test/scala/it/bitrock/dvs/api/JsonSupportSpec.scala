@@ -2,9 +2,45 @@ package it.bitrock.dvs.api
 
 import it.bitrock.dvs.api.JsonSupport.WebSocketIncomeMessageFormat
 import it.bitrock.dvs.api.model._
+import org.scalacheck.{Arbitrary, Gen}
+import org.scalacheck.ScalacheckShapeless._
+import org.scalatest.Assertion
 import spray.json._
 
+import scala.reflect.ClassTag
+
 class JsonSupportSpec extends BaseSpec {
+
+  "eventPayloadWriter" should {
+
+    "parse FlightReceivedList" in {
+      writeReadEquals[FlightReceivedList]
+    }
+
+    "parse TopArrivalAirportList" in {
+      writeReadEquals[TopArrivalAirportList]
+    }
+
+    "parse TopDepartureAirportList" in {
+      writeReadEquals[TopDepartureAirportList]
+    }
+
+    "parse TopSpeedList" in {
+      writeReadEquals[TopSpeedList]
+    }
+
+    "parse TopAirlineList" in {
+      writeReadEquals[TopAirlineList]
+    }
+
+    "parse TotalFlightsCount" in {
+      writeReadEquals[TotalFlightsCount]
+    }
+
+    "parse TotalAirlinesCount" in {
+      writeReadEquals[TotalAirlinesCount]
+    }
+  }
 
   "WebSocketIncomeMessageFormat" should {
     "parse CoordinatesBox" in {
@@ -96,4 +132,7 @@ class JsonSupportSpec extends BaseSpec {
 
   private def read[A <: WebSocketIncomeMessage](message: String)(test: A => Any): Any =
     test(WebSocketIncomeMessageFormat.read(message.parseJson).asInstanceOf[A])
+
+  private def writeReadEquals[A <: EventPayload: ClassTag](implicit value: Arbitrary[A]): Gen[Assertion] =
+    value.arbitrary.flatMap(v => JsonSupport.eventPayloadWriter.read(JsonSupport.eventPayloadWriter.write(v)) shouldBe a[A])
 }
