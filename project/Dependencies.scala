@@ -29,6 +29,7 @@ object Dependencies {
     lazy val Slf4j               = "1.7.28"
     lazy val Mockito             = "2.7.22"
     lazy val ScalafixSortImports = "0.3.2"
+    lazy val ScalacheckShapeless = "1.2.3"
     lazy val ScalaTestAutofix    = "3.1.0.0"
     lazy val ScalaTestPlus       = "3.1.0.0"
 
@@ -63,13 +64,14 @@ object Dependencies {
   ) ++ Logging.prodDeps
 
   lazy val testDeps: Seq[ModuleID] = Seq(
-    "com.typesafe.akka"       %% "akka-http-testkit"              % Versions.AkkaHttp,
-    "com.typesafe.akka"       %% "akka-stream-testkit"            % Versions.Akka,
-    "io.github.embeddedkafka" %% "embedded-kafka-schema-registry" % Versions.ConfluentPlatform,
-    "it.bitrock"              %% "test-commons"                   % Versions.TestCommons,
-    "jakarta.ws.rs"           % "jakarta.ws.rs-api"               % Versions.JakartaWsRs, // mandatory when javax.ws.rs-api gets excluded
-    "org.mockito"             % "mockito-core"                    % Versions.Mockito,
-    "org.scalatestplus"       %% "mockito-1-10"                   % Versions.ScalaTestAutofix
+    "com.typesafe.akka"          %% "akka-http-testkit"              % Versions.AkkaHttp,
+    "com.typesafe.akka"          %% "akka-stream-testkit"            % Versions.Akka,
+    "io.github.embeddedkafka"    %% "embedded-kafka-schema-registry" % Versions.ConfluentPlatform,
+    "it.bitrock"                 %% "test-commons"                   % Versions.TestCommons,
+    "jakarta.ws.rs"              % "jakarta.ws.rs-api"               % Versions.JakartaWsRs, // mandatory when javax.ws.rs-api gets excluded
+    "org.mockito"                % "mockito-core"                    % Versions.Mockito,
+    "org.scalatestplus"          %% "mockito-1-10"                   % Versions.ScalaTestAutofix,
+    "com.github.alexarchambault" %% "scalacheck-shapeless_1.14"      % Versions.ScalacheckShapeless
   ).map(_ % s"$Test,$IntegrationTest")
 
   lazy val excludeDeps: Seq[ExclusionRule] = Seq(

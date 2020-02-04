@@ -37,6 +37,7 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
   implicit val eventPayloadWriter: RootJsonFormat[EventPayload] = new RootJsonFormat[EventPayload] {
     override def write(eventPayload: EventPayload): JsValue =
       eventPayload match {
+        case e: FlightReceivedList      => e.toJson
         case e: TopArrivalAirportList   => e.toJson
         case e: TopDepartureAirportList => e.toJson
         case e: TopSpeedList            => e.toJson
@@ -52,6 +53,7 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
         .recover[EventPayload] { case _ => json.convertTo[TopAirlineList] }
         .recover[EventPayload] { case _ => json.convertTo[TotalFlightsCount] }
         .recover[EventPayload] { case _ => json.convertTo[TotalAirlinesCount] }
+        .recover[EventPayload] { case _ => json.convertTo[FlightReceivedList] }
         .getOrElse(serializationError(s"json serialization error $json"))
   }
 
@@ -63,10 +65,10 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
       json.asJsObject.getFields("@type") match {
         case Seq(JsString("startFlightList")) => json.convertTo[CoordinatesBox]
         case Seq(JsString("stopFlightList"))  => StopFlightList
-        case Seq(JsString("startTop"))        => StartTop
-        case Seq(JsString("stopTop"))         => StopTop
-        case Seq(JsString("startTotal"))      => StartTotal
-        case Seq(JsString("stopTotal"))       => StopTotal
+        case Seq(JsString("startTop"))        => StartTops
+        case Seq(JsString("stopTop"))         => StopTops
+        case Seq(JsString("startTotal"))      => StartTotals
+        case Seq(JsString("stopTotal"))       => StopTotals
         case unrecognized                     => serializationError(s"json serialization error $unrecognized")
       }
   }

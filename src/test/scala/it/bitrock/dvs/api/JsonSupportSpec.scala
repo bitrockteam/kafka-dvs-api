@@ -2,9 +2,45 @@ package it.bitrock.dvs.api
 
 import it.bitrock.dvs.api.JsonSupport.WebSocketIncomeMessageFormat
 import it.bitrock.dvs.api.model._
+import org.scalacheck.Arbitrary
+import org.scalacheck.ScalacheckShapeless._
+import org.scalatest.Assertion
 import spray.json._
 
+import scala.reflect.ClassTag
+
 class JsonSupportSpec extends BaseSpec {
+
+  "eventPayloadWriter" should {
+
+    "parse FlightReceivedList" in {
+      writeReadEquals[FlightReceivedList]
+    }
+
+    "parse TopArrivalAirportList" in {
+      writeReadEquals[TopArrivalAirportList]
+    }
+
+    "parse TopDepartureAirportList" in {
+      writeReadEquals[TopDepartureAirportList]
+    }
+
+    "parse TopSpeedList" in {
+      writeReadEquals[TopSpeedList]
+    }
+
+    "parse TopAirlineList" in {
+      writeReadEquals[TopAirlineList]
+    }
+
+    "parse TotalFlightsCount" in {
+      writeReadEquals[TotalFlightsCount]
+    }
+
+    "parse TotalAirlinesCount" in {
+      writeReadEquals[TotalAirlinesCount]
+    }
+  }
 
   "WebSocketIncomeMessageFormat" should {
     "parse CoordinatesBox" in {
@@ -49,7 +85,7 @@ class JsonSupportSpec extends BaseSpec {
           | }
           |""".stripMargin
 
-      read(json) { result: StartTop.type =>
+      read(json) { result: StartTops.type =>
         result.`@type` shouldBe "startTop"
       }
     }
@@ -62,7 +98,7 @@ class JsonSupportSpec extends BaseSpec {
           | }
           |""".stripMargin
 
-      read(json) { result: StopTop.type =>
+      read(json) { result: StopTops.type =>
         result.`@type` shouldBe "stopTop"
       }
     }
@@ -75,7 +111,7 @@ class JsonSupportSpec extends BaseSpec {
           | }
           |""".stripMargin
 
-      read(json) { result: StartTotal.type =>
+      read(json) { result: StartTotals.type =>
         result.`@type` shouldBe "startTotal"
       }
     }
@@ -88,7 +124,7 @@ class JsonSupportSpec extends BaseSpec {
           | }
           |""".stripMargin
 
-      read(json) { result: StopTotal.type =>
+      read(json) { result: StopTotals.type =>
         result.`@type` shouldBe "stopTotal"
       }
     }
@@ -96,4 +132,10 @@ class JsonSupportSpec extends BaseSpec {
 
   private def read[A <: WebSocketIncomeMessage](message: String)(test: A => Any): Any =
     test(WebSocketIncomeMessageFormat.read(message.parseJson).asInstanceOf[A])
+
+  private def writeReadEquals[A <: EventPayload: ClassTag](implicit value: Arbitrary[A]): Assertion =
+    value.arbitrary
+      .flatMap(v => JsonSupport.eventPayloadWriter.read(JsonSupport.eventPayloadWriter.write(v)) should not be a[Exception])
+      .sample
+      .get
 }
