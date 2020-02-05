@@ -28,7 +28,7 @@ class RoutesSpec extends BaseAsyncSpec with ScalatestRouteTest {
 
   "Routes" should {
 
-    "open a web-socket channel and stream messages with flight list events on it for WS requests on the streams path" in ResourceLoaner.withFixture {
+    "open a web-socket channel and stream messages on it for WS requests" in ResourceLoaner.withFixture {
       case Resource(routes, wsProbe, webSocketConfig) =>
         WS(Uri(path = Uri.Path / webSocketConfig.pathPrefix / webSocketConfig.dvsPath), wsProbe.flow) ~> routes ~> check {
           webSocketExchange(wsProbe, "web-socket is working", "web-socket is working")
