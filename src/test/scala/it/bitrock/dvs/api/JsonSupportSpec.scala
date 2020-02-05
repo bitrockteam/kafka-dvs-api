@@ -1,6 +1,7 @@
 package it.bitrock.dvs.api
 
 import it.bitrock.dvs.api.JsonSupport.WebSocketIncomeMessageFormat
+import it.bitrock.dvs.api.TestValues._
 import it.bitrock.dvs.api.model._
 import org.scalacheck.Arbitrary
 import org.scalacheck.ScalacheckShapeless._
@@ -44,18 +45,7 @@ class JsonSupportSpec extends BaseSpec {
 
   "WebSocketIncomeMessageFormat" should {
     "parse CoordinatesBox" in {
-      val json =
-        """
-          | {
-          |   "@type": "startFlightList",
-          |   "leftHighLat": 23.6,
-          |   "leftHighLon": 67.9,
-          |   "rightLowLat": 37.98,
-          |   "rightLowLon": 43.45
-          | }
-          |""".stripMargin
-
-      read(json) { result: CoordinatesBox =>
+      read(coordinatesBox) { result: CoordinatesBox =>
         result.`@type` shouldBe "startFlightList"
         result.leftHighLat shouldBe 23.6
         result.leftHighLon shouldBe 67.9
@@ -65,66 +55,31 @@ class JsonSupportSpec extends BaseSpec {
     }
 
     "parse StopFlightList" in {
-      val json =
-        """
-          | {
-          |   "@type": "stopFlightList"
-          | }
-          |""".stripMargin
-
-      read(json) { result: StopFlightList.type =>
+      read(stopFlightList) { result: StopFlightList.type =>
         result.`@type` shouldBe "stopFlightList"
       }
     }
 
     "parse StartTop" in {
-      val json =
-        """
-          | {
-          |   "@type": "startTop"
-          | }
-          |""".stripMargin
-
-      read(json) { result: StartTops.type =>
+      read(startTop) { result: StartTops.type =>
         result.`@type` shouldBe "startTop"
       }
     }
 
     "parse StopTop" in {
-      val json =
-        """
-          | {
-          |   "@type": "stopTop"
-          | }
-          |""".stripMargin
-
-      read(json) { result: StopTops.type =>
+      read(stopTop) { result: StopTops.type =>
         result.`@type` shouldBe "stopTop"
       }
     }
 
     "parse StartTotal" in {
-      val json =
-        """
-          | {
-          |   "@type": "startTotal"
-          | }
-          |""".stripMargin
-
-      read(json) { result: StartTotals.type =>
+      read(startTotal) { result: StartTotals.type =>
         result.`@type` shouldBe "startTotal"
       }
     }
 
     "parse StopTotal" in {
-      val json =
-        """
-          | {
-          |   "@type": "stopTotal"
-          | }
-          |""".stripMargin
-
-      read(json) { result: StopTotals.type =>
+      read(stopTotal) { result: StopTotals.type =>
         result.`@type` shouldBe "stopTotal"
       }
     }

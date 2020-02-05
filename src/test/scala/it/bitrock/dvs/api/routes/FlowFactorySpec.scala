@@ -5,6 +5,7 @@ import akka.http.scaladsl.model.ws.TextMessage
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import akka.stream.scaladsl.{Sink, Source}
 import it.bitrock.dvs.api.BaseSpec
+import it.bitrock.dvs.api.TestValues._
 import it.bitrock.dvs.api.core.factory.MessageDispatcherFactory
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 
@@ -16,24 +17,10 @@ class FlowFactorySpec extends BaseSpec with ScalatestRouteTest with ScalaFutures
 
   "FlowFactory" should {
     "create a flow linked to a processor that evaluate only valid messages" in {
-      val flow = FlowFactory.messageExchangeFlowFactory(dummyEchoProcessor).flow
-      val validMessage1 =
-        """
-          | {
-          |   "@type": "startTotal"
-          | }
-          |""".stripMargin
-
-      val validMessage2 =
-        """
-          | {
-          |   "@type": "stopTotal"
-          | }
-          |""".stripMargin
-
+      val flow           = FlowFactory.messageExchangeFlowFactory(dummyEchoProcessor).flow
       val invalidMessage = "invalid"
 
-      val result = Source(List(TextMessage(validMessage1), TextMessage(invalidMessage), TextMessage(validMessage2)))
+      val result = Source(List(TextMessage(startTotal), TextMessage(invalidMessage), TextMessage(stopTotal)))
         .concat(Source.repeat(TextMessage(invalidMessage)))
         .via(flow)
         .take(2)
@@ -44,44 +31,26 @@ class FlowFactorySpec extends BaseSpec with ScalatestRouteTest with ScalaFutures
     }
 
     "parse CoordinatesBox messages" in {
-      val flow = FlowFactory.messageExchangeFlowFactory(dummyEchoProcessor).flow
-      val validMessage =
-        """
-          | {
-          |   "@type": "startFlightList",
-          |   "leftHighLat": 1.0,
-          |   "leftHighLon": 1.0,
-          |   "rightLowLat": 1.0,
-          |   "rightLowLon": 1.0
-          | }
-          |""".stripMargin
-
+      val flow           = FlowFactory.messageExchangeFlowFactory(dummyEchoProcessor).flow
       val invalidMessage = "invalid"
 
       val result = Source
-        .single(TextMessage(validMessage))
+        .single(TextMessage(coordinatesBox))
         .concat(Source.repeat(TextMessage(invalidMessage)))
         .via(flow)
         .take(1)
         .runWith(Sink.head)
       whenReady(result) { messages =>
-        messages shouldBe TextMessage("received CoordinatesBox(1.0,1.0,1.0,1.0)")
+        messages shouldBe TextMessage("received CoordinatesBox(23.6,67.9,37.98,43.45)")
       }
     }
 
     "parse StopFlightList messages" in {
-      val flow = FlowFactory.messageExchangeFlowFactory(dummyEchoProcessor).flow
-      val validMessage =
-        """
-          | {
-          |   "@type": "stopFlightList"
-          | }
-          |""".stripMargin
-
+      val flow           = FlowFactory.messageExchangeFlowFactory(dummyEchoProcessor).flow
       val invalidMessage = "invalid"
 
       val result = Source
-        .single(TextMessage(validMessage))
+        .single(TextMessage(stopFlightList))
         .concat(Source.repeat(TextMessage(invalidMessage)))
         .via(flow)
         .take(1)
@@ -92,18 +61,11 @@ class FlowFactorySpec extends BaseSpec with ScalatestRouteTest with ScalaFutures
     }
 
     "parse StartTotals messages" in {
-      val flow = FlowFactory.messageExchangeFlowFactory(dummyEchoProcessor).flow
-      val validMessage =
-        """
-          | {
-          |   "@type": "startTotal"
-          | }
-          |""".stripMargin
-
+      val flow           = FlowFactory.messageExchangeFlowFactory(dummyEchoProcessor).flow
       val invalidMessage = "invalid"
 
       val result = Source
-        .single(TextMessage(validMessage))
+        .single(TextMessage(startTotal))
         .concat(Source.repeat(TextMessage(invalidMessage)))
         .via(flow)
         .take(1)
@@ -114,18 +76,11 @@ class FlowFactorySpec extends BaseSpec with ScalatestRouteTest with ScalaFutures
     }
 
     "parse StopTotals messages" in {
-      val flow = FlowFactory.messageExchangeFlowFactory(dummyEchoProcessor).flow
-      val validMessage =
-        """
-          | {
-          |   "@type": "stopTotal"
-          | }
-          |""".stripMargin
-
+      val flow           = FlowFactory.messageExchangeFlowFactory(dummyEchoProcessor).flow
       val invalidMessage = "invalid"
 
       val result = Source
-        .single(TextMessage(validMessage))
+        .single(TextMessage(stopTotal))
         .concat(Source.repeat(TextMessage(invalidMessage)))
         .via(flow)
         .take(1)
@@ -136,18 +91,11 @@ class FlowFactorySpec extends BaseSpec with ScalatestRouteTest with ScalaFutures
     }
 
     "parse StartTops messages" in {
-      val flow = FlowFactory.messageExchangeFlowFactory(dummyEchoProcessor).flow
-      val validMessage =
-        """
-          | {
-          |   "@type": "startTop"
-          | }
-          |""".stripMargin
-
+      val flow           = FlowFactory.messageExchangeFlowFactory(dummyEchoProcessor).flow
       val invalidMessage = "invalid"
 
       val result = Source
-        .single(TextMessage(validMessage))
+        .single(TextMessage(startTop))
         .concat(Source.repeat(TextMessage(invalidMessage)))
         .via(flow)
         .take(1)
@@ -158,18 +106,11 @@ class FlowFactorySpec extends BaseSpec with ScalatestRouteTest with ScalaFutures
     }
 
     "parse StopTops messages" in {
-      val flow = FlowFactory.messageExchangeFlowFactory(dummyEchoProcessor).flow
-      val validMessage =
-        """
-          | {
-          |   "@type": "stopTop"
-          | }
-          |""".stripMargin
-
+      val flow           = FlowFactory.messageExchangeFlowFactory(dummyEchoProcessor).flow
       val invalidMessage = "invalid"
 
       val result = Source
-        .single(TextMessage(validMessage))
+        .single(TextMessage(stopTop))
         .concat(Source.repeat(TextMessage(invalidMessage)))
         .via(flow)
         .take(1)

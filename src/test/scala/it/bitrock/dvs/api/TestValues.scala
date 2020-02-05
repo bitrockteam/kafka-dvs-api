@@ -97,4 +97,47 @@ trait TestValues {
   final val DefaultCountAirlineAmount = Random.nextLong
   final val DefaultStartTimeWindow    = Random.nextString(10)
 
+  final val coordinatesBox: String =
+    """
+      | {
+      |   "@type": "startFlightList",
+      |   "leftHighLat": 23.6,
+      |   "leftHighLon": 67.9,
+      |   "rightLowLat": 37.98,
+      |   "rightLowLon": 43.45
+      | }
+      |""".stripMargin
+  final val stopFlightList =
+    """
+      |{
+      |  "@type": "stopFlightList"
+      |}
+      |""".stripMargin
+  final val startTop =
+    """
+      |{
+      |  "@type": "startTop"
+      |}
+      |""".stripMargin
+  final val stopTop =
+    """
+      |{
+      | "@type": "stopTop"
+      |}
+      |""".stripMargin
+  final val startTotal =
+    """
+      |{
+      | "@type":
+      | "startTotal"
+      |}
+      |""".stripMargin
+  final val stopTotal =
+    """
+      |{
+      | "@type": "stopTotal"
+      |}
+      |""".stripMargin
 }
+
+object TestValues extends TestValues

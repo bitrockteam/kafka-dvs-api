@@ -9,6 +9,7 @@ import akka.http.scaladsl.testkit.{ScalatestRouteTest, WSProbe}
 import akka.stream.scaladsl.Flow
 import it.bitrock.dvs.api.BaseAsyncSpec
 import it.bitrock.dvs.api.JsonSupport._
+import it.bitrock.dvs.api.TestValues._
 import it.bitrock.dvs.api.config.WebSocketConfig
 import it.bitrock.dvs.api.core.factory.MessageDispatcherFactory
 import it.bitrock.dvs.api.model.{FlightReceivedList, TopDepartureAirportList, TotalAirlinesCount}
@@ -25,8 +26,6 @@ class RoutesSpec extends BaseAsyncSpec with ScalatestRouteTest {
 
   import RoutesSpec._
 
-  implicit private val ec: ExecutionContextExecutor = system.dispatcher
-
   "Routes" should {
 
     "open a web-socket channel and stream messages with flight list events on it for WS requests on the streams path" in ResourceLoaner.withFixture {
@@ -42,17 +41,7 @@ class RoutesSpec extends BaseAsyncSpec with ScalatestRouteTest {
       "a flight is requested" in ResourceLoaner.withFlowFactory(new FlowFactoryFixture(flightExpectedMessage).flowFactory) {
         case Resource(routes, wsProbe, webSocketConfig) =>
           WS(Uri(path = Uri.Path / webSocketConfig.pathPrefix / webSocketConfig.dvsPath), wsProbe.flow) ~> routes ~> check {
-            val msg =
-              """
-                | {
-                |   "@type": "startFlightList",
-                |   "leftHighLat": 1.1297249669842589E-301,
-                |   "leftHighLon": 1.9284761079986233E-133,
-                |   "rightLowLat": 1.427838496966401E+60,
-                |   "rightLowLon": -4.236777500327674E-217
-                | }
-                |""".stripMargin
-            webSocketExchange(wsProbe, msg, flightExpectedMessage.toJson.toString)
+            webSocketExchange(wsProbe, coordinatesBox, flightExpectedMessage.toJson.toString)
           }
       }
 
@@ -60,12 +49,7 @@ class RoutesSpec extends BaseAsyncSpec with ScalatestRouteTest {
       "a top is requested" in ResourceLoaner.withFlowFactory(new FlowFactoryFixture(topExpectedMsg).flowFactory) {
         case Resource(routes, wsProbe, webSocketConfig) =>
           WS(Uri(path = Uri.Path / webSocketConfig.pathPrefix / webSocketConfig.dvsPath), wsProbe.flow) ~> routes ~> check {
-            val msg = """
-                        | {
-                        |   "@type": "startTop"
-                        | }
-                        |""".stripMargin
-            webSocketExchange(wsProbe, msg, topExpectedMsg.toJson.toString)
+            webSocketExchange(wsProbe, startTop, topExpectedMsg.toJson.toString)
           }
       }
 
@@ -73,12 +57,7 @@ class RoutesSpec extends BaseAsyncSpec with ScalatestRouteTest {
       "a total is requested" in ResourceLoaner.withFlowFactory(new FlowFactoryFixture(totalExpectedMsg).flowFactory) {
         case Resource(routes, wsProbe, webSocketConfig) =>
           WS(Uri(path = Uri.Path / webSocketConfig.pathPrefix / webSocketConfig.dvsPath), wsProbe.flow) ~> routes ~> check {
-            val msg = """
-                        | {
-                        |   "@type": "startTotal"
-                        | }
-                        |""".stripMargin
-            webSocketExchange(wsProbe, msg, totalExpectedMsg.toJson.toString)
+            webSocketExchange(wsProbe, startTotal, totalExpectedMsg.toJson.toString)
           }
       }
     }
