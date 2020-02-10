@@ -52,15 +52,15 @@ object FlowFactory extends LazyLogging {
       .toMat(BroadcastHub.sink)(Keep.both)
       .run()
 
-  private def onFailure = {
+  private def onFailure: PartialFunction[Any, Throwable] = {
     case Status.Failure(cause) => cause
-  }: PartialFunction[Any, Throwable]
+  }
 
-  private def onSuccess = {
+  private def onSuccess: PartialFunction[Any, CompletionStrategy] = {
     case Status.Success(s: CompletionStrategy) => s
     case akka.actor.Status.Success(_)          => CompletionStrategy.draining
     case akka.actor.Status.Success             => CompletionStrategy.draining
-  }: PartialFunction[Any, CompletionStrategy]
+  }
 
   private def buildFlow(sink: Sink[Message, Any], source: Source[String, NotUsed], processor: ActorRef)(
       implicit ec: ExecutionContext
