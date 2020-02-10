@@ -25,8 +25,6 @@ trait KafkaConsumerWrapper {
 
   def uuid: String = UUID.randomUUID.toString
 
-  val maxPollRecords: Int
-
   def getKafkaConsumer[K: Deserializer, V: Deserializer](
       conf: KafkaConfig,
       topics: Seq[String]
@@ -36,7 +34,6 @@ trait KafkaConsumerWrapper {
     properties.put(ConsumerConfig.GROUP_ID_CONFIG, s"${conf.groupId}-$uuid") // Every consumer should be independent
     properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, implicitly[Deserializer[K]].getClass)
     properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, implicitly[Deserializer[V]].getClass)
-    properties.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, maxPollRecords.toString)
     properties.put(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, conf.schemaRegistryUrl.toString)
     properties.put(KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG, true.toString)
     if (conf.enableInterceptors) {

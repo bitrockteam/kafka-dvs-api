@@ -114,7 +114,6 @@ object BaseTestKit {
       new KafkaConsumerWrapper {
         override def pollMessages(): Unit      = pollActorRef ! PollingTriggered
         override def close(): Unit             = ()
-        override val maxPollRecords: Int       = 1
         override def moveTo(epoch: Long): Unit = ()
         override def pause(): Unit             = ()
         override def resume(): Unit            = ()

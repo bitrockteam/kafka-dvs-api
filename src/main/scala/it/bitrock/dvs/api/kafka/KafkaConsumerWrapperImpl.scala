@@ -22,8 +22,6 @@ class KafkaConsumerWrapperImpl[K: Deserializer, V: Deserializer](
 
   import KafkaConsumerWrapper._
 
-  override val maxPollRecords: Int = 1
-
   val kafkaConsumer: KafkaConsumer[K, V] = getKafkaConsumer(conf, topics)
 
   // Startup rewind
