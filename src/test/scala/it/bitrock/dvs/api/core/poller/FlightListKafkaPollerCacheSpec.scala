@@ -29,6 +29,8 @@ class FlightListKafkaPollerCacheSpec extends BaseTestKit {
                   DefaultNameCountry1,
                   DefaultCodeIso2Country1,
                   DefaultTimezone1,
+                  DefaultLatitude1,
+                  DefaultLongitude1,
                   DefaultGmt1
                 ),
                 Airport(
@@ -37,6 +39,8 @@ class FlightListKafkaPollerCacheSpec extends BaseTestKit {
                   DefaultNameCountry2,
                   DefaultCodeIso2Country2,
                   DefaultTimezone2,
+                  DefaultLatitude2,
+                  DefaultLongitude2,
                   DefaultGmt2
                 ),
                 Airline(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
