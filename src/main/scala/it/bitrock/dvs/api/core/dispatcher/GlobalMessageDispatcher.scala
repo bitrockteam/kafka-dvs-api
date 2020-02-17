@@ -76,7 +76,8 @@ class GlobalMessageDispatcher(val sourceActorRef: ActorRef, kafkaPollerHub: Kafk
       coordinate.latitude < box.leftHighLat &&
       coordinate.latitude > box.rightLowLat &&
       coordinate.longitude > box.leftHighLon &&
-      coordinate.longitude < box.rightLowLon
+      coordinate.longitude < box.rightLowLon &&
+      coordinate.altitude != 0d
     }.take(webSocketConfig.maxNumberFlights).force
     FlightReceivedList(filteredList)
   }
