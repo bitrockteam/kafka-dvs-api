@@ -49,9 +49,7 @@ object Main extends App with LazyLogging {
   private val api: Route                           = webSocketRoutes ~ healthCheckRoute
   private val bindingFuture: Future[ServerBinding] = Http().bindAndHandle(api, host, port)
 
-  bindingFuture.map { serverBinding =>
-    logger.info(s"Exposing to ${serverBinding.localAddress}")
-  }
+  bindingFuture.map(serverBinding => logger.info(s"Exposing to ${serverBinding.localAddress}"))
 
   sys.addShutdownHook {
     logger.info("Shutting down")

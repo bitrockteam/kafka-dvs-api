@@ -55,33 +55,23 @@ class JsonSupportSpec extends BaseSpec {
     }
 
     "parse StopFlightList" in {
-      read(stopFlightList) { result: StopFlightList.type =>
-        result.`@type` shouldBe "stopFlightList"
-      }
+      read(stopFlightList) { result: StopFlightList.type => result.`@type` shouldBe "stopFlightList" }
     }
 
     "parse StartTop" in {
-      read(startTop) { result: StartTops.type =>
-        result.`@type` shouldBe "startTop"
-      }
+      read(startTop) { result: StartTops.type => result.`@type` shouldBe "startTop" }
     }
 
     "parse StopTop" in {
-      read(stopTop) { result: StopTops.type =>
-        result.`@type` shouldBe "stopTop"
-      }
+      read(stopTop) { result: StopTops.type => result.`@type` shouldBe "stopTop" }
     }
 
     "parse StartTotal" in {
-      read(startTotal) { result: StartTotals.type =>
-        result.`@type` shouldBe "startTotal"
-      }
+      read(startTotal) { result: StartTotals.type => result.`@type` shouldBe "startTotal" }
     }
 
     "parse StopTotal" in {
-      read(stopTotal) { result: StopTotals.type =>
-        result.`@type` shouldBe "stopTotal"
-      }
+      read(stopTotal) { result: StopTotals.type => result.`@type` shouldBe "stopTotal" }
     }
   }
 
