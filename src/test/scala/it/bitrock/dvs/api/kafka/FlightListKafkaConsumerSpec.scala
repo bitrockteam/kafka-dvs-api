@@ -50,6 +50,8 @@ class FlightListKafkaConsumerSpec
           KAirportInfo(
             DefaultCodeAirport1,
             DefaultNameAirport1,
+            DefaultLatitude,
+            DefaultLongitude,
             DefaultNameCountry1,
             DefaultCodeIso2Country1,
             DefaultTimezone1,
@@ -58,6 +60,8 @@ class FlightListKafkaConsumerSpec
           KAirportInfo(
             DefaultCodeAirport2,
             DefaultNameAirport2,
+            DefaultLatitude,
+            DefaultLongitude,
             DefaultNameCountry2,
             DefaultCodeIso2Country2,
             DefaultTimezone2,
@@ -76,6 +80,8 @@ class FlightListKafkaConsumerSpec
           KAirportInfo(
             DefaultCodeAirport1,
             DefaultNameAirport1,
+            DefaultLatitude,
+            DefaultLongitude,
             DefaultNameCountry1,
             DefaultCodeIso2Country1,
             DefaultTimezone1,
@@ -84,6 +90,8 @@ class FlightListKafkaConsumerSpec
           KAirportInfo(
             DefaultCodeAirport2,
             DefaultNameAirport2,
+            DefaultLatitude,
+            DefaultLongitude,
             DefaultNameCountry2,
             DefaultCodeIso2Country2,
             DefaultTimezone2,
@@ -174,6 +182,8 @@ class FlightListKafkaConsumerSpec
           KAirportInfo(
             DefaultCodeAirport1,
             DefaultNameAirport1,
+            DefaultLatitude,
+            DefaultLongitude,
             DefaultNameCountry1,
             DefaultCodeIso2Country1,
             DefaultTimezone1,
@@ -182,6 +192,8 @@ class FlightListKafkaConsumerSpec
           KAirportInfo(
             DefaultCodeAirport2,
             DefaultNameAirport2,
+            DefaultLatitude,
+            DefaultLongitude,
             DefaultNameCountry2,
             DefaultCodeIso2Country2,
             DefaultTimezone2,
