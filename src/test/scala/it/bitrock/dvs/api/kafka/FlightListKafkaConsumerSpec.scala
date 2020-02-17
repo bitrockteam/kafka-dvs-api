@@ -169,7 +169,7 @@ class FlightListKafkaConsumerSpec
 
           // Using eventually to ignore any warm up time Kafka could have
           eventually {
-            publishToKafka(kafkaConfig.flightReceivedListTopic, "key", kFlightReceivedList)
+            publishToKafka(kafkaConfig.flightEnRouteListTopic, "key", kFlightReceivedList)
             pollMessages()
 
             processorProbe.expectMsg(expectedFlightReceivedList)
@@ -216,7 +216,7 @@ class FlightListKafkaConsumerSpec
 
         withRunningKafka {
           // Publish to a topic before consumer is started
-          publishToKafka(kafkaConfig.flightReceivedListTopic, "key", kFlightReceivedList)
+          publishToKafka(kafkaConfig.flightEnRouteListTopic, "key", kFlightReceivedList)
 
           eventually {
             pollMessages()
@@ -224,7 +224,7 @@ class FlightListKafkaConsumerSpec
           }
 
           val (_, response) =
-            consumeFirstKeyedMessageFrom[String, KFlightReceivedList](kafkaConfig.flightReceivedListTopic)
+            consumeFirstKeyedMessageFrom[String, KFlightReceivedList](kafkaConfig.flightEnRouteListTopic)
 
           response shouldBe kFlightReceivedList
         }
@@ -250,7 +250,7 @@ class FlightListKafkaConsumerSpec
       val kafkaConsumerWrapper =
         KafkaConsumerWrapperFactory
           .flightListKafkaConsumerFactory(kafkaConfig)
-          .build(processor.ref, List(kafkaConfig.flightReceivedListTopic))
+          .build(processor.ref, List(kafkaConfig.flightEnRouteListTopic))
 
       try {
         body(

@@ -20,7 +20,7 @@ class FlightListKafkaPollerCache(
 ) extends KafkaPoller {
 
   override val kafkaConsumerWrapper: KafkaConsumerWrapper =
-    kafkaConsumerWrapperFactory.build(self, List(kafkaConfig.flightReceivedListTopic))
+    kafkaConsumerWrapperFactory.build(self, List(kafkaConfig.flightEnRouteListTopic))
 
   override def receive: Receive = active(FlightReceivedList(Seq()))
 
