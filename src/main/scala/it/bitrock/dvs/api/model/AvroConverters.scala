@@ -39,8 +39,8 @@ object AvroConverters {
         x.icaoNumber,
         toGeographyInfo(x.geography),
         x.speed,
-        toAirportInfo(x.airportDeparture),
-        toAirportInfo(x.airportArrival),
+        toAirportInfo(x.departureAirport),
+        toAirportInfo(x.arrivalAirport),
         toAirlineInfo(x.airline),
         toAirplaneInfo(x.airplane),
         x.status,
@@ -69,18 +69,18 @@ object AvroConverters {
     Geography(x.latitude, x.longitude, x.altitude, x.direction)
 
   private def toAirportInfo(x: KAirportInfo): Airport =
-    Airport(x.codeAirport, x.nameAirport, x.nameCountry, x.codeIso2Country, x.timezone, x.gmt)
+    Airport(x.code, x.name, x.countryName, x.countryIsoCode2, x.timezone, x.gmt)
 
   private def toAirlineInfo(x: KAirlineInfo): Airline =
-    Airline(x.codeAirline, x.nameAirline, x.sizeAirline)
+    Airline(x.code, x.name, x.size)
 
   private def toAirplaneInfo(x: KAirplaneInfo): Airplane =
-    Airplane(x.numberRegistration, x.productionLine, x.modelCode)
+    Airplane(x.registrationNumber, x.productionLine, x.modelCode)
 
-  private def toAirport(x: KTopAirport): AirportCount = AirportCount(x.airportCode, x.eventCount)
+  private def toAirport(x: KTopAirport): AirportCount = AirportCount(x.code, x.eventCount)
 
   private def toSpeedFlight(x: KTopSpeed): SpeedFlight = SpeedFlight(x.flightCode, x.speed)
 
-  private def toAirline(x: KTopAirline): AirlineCount = AirlineCount(x.airlineName, x.eventCount)
+  private def toAirline(x: KTopAirline): AirlineCount = AirlineCount(x.name, x.eventCount)
 
 }
