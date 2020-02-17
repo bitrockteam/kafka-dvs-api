@@ -69,7 +69,7 @@ object AvroConverters {
     Geography(x.latitude, x.longitude, x.altitude, x.direction)
 
   private def toAirportInfo(x: KAirportInfo): Airport =
-    Airport(x.code, x.name, x.countryName, x.countryIsoCode2, x.timezone, x.gmt)
+    Airport(x.code, x.name, x.countryName, x.countryIsoCode2, x.timezone, x.latitude, x.longitude, x.gmt)
 
   private def toAirlineInfo(x: KAirlineInfo): Airline =
     Airline(x.code, x.name, x.size)

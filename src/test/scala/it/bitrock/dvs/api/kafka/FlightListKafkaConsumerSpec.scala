@@ -50,8 +50,8 @@ class FlightListKafkaConsumerSpec
           KAirportInfo(
             DefaultCodeAirport1,
             DefaultNameAirport1,
-            DefaultLatitude,
-            DefaultLongitude,
+            DefaultLatitude1,
+            DefaultLongitude1,
             DefaultNameCountry1,
             DefaultCodeIso2Country1,
             DefaultTimezone1,
@@ -60,8 +60,8 @@ class FlightListKafkaConsumerSpec
           KAirportInfo(
             DefaultCodeAirport2,
             DefaultNameAirport2,
-            DefaultLatitude,
-            DefaultLongitude,
+            DefaultLatitude2,
+            DefaultLongitude2,
             DefaultNameCountry2,
             DefaultCodeIso2Country2,
             DefaultTimezone2,
@@ -80,8 +80,8 @@ class FlightListKafkaConsumerSpec
           KAirportInfo(
             DefaultCodeAirport1,
             DefaultNameAirport1,
-            DefaultLatitude,
-            DefaultLongitude,
+            DefaultLatitude1,
+            DefaultLongitude1,
             DefaultNameCountry1,
             DefaultCodeIso2Country1,
             DefaultTimezone1,
@@ -90,8 +90,8 @@ class FlightListKafkaConsumerSpec
           KAirportInfo(
             DefaultCodeAirport2,
             DefaultNameAirport2,
-            DefaultLatitude,
-            DefaultLongitude,
+            DefaultLatitude2,
+            DefaultLongitude2,
             DefaultNameCountry2,
             DefaultCodeIso2Country2,
             DefaultTimezone2,
@@ -114,6 +114,8 @@ class FlightListKafkaConsumerSpec
             DefaultNameCountry1,
             DefaultCodeIso2Country1,
             DefaultTimezone1,
+            DefaultLatitude1,
+            DefaultLongitude1,
             DefaultGmt1
           ),
           Airport(
@@ -122,6 +124,8 @@ class FlightListKafkaConsumerSpec
             DefaultNameCountry2,
             DefaultCodeIso2Country2,
             DefaultTimezone2,
+            DefaultLatitude2,
+            DefaultLongitude2,
             DefaultGmt2
           ),
           Airline(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
@@ -140,6 +144,8 @@ class FlightListKafkaConsumerSpec
             DefaultNameCountry1,
             DefaultCodeIso2Country1,
             DefaultTimezone1,
+            DefaultLatitude1,
+            DefaultLongitude1,
             DefaultGmt1
           ),
           Airport(
@@ -148,6 +154,8 @@ class FlightListKafkaConsumerSpec
             DefaultNameCountry2,
             DefaultCodeIso2Country2,
             DefaultTimezone2,
+            DefaultLatitude2,
+            DefaultLongitude2,
             DefaultGmt2
           ),
           Airline(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),

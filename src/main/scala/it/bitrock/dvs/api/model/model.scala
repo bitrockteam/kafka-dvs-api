@@ -16,6 +16,8 @@ final case class Airport(
     nameCountry: String,
     codeIso2Country: String,
     timezone: String,
+    latitude: Double,
+    longitude: Double,
     gmt: String
 )
 final case class Airline(codeAirline: String, nameAirline: String, sizeAirline: Long)
