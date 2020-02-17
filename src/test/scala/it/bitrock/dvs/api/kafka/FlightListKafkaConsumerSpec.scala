@@ -50,8 +50,8 @@ class FlightListKafkaConsumerSpec
           KAirportInfo(
             DefaultCodeAirport1,
             DefaultNameAirport1,
-            DefaultLatitude,
-            DefaultLongitude,
+            DefaultLatitude1,
+            DefaultLongitude1,
             DefaultNameCountry1,
             DefaultCodeIso2Country1,
             DefaultTimezone1,
@@ -60,8 +60,8 @@ class FlightListKafkaConsumerSpec
           KAirportInfo(
             DefaultCodeAirport2,
             DefaultNameAirport2,
-            DefaultLatitude,
-            DefaultLongitude,
+            DefaultLatitude2,
+            DefaultLongitude2,
             DefaultNameCountry2,
             DefaultCodeIso2Country2,
             DefaultTimezone2,
@@ -80,8 +80,8 @@ class FlightListKafkaConsumerSpec
           KAirportInfo(
             DefaultCodeAirport1,
             DefaultNameAirport1,
-            DefaultLatitude,
-            DefaultLongitude,
+            DefaultLatitude1,
+            DefaultLongitude1,
             DefaultNameCountry1,
             DefaultCodeIso2Country1,
             DefaultTimezone1,
@@ -90,8 +90,8 @@ class FlightListKafkaConsumerSpec
           KAirportInfo(
             DefaultCodeAirport2,
             DefaultNameAirport2,
-            DefaultLatitude,
-            DefaultLongitude,
+            DefaultLatitude2,
+            DefaultLongitude2,
             DefaultNameCountry2,
             DefaultCodeIso2Country2,
             DefaultTimezone2,
@@ -114,6 +114,8 @@ class FlightListKafkaConsumerSpec
             DefaultNameCountry1,
             DefaultCodeIso2Country1,
             DefaultTimezone1,
+            DefaultLatitude1,
+            DefaultLongitude1,
             DefaultGmt1
           ),
           Airport(
@@ -122,6 +124,8 @@ class FlightListKafkaConsumerSpec
             DefaultNameCountry2,
             DefaultCodeIso2Country2,
             DefaultTimezone2,
+            DefaultLatitude2,
+            DefaultLongitude2,
             DefaultGmt2
           ),
           Airline(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
@@ -140,6 +144,8 @@ class FlightListKafkaConsumerSpec
             DefaultNameCountry1,
             DefaultCodeIso2Country1,
             DefaultTimezone1,
+            DefaultLatitude1,
+            DefaultLongitude1,
             DefaultGmt1
           ),
           Airport(
@@ -148,6 +154,8 @@ class FlightListKafkaConsumerSpec
             DefaultNameCountry2,
             DefaultCodeIso2Country2,
             DefaultTimezone2,
+            DefaultLatitude2,
+            DefaultLongitude2,
             DefaultGmt2
           ),
           Airline(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
@@ -161,7 +169,7 @@ class FlightListKafkaConsumerSpec
 
           // Using eventually to ignore any warm up time Kafka could have
           eventually {
-            publishToKafka(kafkaConfig.flightReceivedListTopic, "key", kFlightReceivedList)
+            publishToKafka(kafkaConfig.flightEnRouteListTopic, "key", kFlightReceivedList)
             pollMessages()
 
             processorProbe.expectMsg(expectedFlightReceivedList)
@@ -208,7 +216,7 @@ class FlightListKafkaConsumerSpec
 
         withRunningKafka {
           // Publish to a topic before consumer is started
-          publishToKafka(kafkaConfig.flightReceivedListTopic, "key", kFlightReceivedList)
+          publishToKafka(kafkaConfig.flightEnRouteListTopic, "key", kFlightReceivedList)
 
           eventually {
             pollMessages()
@@ -216,7 +224,7 @@ class FlightListKafkaConsumerSpec
           }
 
           val (_, response) =
-            consumeFirstKeyedMessageFrom[String, KFlightReceivedList](kafkaConfig.flightReceivedListTopic)
+            consumeFirstKeyedMessageFrom[String, KFlightReceivedList](kafkaConfig.flightEnRouteListTopic)
 
           response shouldBe kFlightReceivedList
         }
@@ -242,7 +250,7 @@ class FlightListKafkaConsumerSpec
       val kafkaConsumerWrapper =
         KafkaConsumerWrapperFactory
           .flightListKafkaConsumerFactory(kafkaConfig)
-          .build(processor.ref, List(kafkaConfig.flightReceivedListTopic))
+          .build(processor.ref, List(kafkaConfig.flightEnRouteListTopic))
 
       try {
         body(

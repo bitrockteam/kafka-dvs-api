@@ -27,6 +27,8 @@ trait TestValues {
   final val DefaultNameCountry1     = Random.nextString(10)
   final val DefaultCodeIso2Country1 = Random.nextString(10)
   final val DefaultTimezone1        = Random.nextString(10)
+  final val DefaultLatitude1        = Random.nextDouble
+  final val DefaultLongitude1       = Random.nextDouble
   final val DefaultGmt1             = Random.nextString(10)
 
   final val DefaultCodeAirport2     = Random.nextString(10)
@@ -34,6 +36,8 @@ trait TestValues {
   final val DefaultNameCountry2     = Random.nextString(10)
   final val DefaultCodeIso2Country2 = Random.nextString(10)
   final val DefaultTimezone2        = Random.nextString(10)
+  final val DefaultLatitude2        = Random.nextDouble
+  final val DefaultLongitude2       = Random.nextDouble
   final val DefaultGmt2             = Random.nextString(10)
 
   final val DefaultCodeAirline = Random.nextString(10)
