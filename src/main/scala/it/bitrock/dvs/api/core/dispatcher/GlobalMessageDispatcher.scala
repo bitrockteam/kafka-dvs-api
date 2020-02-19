@@ -15,24 +15,24 @@ class GlobalMessageDispatcher(val sourceActorRef: ActorRef, kafkaPollerHub: Kafk
 
   import context.dispatcher
 
-  override def receive: Receive = behaviourFor(Map.empty)
+  override def receive: Receive = behaviorFor(Map.empty)
 
-  private def behaviourFor(behaviors: Map[BehaviorType, BehaviorState]): Receive =
+  private def behaviorFor(behaviors: Map[BehaviorType, BehaviorState]): Receive =
     behaviors.values.map(_.handler).fold(commands(behaviors))((pf1, pf2) => pf1.orElse(pf2))
 
-  private def behaviourForFlights(box: CoordinatesBox): Receive = {
+  private def behaviorForFlights(box: CoordinatesBox): Receive = {
     case flights: FlightReceivedList =>
       logger.debug(s"Got a $flights from Kafka Consumer")
       forwardMessage(ApiEvent(EventType.from(flights), getBoxedFlights(flights, box)).toJson.toString)
   }
 
-  private def behaviourForTops: Receive = {
+  private def behaviorForTops: Receive = {
     case e: TopEventPayload =>
       logger.debug(s"Got a $e from Kafka Consumer")
       forwardMessage(ApiEvent(EventType.from(e), e.asInstanceOf[EventPayload]).toJson.toString)
   }
 
-  private def behaviourForTotals: Receive = {
+  private def behaviorForTotals: Receive = {
     case e: TotalEventPayload =>
       logger.debug(s"Got a $e from Kafka Consumer")
       forwardMessage(ApiEvent(EventType.from(e), e.asInstanceOf[EventPayload]).toJson.toString)
@@ -42,30 +42,30 @@ class GlobalMessageDispatcher(val sourceActorRef: ActorRef, kafkaPollerHub: Kafk
     case box: CoordinatesBox =>
       currentBehaviors.get(FlightsBehavior).foreach(_.scheduler.cancel())
       val s = context.system.scheduleEvery(webSocketConfig.throttleDuration)(kafkaPollerHub.flightListPoller ! FlightListUpdate)
-      context.become(behaviourFor(currentBehaviors + (FlightsBehavior -> BehaviorState(behaviourForFlights(box), s))))
+      context.become(behaviorFor(currentBehaviors + (FlightsBehavior -> BehaviorState(behaviorForFlights(box), s))))
     case StopFlightList =>
       currentBehaviors.get(FlightsBehavior).foreach(_.scheduler.cancel())
-      context.become(behaviourFor(currentBehaviors - FlightsBehavior))
+      context.become(behaviorFor(currentBehaviors - FlightsBehavior))
 
     case StartTops =>
       currentBehaviors.get(TopsBehavior).foreach(_.scheduler.cancel())
       val s = context.system.scheduleEvery(webSocketConfig.throttleDuration)(
         GlobalMessageDispatcher.TopsRequestMessages.foreach(kafkaPollerHub.topsPoller ! _)
       )
-      context.become(behaviourFor(currentBehaviors + (TopsBehavior -> BehaviorState(behaviourForTops, s))))
+      context.become(behaviorFor(currentBehaviors + (TopsBehavior -> BehaviorState(behaviorForTops, s))))
     case StopTops =>
       currentBehaviors.get(TopsBehavior).foreach(_.scheduler.cancel())
-      context.become(behaviourFor(currentBehaviors - TopsBehavior))
+      context.become(behaviorFor(currentBehaviors - TopsBehavior))
 
     case StartTotals =>
       currentBehaviors.get(TotalsBehavior).foreach(_.scheduler.cancel())
       val s = context.system.scheduleEvery(webSocketConfig.throttleDuration)(
         GlobalMessageDispatcher.TotalsRequestMessages.foreach(kafkaPollerHub.totalsPoller ! _)
       )
-      context.become(behaviourFor(currentBehaviors + (TotalsBehavior -> BehaviorState(behaviourForTotals, s))))
+      context.become(behaviorFor(currentBehaviors + (TotalsBehavior -> BehaviorState(behaviorForTotals, s))))
     case StopTotals =>
       currentBehaviors.get(TotalsBehavior).foreach(_.scheduler.cancel())
-      context.become(behaviourFor(currentBehaviors - TotalsBehavior))
+      context.become(behaviorFor(currentBehaviors - TotalsBehavior))
 
     case Terminated => self ! PoisonPill
   }
