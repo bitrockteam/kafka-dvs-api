@@ -169,7 +169,7 @@ class FlightListKafkaConsumerSpec
 
           // Using eventually to ignore any warm up time Kafka could have
           eventually {
-            publishToKafka(kafkaConfig.flightEnRouteListTopic, "key", kFlightReceivedList)
+            publishToKafka(kafkaConfig.flightInterpolatedListTopic, "key", kFlightReceivedList)
             pollMessages()
 
             processorProbe.expectMsg(expectedFlightReceivedList)
@@ -216,7 +216,7 @@ class FlightListKafkaConsumerSpec
 
         withRunningKafka {
           // Publish to a topic before consumer is started
-          publishToKafka(kafkaConfig.flightEnRouteListTopic, "key", kFlightReceivedList)
+          publishToKafka(kafkaConfig.flightInterpolatedListTopic, "key", kFlightReceivedList)
 
           eventually {
             pollMessages()
@@ -224,7 +224,7 @@ class FlightListKafkaConsumerSpec
           }
 
           val (_, response) =
-            consumeFirstKeyedMessageFrom[String, KFlightReceivedList](kafkaConfig.flightEnRouteListTopic)
+            consumeFirstKeyedMessageFrom[String, KFlightReceivedList](kafkaConfig.flightInterpolatedListTopic)
 
           response shouldBe kFlightReceivedList
         }
@@ -243,14 +243,14 @@ class FlightListKafkaConsumerSpec
       val kafkaConfig: KafkaConfig = config.kafka.copy(
         bootstrapServers = s"localhost:${embKafkaConfig.kafkaPort}",
         schemaRegistryUrl = URI.create(s"http://localhost:${embKafkaConfig.schemaRegistryPort}"),
-        consumer = config.kafka.consumer.copy(startupRewind = Duration.Zero)
+        consumer = config.kafka.consumer.copy(pollInterval = 100.millis, startupRewind = Duration.Zero)
       )
       val flightListReceivedKeySerde = Serdes.String
       val processor                  = TestProbe()
       val kafkaConsumerWrapper =
         KafkaConsumerWrapperFactory
           .flightListKafkaConsumerFactory(kafkaConfig)
-          .build(processor.ref, List(kafkaConfig.flightEnRouteListTopic))
+          .build(processor.ref, List(kafkaConfig.flightInterpolatedListTopic))
 
       try {
         body(

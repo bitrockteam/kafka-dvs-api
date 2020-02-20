@@ -9,13 +9,13 @@ final case class KafkaConfig(
     schemaRegistryUrl: URI,
     enableInterceptors: Boolean,
     groupId: String,
-    flightEnRouteListTopic: String,
     topArrivalAirportTopic: String,
     topDepartureAirportTopic: String,
     topSpeedTopic: String,
     topAirlineTopic: String,
     totalFlightTopic: String,
     totalAirlineTopic: String,
+    flightInterpolatedListTopic: String,
     consumer: ConsumerConfig
 )
 
