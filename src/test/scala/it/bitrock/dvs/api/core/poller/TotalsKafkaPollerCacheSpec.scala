@@ -19,7 +19,6 @@ class TotalsKafkaPollerCacheSpec extends BaseTestKit {
           val countFlightMessage = TotalFlightsCount(DefaultStartTimeWindow, DefaultCountFlightAmount)
           pollProbe expectMsg PollingTriggered
           messagePollerCache ! countFlightMessage
-          pollProbe expectNoMessage kafkaConfig.consumer.pollInterval
           pollProbe expectMsg PollingTriggered
       }
       "a CountAirline message is received, but only after a delay" in ResourceLoanerPoller.withFixture {
@@ -28,7 +27,6 @@ class TotalsKafkaPollerCacheSpec extends BaseTestKit {
           val countFlightMessage = TotalAirlinesCount(DefaultStartTimeWindow, DefaultCountAirlineAmount)
           pollProbe expectMsg PollingTriggered
           messagePollerCache ! countFlightMessage
-          pollProbe expectNoMessage kafkaConfig.consumer.pollInterval
           pollProbe expectMsg PollingTriggered
       }
     }
