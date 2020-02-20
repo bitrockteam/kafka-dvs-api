@@ -85,7 +85,7 @@ class TotalsKafkaConsumerSpec
       val kafkaConfig: KafkaConfig = config.kafka.copy(
         bootstrapServers = s"localhost:${embKafkaConfig.kafkaPort}",
         schemaRegistryUrl = URI.create(s"http://localhost:${embKafkaConfig.schemaRegistryPort}"),
-        consumer = config.kafka.consumer.copy(startupRewind = Duration.Zero)
+        consumer = config.kafka.consumer.copy(pollInterval = 100.millis, startupRewind = Duration.Zero)
       )
       val totalKeySerde: Serde[String] = Serdes.String
       val processor                    = TestProbe()

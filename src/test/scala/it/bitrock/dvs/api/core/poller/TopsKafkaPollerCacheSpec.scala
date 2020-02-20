@@ -21,7 +21,6 @@ class TopsKafkaPollerCacheSpec extends BaseTestKit {
 
           pollProbe expectMsg PollingTriggered
           topsKafkaPollerCache ! topArrivalMessage
-          pollProbe expectNoMessage kafkaConfig.consumer.pollInterval
           pollProbe expectMsg PollingTriggered
       }
       "a TopDepartureAirportList is received, but only after a delay" in ResourceLoanerPoller.withFixture {
@@ -32,7 +31,6 @@ class TopsKafkaPollerCacheSpec extends BaseTestKit {
 
           pollProbe expectMsg PollingTriggered
           topsKafkaPollerCache ! topDepartureMessage
-          pollProbe expectNoMessage kafkaConfig.consumer.pollInterval
           pollProbe expectMsg PollingTriggered
       }
       "a TopSpeedList is received, but only after a delay" in ResourceLoanerPoller.withFixture {
@@ -42,7 +40,6 @@ class TopsKafkaPollerCacheSpec extends BaseTestKit {
 
           pollProbe expectMsg PollingTriggered
           topsKafkaPollerCache ! topSpeedMessage
-          pollProbe expectNoMessage kafkaConfig.consumer.pollInterval
           pollProbe expectMsg PollingTriggered
       }
       "a TopAirlineList is received, but only after a delay" in ResourceLoanerPoller.withFixture {
@@ -52,7 +49,6 @@ class TopsKafkaPollerCacheSpec extends BaseTestKit {
 
           pollProbe expectMsg PollingTriggered
           topsKafkaPollerCache ! topAirlineMessage
-          pollProbe expectNoMessage kafkaConfig.consumer.pollInterval
           pollProbe expectMsg PollingTriggered
       }
     }

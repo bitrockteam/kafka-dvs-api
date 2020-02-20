@@ -59,7 +59,6 @@ class FlightListKafkaPollerCacheSpec extends BaseTestKit {
           )
           pollProbe expectMsg PollingTriggered
           messageProcessor ! flightListMessage
-          pollProbe expectNoMessage kafkaConfig.consumer.pollInterval
           pollProbe expectMsg PollingTriggered
 
           val testProbe = new TestProbe(system)

@@ -20,7 +20,7 @@ class FlightListKafkaPollerCache(
 ) extends KafkaPoller {
 
   override val kafkaConsumerWrapper: KafkaConsumerWrapper =
-    kafkaConsumerWrapperFactory.build(self, List(kafkaConfig.flightEnRouteListTopic))
+    kafkaConsumerWrapperFactory.build(self, List(kafkaConfig.flightInterpolatedListTopic))
 
   override def receive: Receive = active(FlightReceivedList(Seq()))
 
@@ -34,7 +34,7 @@ class FlightListKafkaPollerCache(
       if (flights.elements.nonEmpty) {
         context.become(active(FlightReceivedList(flights.elements.sorted(Ordering.by[FlightReceived, Long](_.updated).reverse))))
       }
-      throttle(kafkaConsumerWrapper.pollMessages())
+      kafkaConsumerWrapper.pollMessages()
 
     case FlightListUpdate => sender ! cache
 
