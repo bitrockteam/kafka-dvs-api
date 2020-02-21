@@ -27,14 +27,14 @@ class FlightListKafkaPollerCache(
   def active(cache: FlightReceivedList): Receive = {
     case NoMessage =>
       logger.debug("Got no-message notice from Kafka Consumer, going to poll again")
-      kafkaConsumerWrapper.pollMessages()
+      schedulePoll()
 
     case flights: FlightReceivedList =>
       logger.debug(s"Got a $flights from Kafka Consumer")
       if (flights.elements.nonEmpty) {
         context.become(active(FlightReceivedList(flights.elements.sorted(Ordering.by[FlightReceived, Long](_.updated).reverse))))
       }
-      kafkaConsumerWrapper.pollMessages()
+      schedulePoll()
 
     case FlightListUpdate => sender ! cache
 
