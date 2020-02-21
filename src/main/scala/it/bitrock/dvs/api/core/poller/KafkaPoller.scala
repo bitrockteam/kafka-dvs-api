@@ -2,9 +2,9 @@ package it.bitrock.dvs.api.core.poller
 
 import akka.actor.Actor
 import com.typesafe.scalalogging.LazyLogging
+import it.bitrock.dvs.api.ActorSystemOps
 import it.bitrock.dvs.api.config.KafkaConfig
 import it.bitrock.dvs.api.kafka.KafkaConsumerWrapper
-import it.bitrock.dvs.api.ActorSystemOps
 
 trait KafkaPoller extends Actor with LazyLogging {
 
