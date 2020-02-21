@@ -42,31 +42,31 @@ class TopsKafkaPollerCache(val kafkaConfig: KafkaConfig, kafkaConsumerWrapperFac
 
     case NoMessage =>
       logger.debug("Got no-message notice from Kafka Consumer, going to poll again")
-      kafkaConsumerWrapper.pollMessages()
+      schedulePoll()
 
     case topArrivalAirportList: TopArrivalAirportList =>
       logger.debug(s"Got a $topArrivalAirportList from Kafka Consumer")
       if (topArrivalAirportList.elements.nonEmpty)
         context.become(active(topArrivalAirportList, departureCache, speedCache, airlineCache))
-      kafkaConsumerWrapper.pollMessages()
+      schedulePoll()
 
     case topDepartureAirportList: TopDepartureAirportList =>
       logger.debug(s"Got a $topDepartureAirportList from Kafka Consumer")
       if (topDepartureAirportList.elements.nonEmpty)
         context.become(active(arrivalCache, topDepartureAirportList, speedCache, airlineCache))
-      kafkaConsumerWrapper.pollMessages()
+      schedulePoll()
 
     case topSpeedList: TopSpeedList =>
       logger.debug(s"Got a $topSpeedList from Kafka Consumer")
       if (topSpeedList.elements.nonEmpty)
         context.become(active(arrivalCache, departureCache, topSpeedList, airlineCache))
-      kafkaConsumerWrapper.pollMessages()
+      schedulePoll()
 
     case topAirlineList: TopAirlineList =>
       logger.debug(s"Got a $topAirlineList from Kafka Consumer")
       if (topAirlineList.elements.nonEmpty)
         context.become(active(arrivalCache, departureCache, speedCache, topAirlineList))
-      kafkaConsumerWrapper.pollMessages()
+      schedulePoll()
 
     case TopArrivalAirportUpdate   => sender ! arrivalCache
     case TopDepartureAirportUpdate => sender ! departureCache
