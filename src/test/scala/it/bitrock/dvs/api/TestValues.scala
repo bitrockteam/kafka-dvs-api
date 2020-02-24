@@ -5,6 +5,8 @@ import java.time.Instant
 import it.bitrock.dvs.api.model.CoordinatesBox
 
 import scala.util.Random
+import scala.concurrent.duration._
+import scala.language.postfixOps
 
 trait TestValues {
 
@@ -19,6 +21,7 @@ trait TestValues {
   final val DefaultOutBoxLongitude = 0
 
   final val changedBox                   = CoordinatesBox(101, 99, 99, 101, None)
+  final val changedBox1Second            = CoordinatesBox(101, 99, 99, 101, Some(1 second))
   final val DefaultChangedInBoxLatitude  = 100
   final val DefaultChangedInBoxLongitude = 100
 

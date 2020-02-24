@@ -115,6 +115,57 @@ class GlobalMessageDispatcherSpec extends BaseTestKit {
             case m: String => m === ApiEvent("FlightList", msg).toJson.toString
           }
       }
+
+      "the flights in the list are inside the box after its change with update rate" in ResourceLoanerDispatcher.withFixture {
+        case ResourceDispatcher(webSocketConfig, kafkaConfig, consumerFactory, sourceProbe) =>
+          val flightListKafkaPollerCache = FlightListKafkaPollerCache.build(kafkaConfig, consumerFactory)
+          val topsKafkaPollerCache       = TopsKafkaPollerCache.build(kafkaConfig, consumerFactory)
+          val totalsKafkaPollerCache     = TotalsKafkaPollerCache.build(kafkaConfig, consumerFactory)
+          val kafkaPollerHub             = KafkaPollerHub(flightListKafkaPollerCache, topsKafkaPollerCache, totalsKafkaPollerCache)
+          val messageProcessor =
+            MessageDispatcherFactory
+              .globalMessageDispatcherFactory(kafkaPollerHub, webSocketConfig.copy(throttleDuration = 1 minute))
+              .build(sourceProbe.ref)
+          val msg = FlightReceivedList(
+            Seq(
+              FlightReceived(
+                DefaultIataNumber,
+                DefaultIcaoNumber,
+                Geography(DefaultChangedInBoxLatitude, DefaultChangedInBoxLongitude, DefaultAltitude, DefaultDirection),
+                DefaultSpeed,
+                Airport(
+                  DefaultCodeAirport1,
+                  DefaultNameAirport1,
+                  DefaultNameCountry1,
+                  DefaultCodeIso2Country1,
+                  DefaultTimezone1,
+                  DefaultLatitude1,
+                  DefaultLongitude1,
+                  DefaultGmt1
+                ),
+                Airport(
+                  DefaultCodeAirport2,
+                  DefaultNameAirport2,
+                  DefaultNameCountry2,
+                  DefaultCodeIso2Country2,
+                  DefaultTimezone2,
+                  DefaultLatitude2,
+                  DefaultLongitude2,
+                  DefaultGmt2
+                ),
+                Airline(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
+                Airplane(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
+                DefaultStatus,
+                DefaultUpdated.toEpochMilli
+              )
+            )
+          )
+          messageProcessor ! changedBox1Second
+          messageProcessor ! msg
+          sourceProbe.fishForMessage(timeout) {
+            case m: String => m === ApiEvent("FlightList", msg).toJson.toString
+          }
+      }
     }
 
     "forward an empty message to source actor" when {
@@ -199,6 +250,24 @@ class GlobalMessageDispatcherSpec extends BaseTestKit {
               .build(sourceProbe.ref)
           val msg = TopArrivalAirportList(List(AirportCount(DefaultArrivalAirport1Name, DefaultArrivalAirport1Amount)))
           messageProcessor ! StartTops(None)
+          messageProcessor ! msg
+          val expectedResult = ApiEvent("TopArrivalAirportList", msg).toJson.toString
+          sourceProbe.fishForMessage(timeout) {
+            case m: String => m === expectedResult
+          }
+      }
+      "a TopArrivalAirportList is received with update rate" in ResourceLoanerDispatcher.withFixture {
+        case ResourceDispatcher(webSocketConfig, kafkaConfig, consumerFactory, sourceProbe) =>
+          val flightListKafkaPollerCache = FlightListKafkaPollerCache.build(kafkaConfig, consumerFactory)
+          val topsKafkaPollerCache       = TopsKafkaPollerCache.build(kafkaConfig, consumerFactory)
+          val totalsKafkaPollerCache     = TotalsKafkaPollerCache.build(kafkaConfig, consumerFactory)
+          val kafkaPollerHub             = KafkaPollerHub(flightListKafkaPollerCache, topsKafkaPollerCache, totalsKafkaPollerCache)
+          val messageProcessor =
+            MessageDispatcherFactory
+              .globalMessageDispatcherFactory(kafkaPollerHub, webSocketConfig.copy(throttleDuration = 1 minute))
+              .build(sourceProbe.ref)
+          val msg = TopArrivalAirportList(List(AirportCount(DefaultArrivalAirport1Name, DefaultArrivalAirport1Amount)))
+          messageProcessor ! StartTops(Some(1 second))
           messageProcessor ! msg
           val expectedResult = ApiEvent("TopArrivalAirportList", msg).toJson.toString
           sourceProbe.fishForMessage(timeout) {
@@ -293,6 +362,24 @@ class GlobalMessageDispatcherSpec extends BaseTestKit {
               .build(sourceProbe.ref)
           val msg = TotalAirlinesCount(DefaultStartTimeWindow, DefaultCountAirlineAmount)
           messageProcessor ! StartTotals(None)
+          messageProcessor ! msg
+          val expectedResult = ApiEvent("TotalAirlinesCount", msg).toJson.toString
+          sourceProbe.fishForMessage(timeout) {
+            case m: String => m === expectedResult
+          }
+      }
+      "a CountAirline is received with update rate" in ResourceLoanerDispatcher.withFixture {
+        case ResourceDispatcher(webSocketConfig, kafkaConfig, consumerFactory, sourceProbe) =>
+          val flightListKafkaPollerCache = FlightListKafkaPollerCache.build(kafkaConfig, consumerFactory)
+          val topsKafkaPollerCache       = TopsKafkaPollerCache.build(kafkaConfig, consumerFactory)
+          val totalsKafkaPollerCache     = TotalsKafkaPollerCache.build(kafkaConfig, consumerFactory)
+          val kafkaPollerHub             = KafkaPollerHub(flightListKafkaPollerCache, topsKafkaPollerCache, totalsKafkaPollerCache)
+          val messageProcessor =
+            MessageDispatcherFactory
+              .globalMessageDispatcherFactory(kafkaPollerHub, webSocketConfig.copy(throttleDuration = 1 minute))
+              .build(sourceProbe.ref)
+          val msg = TotalAirlinesCount(DefaultStartTimeWindow, DefaultCountAirlineAmount)
+          messageProcessor ! StartTotals(Some(-2 second))
           messageProcessor ! msg
           val expectedResult = ApiEvent("TotalAirlinesCount", msg).toJson.toString
           sourceProbe.fishForMessage(timeout) {
