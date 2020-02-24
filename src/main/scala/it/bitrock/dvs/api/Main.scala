@@ -11,7 +11,6 @@ import it.bitrock.dvs.api.core.factory.MessageDispatcherFactory
 import it.bitrock.dvs.api.core.poller._
 import it.bitrock.dvs.api.kafka.KafkaConsumerWrapperFactory._
 import it.bitrock.dvs.api.model.KafkaPollerHub
-import it.bitrock.dvs.api.routes.HealthRoute._
 import it.bitrock.dvs.api.routes._
 
 import scala.concurrent.duration._
@@ -45,8 +44,9 @@ object Main extends App with LazyLogging {
     MessageDispatcherFactory.globalMessageDispatcherFactory(kafkaPollerHub, config.server.webSocket)
   private val globalFlowFactory = FlowFactory.messageExchangeFlowFactory(globalMessageDispatcherFactory)
 
+  private val restRoutes                           = Routes.healthRoutes(config.server.rest)
   private val webSocketRoutes                      = Routes.webSocketRoutes(config.server.webSocket, globalFlowFactory)
-  private val api: Route                           = webSocketRoutes ~ healthCheckRoute
+  private val api: Route                           = webSocketRoutes ~ restRoutes
   private val bindingFuture: Future[ServerBinding] = Http().bindAndHandle(api, host, port)
 
   bindingFuture.map(serverBinding => logger.info(s"Exposing to ${serverBinding.localAddress}"))
