@@ -1,8 +1,10 @@
 package it.bitrock.dvs.api.model
 
+import scala.concurrent.duration.FiniteDuration
+
 sealed abstract class WebSocketIncomeMessage(val `@type`: String)
 sealed trait FrequencyCommand {
-  val maxUpdateRate: Option[Int]
+  val updateRate: Option[FiniteDuration]
 }
 
 final case class CoordinatesBox(
@@ -10,17 +12,17 @@ final case class CoordinatesBox(
     leftHighLon: Double,
     rightLowLat: Double,
     rightLowLon: Double,
-    override val maxUpdateRate: Option[Int]
+    override val updateRate: Option[FiniteDuration]
 ) extends WebSocketIncomeMessage("startFlightList")
     with FrequencyCommand
 case object StopFlightList extends WebSocketIncomeMessage("stopFlightList")
 
-final case class StartTops(override val maxUpdateRate: Option[Int])
+final case class StartTops(override val updateRate: Option[FiniteDuration])
     extends WebSocketIncomeMessage("startTop")
     with FrequencyCommand
 case object StopTops extends WebSocketIncomeMessage("stopTop")
 
-final case class StartTotals(override val maxUpdateRate: Option[Int])
+final case class StartTotals(override val updateRate: Option[FiniteDuration])
     extends WebSocketIncomeMessage("startTotal")
     with FrequencyCommand
 case object StopTotals extends WebSocketIncomeMessage("stopTotal")

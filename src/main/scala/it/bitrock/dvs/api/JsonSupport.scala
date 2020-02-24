@@ -4,10 +4,17 @@ import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import it.bitrock.dvs.api.model._
 import spray.json._
 
+import scala.concurrent.duration._
+import scala.language.postfixOps
 import scala.util.Try
 
 trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
 
+  implicit val finiteDurationJsonFormat: RootJsonFormat[FiniteDuration] = new RootJsonFormat[FiniteDuration] {
+    override def write(obj: FiniteDuration): JsValue = JsNumber(obj.toSeconds)
+
+    override def read(json: JsValue): FiniteDuration = json.convertTo[Int] seconds
+  }
   implicit val coordinatesBoxJsonFormat: RootJsonFormat[CoordinatesBox] = jsonFormat5(CoordinatesBox.apply)
   implicit val startTopsJsonFormat: RootJsonFormat[StartTops]           = jsonFormat1(StartTops.apply)
   implicit val startTotalsJsonFormat: RootJsonFormat[StartTotals]       = jsonFormat1(StartTotals.apply)

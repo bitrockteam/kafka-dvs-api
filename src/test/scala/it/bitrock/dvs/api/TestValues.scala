@@ -120,7 +120,7 @@ trait TestValues {
       |   "rightLowLat": 37.98,
       |   "rightLowLon": 43.45,
       |   "rightLowLon": 43.45,
-      |   "maxUpdateRate": 60
+      |   "updateRate": 60
       | }
       |""".stripMargin
   final val stopFlightList =
@@ -139,7 +139,7 @@ trait TestValues {
     """
       |{
       |  "@type": "startTop",
-      |  "maxUpdateRate": 30
+      |  "updateRate": 30
       |}
       |""".stripMargin
   final val stopTop =
@@ -158,7 +158,7 @@ trait TestValues {
     """
       |{
       | "@type": "startTotal",
-      | "maxUpdateRate": 15
+      | "updateRate": -15
       |}
       |""".stripMargin
   final val stopTotal =
