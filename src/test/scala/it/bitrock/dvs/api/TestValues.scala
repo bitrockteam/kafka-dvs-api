@@ -111,6 +111,18 @@ trait TestValues {
       |   "rightLowLon": 43.45
       | }
       |""".stripMargin
+  final val coordinatesBoxWithRate: String =
+    """
+      | {
+      |   "@type": "startFlightList",
+      |   "leftHighLat": 23.6,
+      |   "leftHighLon": 67.9,
+      |   "rightLowLat": 37.98,
+      |   "rightLowLon": 43.45,
+      |   "rightLowLon": 43.45,
+      |   "maxUpdateRate": 60
+      | }
+      |""".stripMargin
   final val stopFlightList =
     """
       |{
@@ -123,6 +135,13 @@ trait TestValues {
       |  "@type": "startTop"
       |}
       |""".stripMargin
+  final val startTopWithRate =
+    """
+      |{
+      |  "@type": "startTop",
+      |  "maxUpdateRate": 30
+      |}
+      |""".stripMargin
   final val stopTop =
     """
       |{
@@ -132,8 +151,14 @@ trait TestValues {
   final val startTotal =
     """
       |{
-      | "@type":
-      | "startTotal"
+      | "@type": "startTotal"
+      |}
+      |""".stripMargin
+  final val startTotalWithRate =
+    """
+      |{
+      | "@type": "startTotal",
+      | "maxUpdateRate": 15
       |}
       |""".stripMargin
   final val stopTotal =

@@ -5,12 +5,12 @@ import it.bitrock.dvs.api.TestValues._
 import it.bitrock.dvs.api.model._
 import org.scalacheck.Arbitrary
 import org.scalacheck.ScalacheckShapeless._
-import org.scalatest.Assertion
+import org.scalatest.{Assertion, ParallelTestExecution}
 import spray.json._
 
 import scala.reflect.ClassTag
 
-class JsonSupportSpec extends BaseSpec {
+class JsonSupportSpec extends BaseSpec with ParallelTestExecution {
 
   "eventPayloadWriter" should {
 
@@ -51,7 +51,12 @@ class JsonSupportSpec extends BaseSpec {
         result.leftHighLon shouldBe 67.9
         result.rightLowLat shouldBe 37.98
         result.rightLowLon shouldBe 43.45
+        result.maxUpdateRate shouldBe None
       }
+    }
+
+    "parse CoordinatesBox rate" in {
+      read(coordinatesBoxWithRate) { result: CoordinatesBox => result.maxUpdateRate shouldBe Some(60) }
     }
 
     "parse StopFlightList" in {
@@ -62,12 +67,20 @@ class JsonSupportSpec extends BaseSpec {
       read(startTop) { result: StartTops => result.`@type` shouldBe "startTop" }
     }
 
+    "parse StartTop with rate" in {
+      read(startTopWithRate) { result: StartTops => result.maxUpdateRate shouldBe Some(30) }
+    }
+
     "parse StopTop" in {
       read(stopTop) { result: StopTops.type => result.`@type` shouldBe "stopTop" }
     }
 
     "parse StartTotal" in {
       read(startTotal) { result: StartTotals => result.`@type` shouldBe "startTotal" }
+    }
+
+    "parse StartTotal with rate" in {
+      read(startTotalWithRate) { result: StartTotals => result.maxUpdateRate shouldBe Some(15) }
     }
 
     "parse StopTotal" in {
