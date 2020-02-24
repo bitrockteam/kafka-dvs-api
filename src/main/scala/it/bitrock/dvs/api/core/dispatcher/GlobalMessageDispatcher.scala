@@ -10,6 +10,9 @@ import it.bitrock.dvs.api.kafka.KafkaConsumerWrapper._
 import it.bitrock.dvs.api.model._
 import spray.json._
 
+import scala.concurrent.duration._
+import scala.language.postfixOps
+
 class GlobalMessageDispatcher(val sourceActorRef: ActorRef, kafkaPollerHub: KafkaPollerHub, val webSocketConfig: WebSocketConfig)
     extends MessageDispatcher {
 
@@ -38,18 +41,26 @@ class GlobalMessageDispatcher(val sourceActorRef: ActorRef, kafkaPollerHub: Kafk
       forwardMessage(ApiEvent(EventType.from(e), e.asInstanceOf[EventPayload]).toJson.toString)
   }
 
+  private def maxUpdateRateToDuration(maxUpdateRate: Option[Int]): Option[FiniteDuration] =
+    for {
+      maxUpdateRate <- maxUpdateRate
+      if maxUpdateRate > 0 && 60 <= maxUpdateRate
+    } yield (60 / maxUpdateRate) seconds
+
   private def commands(currentBehaviors: Map[BehaviorType, BehaviorState]): Receive = {
     case box: CoordinatesBox =>
       currentBehaviors.get(FlightsBehavior).foreach(_.scheduler.cancel())
-      val s = context.system.scheduleEvery(webSocketConfig.throttleDuration)(kafkaPollerHub.flightListPoller ! FlightListUpdate)
+      val s = context.system.scheduleEvery(
+        maxUpdateRateToDuration(box.maxUpdateRate).getOrElse(webSocketConfig.throttleDuration)
+      )(kafkaPollerHub.flightListPoller ! FlightListUpdate)
       context.become(behaviorFor(currentBehaviors + (FlightsBehavior -> BehaviorState(behaviorForFlights(box), s))))
     case StopFlightList =>
       currentBehaviors.get(FlightsBehavior).foreach(_.scheduler.cancel())
       context.become(behaviorFor(currentBehaviors - FlightsBehavior))
 
-    case StartTops =>
+    case StartTops(maxUpdateRate) =>
       currentBehaviors.get(TopsBehavior).foreach(_.scheduler.cancel())
-      val s = context.system.scheduleEvery(webSocketConfig.throttleDuration)(
+      val s = context.system.scheduleEvery(maxUpdateRateToDuration(maxUpdateRate).getOrElse(webSocketConfig.throttleDuration))(
         GlobalMessageDispatcher.TopsRequestMessages.foreach(kafkaPollerHub.topsPoller ! _)
       )
       context.become(behaviorFor(currentBehaviors + (TopsBehavior -> BehaviorState(behaviorForTops, s))))
@@ -57,9 +68,9 @@ class GlobalMessageDispatcher(val sourceActorRef: ActorRef, kafkaPollerHub: Kafk
       currentBehaviors.get(TopsBehavior).foreach(_.scheduler.cancel())
       context.become(behaviorFor(currentBehaviors - TopsBehavior))
 
-    case StartTotals =>
+    case StartTotals(maxUpdateRate) =>
       currentBehaviors.get(TotalsBehavior).foreach(_.scheduler.cancel())
-      val s = context.system.scheduleEvery(webSocketConfig.throttleDuration)(
+      val s = context.system.scheduleEvery(maxUpdateRateToDuration(maxUpdateRate).getOrElse(webSocketConfig.throttleDuration))(
         GlobalMessageDispatcher.TotalsRequestMessages.foreach(kafkaPollerHub.totalsPoller ! _)
       )
       context.become(behaviorFor(currentBehaviors + (TotalsBehavior -> BehaviorState(behaviorForTotals, s))))

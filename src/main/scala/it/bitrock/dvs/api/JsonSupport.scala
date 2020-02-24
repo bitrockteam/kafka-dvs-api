@@ -8,7 +8,9 @@ import scala.util.Try
 
 trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
 
-  implicit val coordinatesBoxJsonFormat: RootJsonFormat[CoordinatesBox] = jsonFormat4(CoordinatesBox.apply)
+  implicit val coordinatesBoxJsonFormat: RootJsonFormat[CoordinatesBox] = jsonFormat5(CoordinatesBox.apply)
+  implicit val startTopsJsonFormat: RootJsonFormat[StartTops]           = jsonFormat1(StartTops.apply)
+  implicit val startTotalsJsonFormat: RootJsonFormat[StartTotals]       = jsonFormat1(StartTotals.apply)
 
   implicit val geographyJsonFormat: RootJsonFormat[Geography]                   = jsonFormat4(Geography.apply)
   implicit val airportJsonFormat: RootJsonFormat[Airport]                       = jsonFormat8(Airport.apply)
@@ -65,9 +67,9 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
       json.asJsObject.getFields("@type") match {
         case Seq(JsString("startFlightList")) => json.convertTo[CoordinatesBox]
         case Seq(JsString("stopFlightList"))  => StopFlightList
-        case Seq(JsString("startTop"))        => StartTops
+        case Seq(JsString("startTop"))        => json.convertTo[StartTops]
         case Seq(JsString("stopTop"))         => StopTops
-        case Seq(JsString("startTotal"))      => StartTotals
+        case Seq(JsString("startTotal"))      => json.convertTo[StartTotals]
         case Seq(JsString("stopTotal"))       => StopTotals
         case unrecognized                     => serializationError(s"json serialization error $unrecognized")
       }

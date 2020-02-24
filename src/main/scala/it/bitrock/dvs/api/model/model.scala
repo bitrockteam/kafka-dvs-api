@@ -1,13 +1,29 @@
 package it.bitrock.dvs.api.model
 
 sealed abstract class WebSocketIncomeMessage(val `@type`: String)
-final case class CoordinatesBox(leftHighLat: Double, leftHighLon: Double, rightLowLat: Double, rightLowLon: Double)
-    extends WebSocketIncomeMessage("startFlightList")
+sealed trait FrequencyCommand {
+  val maxUpdateRate: Option[Int]
+}
+
+final case class CoordinatesBox(
+    leftHighLat: Double,
+    leftHighLon: Double,
+    rightLowLat: Double,
+    rightLowLon: Double,
+    override val maxUpdateRate: Option[Int]
+) extends WebSocketIncomeMessage("startFlightList")
+    with FrequencyCommand
 case object StopFlightList extends WebSocketIncomeMessage("stopFlightList")
-case object StartTops      extends WebSocketIncomeMessage("startTop")
-case object StopTops       extends WebSocketIncomeMessage("stopTop")
-case object StartTotals    extends WebSocketIncomeMessage("startTotal")
-case object StopTotals     extends WebSocketIncomeMessage("stopTotal")
+
+final case class StartTops(override val maxUpdateRate: Option[Int])
+    extends WebSocketIncomeMessage("startTop")
+    with FrequencyCommand
+case object StopTops extends WebSocketIncomeMessage("stopTop")
+
+final case class StartTotals(override val maxUpdateRate: Option[Int])
+    extends WebSocketIncomeMessage("startTotal")
+    with FrequencyCommand
+case object StopTotals extends WebSocketIncomeMessage("stopTotal")
 
 final case class Geography(latitude: Double, longitude: Double, altitude: Double, direction: Double)
 final case class Airport(

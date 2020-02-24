@@ -59,7 +59,7 @@ class JsonSupportSpec extends BaseSpec {
     }
 
     "parse StartTop" in {
-      read(startTop) { result: StartTops.type => result.`@type` shouldBe "startTop" }
+      read(startTop) { result: StartTops => result.`@type` shouldBe "startTop" }
     }
 
     "parse StopTop" in {
@@ -67,7 +67,7 @@ class JsonSupportSpec extends BaseSpec {
     }
 
     "parse StartTotal" in {
-      read(startTotal) { result: StartTotals.type => result.`@type` shouldBe "startTotal" }
+      read(startTotal) { result: StartTotals => result.`@type` shouldBe "startTotal" }
     }
 
     "parse StopTotal" in {

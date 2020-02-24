@@ -26,7 +26,7 @@ class FlowFactorySpec extends BaseSpec with ScalatestRouteTest with ScalaFutures
         .take(2)
         .runWith(Sink.seq)
       whenReady(result) { messages =>
-        messages shouldBe Vector(TextMessage("received StartTotals"), TextMessage("received StopTotals"))
+        messages shouldBe Vector(TextMessage("received StartTotals(None)"), TextMessage("received StopTotals"))
       }
     }
 
@@ -40,7 +40,7 @@ class FlowFactorySpec extends BaseSpec with ScalatestRouteTest with ScalaFutures
         .via(flow)
         .take(1)
         .runWith(Sink.head)
-      whenReady(result)(messages => messages shouldBe TextMessage("received CoordinatesBox(23.6,67.9,37.98,43.45)"))
+      whenReady(result)(messages => messages shouldBe TextMessage("received CoordinatesBox(23.6,67.9,37.98,43.45,None)"))
     }
 
     "parse StopFlightList messages" in {
@@ -66,7 +66,7 @@ class FlowFactorySpec extends BaseSpec with ScalatestRouteTest with ScalaFutures
         .via(flow)
         .take(1)
         .runWith(Sink.head)
-      whenReady(result)(messages => messages shouldBe TextMessage("received StartTotals"))
+      whenReady(result)(messages => messages shouldBe TextMessage("received StartTotals(None)"))
     }
 
     "parse StopTotals messages" in {
@@ -92,7 +92,7 @@ class FlowFactorySpec extends BaseSpec with ScalatestRouteTest with ScalaFutures
         .via(flow)
         .take(1)
         .runWith(Sink.head)
-      whenReady(result)(messages => messages shouldBe TextMessage("received StartTops"))
+      whenReady(result)(messages => messages shouldBe TextMessage("received StartTops(None)"))
     }
 
     "parse StopTops messages" in {
