@@ -2,15 +2,15 @@ package it.bitrock.dvs.api.routes
 
 import akka.NotUsed
 import akka.actor.{Actor, ActorRef, ActorSystem, Props}
-import akka.http.scaladsl.model.Uri
 import akka.http.scaladsl.model.ws.{Message, TextMessage}
+import akka.http.scaladsl.model.{StatusCodes, Uri}
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.testkit.{ScalatestRouteTest, WSProbe}
 import akka.stream.scaladsl.Flow
 import it.bitrock.dvs.api.BaseAsyncSpec
 import it.bitrock.dvs.api.JsonSupport._
 import it.bitrock.dvs.api.TestValues._
-import it.bitrock.dvs.api.config.WebSocketConfig
+import it.bitrock.dvs.api.config.{RestConfig, WebSocketConfig}
 import it.bitrock.dvs.api.core.factory.MessageDispatcherFactory
 import it.bitrock.dvs.api.model.{FlightReceivedList, TopDepartureAirportList, TotalAirlinesCount}
 import it.bitrock.testcommons.AsyncFixtureLoaner
@@ -59,6 +59,14 @@ class RoutesSpec extends BaseAsyncSpec with ScalatestRouteTest {
           WS(Uri(path = Uri.Path / webSocketConfig.pathPrefix / webSocketConfig.dvsPath), wsProbe.flow) ~> routes ~> check {
             webSocketExchange(wsProbe, startTotal, totalExpectedMsg.toJson.toString)
           }
+      }
+    }
+
+    "respond to the health check" in {
+      val restConfig = RestConfig(healthPath = "health")
+      val routes     = Routes.healthRoutes(restConfig)
+      Get(s"/${restConfig.healthPath}") ~> Route.seal(routes) ~> check {
+        status shouldBe StatusCodes.OK
       }
     }
   }
