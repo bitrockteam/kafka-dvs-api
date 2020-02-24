@@ -4,7 +4,7 @@ import java.net.URI
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{ImplicitSender, TestKit, TestProbe}
-import it.bitrock.dvs.api.BaseTestKit._
+import it.bitrock.dvs.api.BaseTestKit.{webSocketConfig, _}
 import it.bitrock.dvs.api.config.{ConsumerConfig, KafkaConfig, WebSocketConfig}
 import it.bitrock.dvs.api.kafka.{KafkaConsumerWrapper, KafkaConsumerWrapperFactory}
 import it.bitrock.testcommons.{AsyncSuite, FixtureLoanerAnyResult, Suite}
@@ -47,7 +47,7 @@ abstract class BaseTestKit
   }
 
   object ResourceLoanerDispatcher extends FixtureLoanerAnyResult[ResourceDispatcher] {
-    override def withFixture(body: ResourceDispatcher => Any): Any = {
+    override def withFixture(body: ResourceDispatcher => Any): Any =  {
       val pollProbe       = TestProbe(s"poll-probe-${Random.nextInt()}")
       val sourceProbe     = TestProbe(s"source-probe-${Random.nextInt()}")
       val consumerFactory = new TestKafkaConsumerWrapperFactory(pollProbe.ref)

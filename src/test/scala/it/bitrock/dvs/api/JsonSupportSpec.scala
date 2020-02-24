@@ -10,9 +10,9 @@ import org.scalacheck.ScalacheckShapeless._
 import org.scalatest.{Assertion, ParallelTestExecution}
 import spray.json._
 
-import scala.reflect.ClassTag
 import scala.concurrent.duration._
 import scala.language.postfixOps
+import scala.reflect.ClassTag
 
 class JsonSupportSpec extends BaseSpec with ParallelTestExecution {
 
