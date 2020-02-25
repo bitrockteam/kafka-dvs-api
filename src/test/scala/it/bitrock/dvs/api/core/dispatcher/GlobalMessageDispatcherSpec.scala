@@ -55,7 +55,8 @@ class GlobalMessageDispatcherSpec extends BaseTestKit {
                 Airline(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
                 Airplane(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
                 DefaultStatus,
-                DefaultUpdated.toEpochMilli
+                DefaultUpdated.toEpochMilli,
+                DefaultInterpolatedUntil.toEpochMilli
               )
             )
           )
@@ -105,7 +106,8 @@ class GlobalMessageDispatcherSpec extends BaseTestKit {
                 Airline(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
                 Airplane(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
                 DefaultStatus,
-                DefaultUpdated.toEpochMilli
+                DefaultUpdated.toEpochMilli,
+                DefaultInterpolatedUntil.toEpochMilli
               )
             )
           )
@@ -158,7 +160,8 @@ class GlobalMessageDispatcherSpec extends BaseTestKit {
                 Airline(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
                 Airplane(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
                 DefaultStatus,
-                DefaultUpdated.toEpochMilli
+                DefaultUpdated.toEpochMilli,
+                DefaultInterpolatedUntil.toEpochMilli
               )
             )
           )

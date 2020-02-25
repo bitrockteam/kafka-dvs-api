@@ -6,8 +6,8 @@ import it.bitrock.dvs.model.avro.{
   AirportInfo => KAirportInfo,
   CountAirline => KCountAirline,
   CountFlight => KCountFlight,
-  FlightReceived => KFlightReceivedEvent,
-  FlightReceivedList => KFlightReceivedListEvent,
+  FlightInterpolated => KFlightReceivedEvent,
+  FlightInterpolatedList => KFlightReceivedListEvent,
   GeographyInfo => KGeographyInfo,
   TopAirline => KTopAirline,
   TopAirport => KTopAirport,
@@ -44,7 +44,8 @@ object AvroConverters {
         toAirlineInfo(x.airline),
         toAirplaneInfo(x.airplane),
         x.status,
-        x.updated.toEpochMilli
+        x.updated.toEpochMilli,
+        x.interpolatedUntil.toEpochMilli
       )
   }
 

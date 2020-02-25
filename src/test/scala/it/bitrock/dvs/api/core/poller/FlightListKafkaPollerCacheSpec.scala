@@ -48,7 +48,8 @@ class FlightListKafkaPollerCacheSpec extends BaseTestKit {
             Airline(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
             Airplane(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
             DefaultStatus,
-            DefaultUpdated.toEpochMilli
+            DefaultUpdated.toEpochMilli,
+            DefaultInterpolatedUntil.toEpochMilli
           )
           val flightListMessage = FlightReceivedList(
             Seq(
