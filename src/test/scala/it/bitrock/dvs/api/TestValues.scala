@@ -4,9 +4,9 @@ import java.time.Instant
 
 import it.bitrock.dvs.api.model.CoordinatesBox
 
-import scala.util.Random
 import scala.concurrent.duration._
 import scala.language.postfixOps
+import scala.util.Random
 
 trait TestValues {
 
