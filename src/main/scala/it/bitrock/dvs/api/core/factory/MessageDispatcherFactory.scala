@@ -1,5 +1,7 @@
 package it.bitrock.dvs.api.core.factory
 
+import java.util.UUID
+
 import akka.actor.{ActorRef, ActorRefFactory}
 import it.bitrock.dvs.api.config.WebSocketConfig
 import it.bitrock.dvs.api.core.dispatcher.GlobalMessageDispatcher
@@ -15,6 +17,9 @@ object MessageDispatcherFactory {
       implicit system: ActorRefFactory
   ): MessageDispatcherFactory =
     (sourceActorRef: ActorRef) =>
-      system.actorOf(GlobalMessageDispatcher.props(sourceActorRef, kafkaMessageDispatcherHub, webSocketConfig))
+      system.actorOf(
+        GlobalMessageDispatcher.props(sourceActorRef, kafkaMessageDispatcherHub, webSocketConfig),
+        s"global-message-dispatcher-${UUID.randomUUID().toString}"
+      )
 
 }

@@ -21,7 +21,7 @@ trait TestValues {
   final val DefaultOutBoxLongitude = 0
 
   final val changedBox                   = CoordinatesBox(101, 99, 99, 101, None)
-  final val changedBox1Second            = CoordinatesBox(101, 99, 99, 101, Some(1 second))
+  final val changedBox1Minute            = CoordinatesBox(101, 99, 99, 101, Some(1 minute))
   final val DefaultChangedInBoxLatitude  = 100
   final val DefaultChangedInBoxLongitude = 100
 
