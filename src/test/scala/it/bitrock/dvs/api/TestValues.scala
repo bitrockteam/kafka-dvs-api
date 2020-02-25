@@ -4,6 +4,8 @@ import java.time.Instant
 
 import it.bitrock.dvs.api.model.CoordinatesBox
 
+import scala.concurrent.duration._
+import scala.language.postfixOps
 import scala.util.Random
 
 trait TestValues {
@@ -18,7 +20,8 @@ trait TestValues {
   final val DefaultOutBoxLatitude  = 0
   final val DefaultOutBoxLongitude = 0
 
-  final val changedBox                   = CoordinatesBox(101, 99, 99, 101)
+  final val changedBox                   = CoordinatesBox(101, 99, 99, 101, None)
+  final val changedBox1Minute            = CoordinatesBox(101, 99, 99, 101, Some(1 minute))
   final val DefaultChangedInBoxLatitude  = 100
   final val DefaultChangedInBoxLongitude = 100
 
@@ -111,6 +114,18 @@ trait TestValues {
       |   "rightLowLon": 43.45
       | }
       |""".stripMargin
+  final val coordinatesBoxWithRate: String =
+    """
+      | {
+      |   "@type": "startFlightList",
+      |   "leftHighLat": 23.6,
+      |   "leftHighLon": 67.9,
+      |   "rightLowLat": 37.98,
+      |   "rightLowLon": 43.45,
+      |   "rightLowLon": 43.45,
+      |   "updateRate": 60
+      | }
+      |""".stripMargin
   final val stopFlightList =
     """
       |{
@@ -123,6 +138,13 @@ trait TestValues {
       |  "@type": "startTop"
       |}
       |""".stripMargin
+  final val startTopWithRate =
+    """
+      |{
+      |  "@type": "startTop",
+      |  "updateRate": 30
+      |}
+      |""".stripMargin
   final val stopTop =
     """
       |{
@@ -132,8 +154,14 @@ trait TestValues {
   final val startTotal =
     """
       |{
-      | "@type":
-      | "startTotal"
+      | "@type": "startTotal"
+      |}
+      |""".stripMargin
+  final val startTotalWithRate =
+    """
+      |{
+      | "@type": "startTotal",
+      | "updateRate": -15
       |}
       |""".stripMargin
   final val stopTotal =
