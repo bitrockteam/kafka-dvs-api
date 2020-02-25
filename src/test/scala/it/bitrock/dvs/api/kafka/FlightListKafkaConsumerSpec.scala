@@ -101,8 +101,8 @@ class FlightListKafkaConsumerSpec
           KAirlineInfo(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
           KAirplaneInfo(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
           DefaultStatus,
-          DefaultUpdated,
-          DefaultInterpolatedUntil.plusSeconds(5)
+          DefaultUpdated.plusSeconds(5),
+          DefaultInterpolatedUntil.plusSeconds(10)
         )
         val kFlightReceivedList = KFlightReceivedList(Seq(kFlightReceivedEvent1, kFlightReceivedEvent2))
         val expectedFlightReceived1 = FlightReceived(
@@ -163,7 +163,7 @@ class FlightListKafkaConsumerSpec
           Airline(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
           Airplane(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
           DefaultStatus,
-          DefaultInterpolatedUntil.plusSeconds(5).toEpochMilli
+          DefaultInterpolatedUntil.plusSeconds(10).toEpochMilli
         )
         val expectedFlightReceivedList = FlightReceivedList(Seq(expectedFlightReceived2, expectedFlightReceived1))
 
