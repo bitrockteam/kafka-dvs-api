@@ -21,7 +21,8 @@ object KafkaConsumerWrapperFactory {
         kafkaConfig,
         processor,
         topics,
-        (record: FlightInterpolatedList) => record.toFlightReceivedList
+        (record: FlightInterpolatedList) =>
+          FlightInterpolatedList(record.elements.sorted(Ordering.by[FlightInterpolated, Long](_.updated.toEpochMilli).reverse)).toFlightReceivedList
       )(byteArrayDeserializer, serdeFrom[FlightInterpolatedList](kafkaConfig.schemaRegistryUrl).deserializer)
 
   def topsKafkaConsumerFactory(kafkaConfig: KafkaConfig): KafkaConsumerWrapperFactory =

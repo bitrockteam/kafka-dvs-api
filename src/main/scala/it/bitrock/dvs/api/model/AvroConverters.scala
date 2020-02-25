@@ -44,7 +44,6 @@ object AvroConverters {
         toAirlineInfo(x.airline),
         toAirplaneInfo(x.airplane),
         x.status,
-        x.updated.toEpochMilli,
         x.interpolatedUntil.toEpochMilli
       )
   }

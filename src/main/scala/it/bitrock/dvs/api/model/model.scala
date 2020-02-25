@@ -32,8 +32,7 @@ final case class FlightReceived(
     airline: Airline,
     airplane: Airplane,
     status: String,
-    updated: Long,
-    interpolatedUntil: Long
+    updated: Long
 )
 sealed trait EventPayload
 
