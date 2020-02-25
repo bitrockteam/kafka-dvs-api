@@ -1,20 +1,20 @@
 package it.bitrock.dvs.api.model
 
 import it.bitrock.dvs.model.avro.{
+  FlightInterpolated,
+  FlightInterpolatedList,
   AirlineInfo => KAirlineInfo,
   AirplaneInfo => KAirplaneInfo,
   AirportInfo => KAirportInfo,
   CountAirline => KCountAirline,
   CountFlight => KCountFlight,
-  FlightInterpolated => KFlightReceivedEvent,
-  FlightInterpolatedList => KFlightReceivedListEvent,
   GeographyInfo => KGeographyInfo,
   TopAirline => KTopAirline,
-  TopAirport => KTopAirport,
-  TopSpeed => KTopSpeed,
   TopAirlineList => KTopAirlineList,
+  TopAirport => KTopAirport,
   TopArrivalAirportList => KTopArrivalAirportList,
   TopDepartureAirportList => KTopDepartureAirportList,
+  TopSpeed => KTopSpeed,
   TopSpeedList => KTopSpeedList
 }
 
@@ -32,7 +32,7 @@ object AvroConverters {
     def toCountAirline: TotalAirlinesCount = TotalAirlinesCount(x.windowStartTime, x.eventCount)
   }
 
-  implicit class FlightReceivedOps(x: KFlightReceivedEvent) {
+  implicit class FlightReceivedOps(x: FlightInterpolated) {
     def toFlightReceived: FlightReceived =
       FlightReceived(
         x.iataNumber,
@@ -48,7 +48,7 @@ object AvroConverters {
       )
   }
 
-  implicit class FlightReceivedListOps(x: KFlightReceivedListEvent) {
+  implicit class FlightReceivedListOps(x: FlightInterpolatedList) {
     def toFlightReceivedList: FlightReceivedList =
       FlightReceivedList(x.elements.map(_.toFlightReceived))
   }
