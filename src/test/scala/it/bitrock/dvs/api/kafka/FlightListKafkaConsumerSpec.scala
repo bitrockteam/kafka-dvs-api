@@ -10,11 +10,11 @@ import it.bitrock.dvs.api.kafka.KafkaConsumerWrapper.NoMessage
 import it.bitrock.dvs.api.model._
 import it.bitrock.dvs.api.{BaseSpec, TestValues}
 import it.bitrock.dvs.model.avro.{
+  FlightInterpolated,
+  FlightInterpolatedList,
   AirlineInfo => KAirlineInfo,
   AirplaneInfo => KAirplaneInfo,
   AirportInfo => KAirportInfo,
-  FlightReceived => KFlightReceived,
-  FlightReceivedList => KFlightReceivedList,
   GeographyInfo => KGeographyInfo
 }
 import it.bitrock.kafkacommons.serialization.ImplicitConversions._
@@ -42,7 +42,7 @@ class FlightListKafkaConsumerSpec
         implicit val embKafkaConfig: EmbeddedKafkaConfig = embeddedKafkaConfig
         implicit val stringSerde: Serde[String]          = flightListReceivedKeySerde
 
-        val kFlightReceivedEvent1 = KFlightReceived(
+        val flightInterpolated1 = FlightInterpolated(
           DefaultIataNumber,
           DefaultIcaoNumber,
           KGeographyInfo(DefaultLatitude, DefaultLongitude, DefaultAltitude, DefaultDirection),
@@ -70,9 +70,10 @@ class FlightListKafkaConsumerSpec
           KAirlineInfo(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
           KAirplaneInfo(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
           DefaultStatus,
-          DefaultUpdated
+          DefaultUpdated,
+          DefaultInterpolatedUntil
         )
-        val kFlightReceivedEvent2 = KFlightReceived(
+        val flightInterpolated2 = FlightInterpolated(
           DefaultIataNumber,
           DefaultIcaoNumber,
           KGeographyInfo(DefaultLatitude, DefaultLongitude, DefaultAltitude, DefaultDirection),
@@ -100,9 +101,10 @@ class FlightListKafkaConsumerSpec
           KAirlineInfo(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
           KAirplaneInfo(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
           DefaultStatus,
-          DefaultUpdated
+          DefaultUpdated.plusSeconds(5),
+          DefaultInterpolatedUntil.plusSeconds(10)
         )
-        val kFlightReceivedList = KFlightReceivedList(Seq(kFlightReceivedEvent1, kFlightReceivedEvent2))
+        val flightInterpolatedList = FlightInterpolatedList(Seq(flightInterpolated1, flightInterpolated2))
         val expectedFlightReceived1 = FlightReceived(
           DefaultIataNumber,
           DefaultIcaoNumber,
@@ -131,7 +133,7 @@ class FlightListKafkaConsumerSpec
           Airline(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
           Airplane(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
           DefaultStatus,
-          DefaultUpdated.toEpochMilli
+          DefaultInterpolatedUntil.toEpochMilli
         )
         val expectedFlightReceived2 = FlightReceived(
           DefaultIataNumber,
@@ -161,15 +163,15 @@ class FlightListKafkaConsumerSpec
           Airline(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
           Airplane(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
           DefaultStatus,
-          DefaultUpdated.toEpochMilli
+          DefaultInterpolatedUntil.plusSeconds(10).toEpochMilli
         )
-        val expectedFlightReceivedList = FlightReceivedList(Seq(expectedFlightReceived1, expectedFlightReceived2))
+        val expectedFlightReceivedList = FlightReceivedList(Seq(expectedFlightReceived2, expectedFlightReceived1))
 
         withRunningKafka {
 
           // Using eventually to ignore any warm up time Kafka could have
           eventually {
-            publishToKafka(kafkaConfig.flightInterpolatedListTopic, "key", kFlightReceivedList)
+            publishToKafka(kafkaConfig.flightInterpolatedListTopic, "key", flightInterpolatedList)
             pollMessages()
 
             processorProbe.expectMsg(expectedFlightReceivedList)
@@ -182,7 +184,7 @@ class FlightListKafkaConsumerSpec
         implicit val embKafkaConfig: EmbeddedKafkaConfig = embeddedKafkaConfig
         implicit val longSerde: Serde[String]            = flightListReceivedKeySerde
 
-        val kFlightReceivedEvent = KFlightReceived(
+        val flightInterpolated = FlightInterpolated(
           DefaultIataNumber,
           DefaultIcaoNumber,
           KGeographyInfo(DefaultLatitude, DefaultLongitude, DefaultAltitude, DefaultDirection),
@@ -210,13 +212,14 @@ class FlightListKafkaConsumerSpec
           KAirlineInfo(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
           KAirplaneInfo(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
           DefaultStatus,
-          DefaultUpdated
+          DefaultUpdated,
+          DefaultInterpolatedUntil
         )
-        val kFlightReceivedList = KFlightReceivedList(Seq(kFlightReceivedEvent))
+        val flightInterpolatedList = FlightInterpolatedList(Seq(flightInterpolated))
 
         withRunningKafka {
           // Publish to a topic before consumer is started
-          publishToKafka(kafkaConfig.flightInterpolatedListTopic, "key", kFlightReceivedList)
+          publishToKafka(kafkaConfig.flightInterpolatedListTopic, "key", flightInterpolatedList)
 
           eventually {
             pollMessages()
@@ -224,9 +227,9 @@ class FlightListKafkaConsumerSpec
           }
 
           val (_, response) =
-            consumeFirstKeyedMessageFrom[String, KFlightReceivedList](kafkaConfig.flightInterpolatedListTopic)
+            consumeFirstKeyedMessageFrom[String, FlightInterpolatedList](kafkaConfig.flightInterpolatedListTopic)
 
-          response shouldBe kFlightReceivedList
+          response shouldBe flightInterpolatedList
         }
     }
   }
