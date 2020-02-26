@@ -11,7 +11,6 @@ import scala.collection.JavaConverters._
 
 object KafkaConsumerWrapper {
   sealed trait MessageUpdate
-  final case object NoMessage                 extends MessageUpdate
   final case object FlightListUpdate          extends MessageUpdate
   final case object TotalFlightUpdate         extends MessageUpdate
   final case object TotalAirlineUpdate        extends MessageUpdate

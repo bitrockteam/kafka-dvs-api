@@ -20,8 +20,6 @@ class KafkaConsumerWrapperImpl[K: Deserializer, V: Deserializer](
 ) extends KafkaConsumerWrapper
     with LazyLogging {
 
-  import KafkaConsumerWrapper._
-
   val kafkaConsumer: KafkaConsumer[K, V] = getKafkaConsumer(conf, topics)
 
   // Startup rewind
@@ -30,11 +28,6 @@ class KafkaConsumerWrapperImpl[K: Deserializer, V: Deserializer](
   override def pollMessages(): Unit = {
     logger.debug("Going to poll for records")
     kafkaConsumer.poll(duration2JavaDuration(conf.consumer.pollInterval)).asScala match {
-      case l if l.isEmpty =>
-        logger.debug("Got no records")
-
-        processor ! NoMessage
-
       case results =>
         logger.debug(s"Got ${results.size} records")
 

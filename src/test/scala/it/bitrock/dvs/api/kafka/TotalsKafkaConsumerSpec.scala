@@ -4,8 +4,8 @@ import java.net.URI
 
 import akka.actor.ActorSystem
 import akka.testkit.{TestKit, TestProbe}
+import it.bitrock.dvs.api.TestProbeExtensions._
 import it.bitrock.dvs.api.config.{AppConfig, KafkaConfig}
-import it.bitrock.dvs.api.kafka.KafkaConsumerWrapper.NoMessage
 import it.bitrock.dvs.api.kafka.TotalsKafkaConsumerSpec.Resource
 import it.bitrock.dvs.api.model._
 import it.bitrock.dvs.api.{BaseSpec, TestValues}
@@ -28,6 +28,7 @@ class TotalsKafkaConsumerSpec
     with BeforeAndAfterAll {
 
   implicit override val patienceConfig: PatienceConfig = PatienceConfig(6.seconds)
+  implicit private val akkaTimeout: FiniteDuration     = 250.millis
 
   "Kafka Consumer" should {
 
@@ -38,7 +39,7 @@ class TotalsKafkaConsumerSpec
           eventually {
             publishToKafka(kafkaConfig.totalFlightTopic, KCountFlight(DefaultStartTimeWindow, DefaultCountFlightAmount))
             pollMessages()
-            processorProbe.expectMsg(TotalFlightsCount(DefaultStartTimeWindow, DefaultCountFlightAmount))
+            processorProbe.expectMessage(TotalFlightsCount(DefaultStartTimeWindow, DefaultCountFlightAmount))
           }
           eventually {
             publishToKafka(
@@ -46,7 +47,7 @@ class TotalsKafkaConsumerSpec
               KCountAirline(DefaultStartTimeWindow, DefaultCountAirlineAmount)
             )
             pollMessages()
-            processorProbe.expectMsg(TotalAirlinesCount(DefaultStartTimeWindow, DefaultCountAirlineAmount))
+            processorProbe.expectMessage(TotalAirlinesCount(DefaultStartTimeWindow, DefaultCountAirlineAmount))
           }
         }
     }
@@ -64,7 +65,7 @@ class TotalsKafkaConsumerSpec
 
           eventually {
             pollMessages()
-            processorProbe.expectMsg(NoMessage)
+            processorProbe.expectNoMessage()
           }
 
           val (_, expectedValue) = consumeFirstKeyedMessageFrom[String, KCountFlight](kafkaConfig.totalFlightTopic)

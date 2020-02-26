@@ -4,18 +4,18 @@ import java.net.URI
 
 import akka.actor.ActorSystem
 import akka.testkit.{TestKit, TestProbe}
+import it.bitrock.dvs.api.TestProbeExtensions._
 import it.bitrock.dvs.api.config.{AppConfig, KafkaConfig}
-import it.bitrock.dvs.api.kafka.KafkaConsumerWrapper.NoMessage
 import it.bitrock.dvs.api.kafka.TopsKafkaConsumerSpec.Resource
 import it.bitrock.dvs.api.model._
 import it.bitrock.dvs.api.{BaseSpec, TestValues}
 import it.bitrock.dvs.model.avro.{
   TopAirline => KTopAirline,
-  TopAirport => KTopAirport,
-  TopSpeed => KTopSpeed,
   TopAirlineList => KTopAirlineList,
+  TopAirport => KTopAirport,
   TopArrivalAirportList => KTopArrivalAirportList,
   TopDepartureAirportList => KTopDepartureAirportList,
+  TopSpeed => KTopSpeed,
   TopSpeedList => KTopSpeedList
 }
 import it.bitrock.kafkacommons.serialization.ImplicitConversions._
@@ -36,6 +36,7 @@ class TopsKafkaConsumerSpec
     with BeforeAndAfterAll {
 
   implicit override val patienceConfig: PatienceConfig = PatienceConfig(6.seconds)
+  implicit private val akkaTimeout: FiniteDuration     = 250.millis
 
   "Kafka Consumer" should {
 
@@ -93,7 +94,7 @@ class TopsKafkaConsumerSpec
               )
             )
             pollMessages()
-            processorProbe.expectMsg(expectedTopArrivalAirportList)
+            processorProbe.expectMessage(expectedTopArrivalAirportList)
           }
           eventually {
             publishToKafka(kafkaConfig.topDepartureAirportTopic, kTopDepartureAirportList)
@@ -107,7 +108,7 @@ class TopsKafkaConsumerSpec
               )
             )
             pollMessages()
-            processorProbe.expectMsg(expectedTopDepartureAirportList)
+            processorProbe.expectMessage(expectedTopDepartureAirportList)
           }
           eventually {
             publishToKafka(kafkaConfig.topSpeedTopic, kTopSpeedList)
@@ -121,7 +122,7 @@ class TopsKafkaConsumerSpec
               )
             )
             pollMessages()
-            processorProbe.expectMsg(expectedTopSpeedList)
+            processorProbe.expectMessage(expectedTopSpeedList)
           }
           eventually {
             publishToKafka(kafkaConfig.topAirlineTopic, kTopAirlineList)
@@ -135,7 +136,7 @@ class TopsKafkaConsumerSpec
               )
             )
             pollMessages()
-            processorProbe.expectMsg(expectedTopAirlineList)
+            processorProbe.expectMessage(expectedTopAirlineList)
           }
         }
 
@@ -192,7 +193,7 @@ class TopsKafkaConsumerSpec
 
           eventually {
             pollMessages()
-            processorProbe.expectMsg(NoMessage)
+            processorProbe.expectNoMessage()
           }
 
           val (_, responseArrivalAirport) =
