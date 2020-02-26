@@ -13,10 +13,16 @@ trait KafkaPoller extends Actor with LazyLogging {
 
   val kafkaConsumerWrapper: KafkaConsumerWrapper
 
-  private val scheduledPoll: Cancellable =
+  private lazy val scheduledPoll: Cancellable =
     context.system.scheduler.scheduleAtFixedRate(kafkaConfig.consumer.pollInterval, kafkaConfig.consumer.pollInterval)(() =>
       kafkaConsumerWrapper.pollMessages()
     )
+
+  override def preStart(): Unit = {
+    super.preStart()
+    logger.debug("Starting kafka message processor")
+    scheduledPoll
+  }
 
   override def postStop(): Unit = {
     logger.debug("Stopping kafka message processor")
