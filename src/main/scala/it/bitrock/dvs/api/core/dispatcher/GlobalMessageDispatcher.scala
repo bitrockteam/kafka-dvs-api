@@ -41,15 +41,17 @@ class GlobalMessageDispatcher(val sourceActorRef: ActorRef, kafkaPollerHub: Kafk
   private def commands(currentBehaviors: Map[BehaviorType, BehaviorState]): Receive = {
     case box: CoordinatesBox =>
       currentBehaviors.get(FlightsBehavior).foreach(_.scheduler.cancel())
-      val s = context.system.scheduleEvery(webSocketConfig.throttleDuration)(kafkaPollerHub.flightListPoller ! FlightListUpdate)
+      val s = context.system.scheduleEvery(box.updateRate.getOrElse(webSocketConfig.throttleDuration))(
+        kafkaPollerHub.flightListPoller ! FlightListUpdate
+      )
       context.become(behaviorFor(currentBehaviors + (FlightsBehavior -> BehaviorState(behaviorForFlights(box), s))))
     case StopFlightList =>
       currentBehaviors.get(FlightsBehavior).foreach(_.scheduler.cancel())
       context.become(behaviorFor(currentBehaviors - FlightsBehavior))
 
-    case StartTops =>
+    case StartTops(updateRate) =>
       currentBehaviors.get(TopsBehavior).foreach(_.scheduler.cancel())
-      val s = context.system.scheduleEvery(webSocketConfig.throttleDuration)(
+      val s = context.system.scheduleEvery(updateRate.getOrElse(webSocketConfig.throttleDuration))(
         GlobalMessageDispatcher.TopsRequestMessages.foreach(kafkaPollerHub.topsPoller ! _)
       )
       context.become(behaviorFor(currentBehaviors + (TopsBehavior -> BehaviorState(behaviorForTops, s))))
@@ -57,9 +59,9 @@ class GlobalMessageDispatcher(val sourceActorRef: ActorRef, kafkaPollerHub: Kafk
       currentBehaviors.get(TopsBehavior).foreach(_.scheduler.cancel())
       context.become(behaviorFor(currentBehaviors - TopsBehavior))
 
-    case StartTotals =>
+    case StartTotals(updateRate) =>
       currentBehaviors.get(TotalsBehavior).foreach(_.scheduler.cancel())
-      val s = context.system.scheduleEvery(webSocketConfig.throttleDuration)(
+      val s = context.system.scheduleEvery(updateRate.getOrElse(webSocketConfig.throttleDuration))(
         GlobalMessageDispatcher.TotalsRequestMessages.foreach(kafkaPollerHub.totalsPoller ! _)
       )
       context.become(behaviorFor(currentBehaviors + (TotalsBehavior -> BehaviorState(behaviorForTotals, s))))

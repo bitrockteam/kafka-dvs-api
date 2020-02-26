@@ -65,7 +65,7 @@ class FlightListKafkaPollerCacheSpec extends BaseTestKit {
 
           messageProcessor.tell(FlightListUpdate, testProbe.ref)
 
-          testProbe expectMsg flightListMessage.copy(elements = flightListMessage.elements.sortBy(_.updated).reverse)
+          testProbe expectMsg flightListMessage
       }
     }
   }

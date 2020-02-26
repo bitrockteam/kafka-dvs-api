@@ -1,16 +1,20 @@
 package it.bitrock.dvs.api
 
+import java.util.concurrent.TimeUnit
+
 import it.bitrock.dvs.api.JsonSupport.WebSocketIncomeMessageFormat
 import it.bitrock.dvs.api.TestValues._
 import it.bitrock.dvs.api.model._
 import org.scalacheck.Arbitrary
 import org.scalacheck.ScalacheckShapeless._
-import org.scalatest.Assertion
+import org.scalatest.{Assertion, ParallelTestExecution}
 import spray.json._
 
+import scala.concurrent.duration._
+import scala.language.postfixOps
 import scala.reflect.ClassTag
 
-class JsonSupportSpec extends BaseSpec {
+class JsonSupportSpec extends BaseSpec with ParallelTestExecution {
 
   "eventPayloadWriter" should {
 
@@ -51,7 +55,12 @@ class JsonSupportSpec extends BaseSpec {
         result.leftHighLon shouldBe 67.9
         result.rightLowLat shouldBe 37.98
         result.rightLowLon shouldBe 43.45
+        result.updateRate shouldBe None
       }
+    }
+
+    "parse CoordinatesBox rate" in {
+      read(coordinatesBoxWithRate) { result: CoordinatesBox => result.updateRate shouldBe Some(60 seconds) }
     }
 
     "parse StopFlightList" in {
@@ -59,7 +68,11 @@ class JsonSupportSpec extends BaseSpec {
     }
 
     "parse StartTop" in {
-      read(startTop) { result: StartTops.type => result.`@type` shouldBe "startTop" }
+      read(startTop) { result: StartTops => result.`@type` shouldBe "startTop" }
+    }
+
+    "parse StartTop with rate" in {
+      read(startTopWithRate) { result: StartTops => result.updateRate shouldBe Some(30 seconds) }
     }
 
     "parse StopTop" in {
@@ -67,7 +80,11 @@ class JsonSupportSpec extends BaseSpec {
     }
 
     "parse StartTotal" in {
-      read(startTotal) { result: StartTotals.type => result.`@type` shouldBe "startTotal" }
+      read(startTotal) { result: StartTotals => result.`@type` shouldBe "startTotal" }
+    }
+
+    "parse StartTotal with rate" in {
+      read(startTotalWithRate) { result: StartTotals => result.updateRate shouldBe Some(FiniteDuration(-15, TimeUnit.SECONDS)) }
     }
 
     "parse StopTotal" in {
