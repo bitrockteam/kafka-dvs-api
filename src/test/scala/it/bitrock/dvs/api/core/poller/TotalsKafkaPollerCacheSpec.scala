@@ -1,7 +1,9 @@
 package it.bitrock.dvs.api.core.poller
 
+import akka.testkit.TestProbe
 import it.bitrock.dvs.api.BaseTestKit
 import it.bitrock.dvs.api.BaseTestKit._
+import it.bitrock.dvs.api.kafka.KafkaConsumerWrapper.{TotalAirlineUpdate, TotalFlightUpdate}
 import it.bitrock.dvs.api.model.{TotalAirlinesCount, TotalFlightsCount}
 
 class TotalsKafkaPollerCacheSpec extends BaseTestKit {
@@ -13,21 +15,41 @@ class TotalsKafkaPollerCacheSpec extends BaseTestKit {
           TotalsKafkaPollerCache.build(kafkaConfig, consumerFactory)
           pollProbe expectMsg PollingTriggered
       }
-      "a CountFlight message is received, but only after a delay" in ResourceLoanerPoller.withFixture {
+      "periodically" in ResourceLoanerPoller.withFixture {
         case ResourcePoller(kafkaConfig, consumerFactory, pollProbe) =>
+          TotalsKafkaPollerCache.build(kafkaConfig, consumerFactory)
+          pollProbe.expectMsg(kafkaConfig.consumer.pollInterval * 2, PollingTriggered)
+          pollProbe.expectMsg(kafkaConfig.consumer.pollInterval * 2, PollingTriggered)
+          pollProbe.expectMsg(kafkaConfig.consumer.pollInterval * 2, PollingTriggered)
+          pollProbe.expectMsg(kafkaConfig.consumer.pollInterval * 2, PollingTriggered)
+      }
+    }
+    "return updated cached value" when {
+      "a TotalFlightUpdate message is received" in ResourceLoanerPoller.withFixture {
+        case ResourcePoller(kafkaConfig, consumerFactory, _) =>
           val messagePollerCache = TotalsKafkaPollerCache.build(kafkaConfig, consumerFactory)
           val countFlightMessage = TotalFlightsCount(DefaultStartTimeWindow, DefaultCountFlightAmount)
-          pollProbe expectMsg PollingTriggered
+
           messagePollerCache ! countFlightMessage
-          pollProbe expectMsg PollingTriggered
+
+          val testProbe = new TestProbe(system)
+
+          messagePollerCache.tell(TotalFlightUpdate, testProbe.ref)
+
+          testProbe expectMsg countFlightMessage
       }
-      "a CountAirline message is received, but only after a delay" in ResourceLoanerPoller.withFixture {
-        case ResourcePoller(kafkaConfig, consumerFactory, pollProbe) =>
-          val messagePollerCache = TotalsKafkaPollerCache.build(kafkaConfig, consumerFactory)
-          val countFlightMessage = TotalAirlinesCount(DefaultStartTimeWindow, DefaultCountAirlineAmount)
-          pollProbe expectMsg PollingTriggered
-          messagePollerCache ! countFlightMessage
-          pollProbe expectMsg PollingTriggered
+      "a TotalAirlineUpdate message is received" in ResourceLoanerPoller.withFixture {
+        case ResourcePoller(kafkaConfig, consumerFactory, _) =>
+          val messagePollerCache   = TotalsKafkaPollerCache.build(kafkaConfig, consumerFactory)
+          val countAirlinesMessage = TotalAirlinesCount(DefaultStartTimeWindow, DefaultCountAirlineAmount)
+
+          messagePollerCache ! countAirlinesMessage
+
+          val testProbe = new TestProbe(system)
+
+          messagePollerCache.tell(TotalAirlineUpdate, testProbe.ref)
+
+          testProbe expectMsg countAirlinesMessage
       }
     }
   }

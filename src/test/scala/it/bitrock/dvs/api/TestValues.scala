@@ -101,8 +101,8 @@ trait TestValues {
   final val DefaultAirline5Name   = randomString(10)
   final val DefaultAirline5Amount = Random.nextLong
 
-  final val DefaultCountFlightAmount  = Random.nextLong
-  final val DefaultCountAirlineAmount = Random.nextLong
+  final val DefaultCountFlightAmount  = Math.abs(Random.nextLong)
+  final val DefaultCountAirlineAmount = Math.abs(Random.nextLong)
   final val DefaultStartTimeWindow    = randomString(10)
 
   final val coordinatesBox: String =
