@@ -9,7 +9,6 @@ import it.bitrock.dvs.api.kafka.KafkaConsumerWrapper.FlightListUpdate
 import it.bitrock.dvs.api.model._
 
 class FlightListKafkaPollerCacheSpec extends BaseTestKit {
-
   "Flight List Kafka Poller Cache" should {
     "trigger Kafka Consumer polling" when {
       "it starts" in ResourceLoanerPoller.withFixture {
@@ -17,8 +16,18 @@ class FlightListKafkaPollerCacheSpec extends BaseTestKit {
           FlightListKafkaPollerCache.build(kafkaConfig, consumerFactory)
           pollProbe expectMsg PollingTriggered
       }
-      "a FlightReceivedList message is received, but only after a delay" in ResourceLoanerPoller.withFixture {
+      "periodically" in ResourceLoanerPoller.withFixture {
         case ResourcePoller(kafkaConfig, consumerFactory, pollProbe) =>
+          FlightListKafkaPollerCache.build(kafkaConfig, consumerFactory)
+          pollProbe.expectMsg(kafkaConfig.consumer.pollInterval * 2, PollingTriggered)
+          pollProbe.expectMsg(kafkaConfig.consumer.pollInterval * 2, PollingTriggered)
+          pollProbe.expectMsg(kafkaConfig.consumer.pollInterval * 2, PollingTriggered)
+          pollProbe.expectMsg(kafkaConfig.consumer.pollInterval * 2, PollingTriggered)
+      }
+    }
+    "send flight list updated" when {
+      "a FlightReceivedList message is received" in ResourceLoanerPoller.withFixture {
+        case ResourcePoller(kafkaConfig, consumerFactory, _) =>
           val messageProcessor = FlightListKafkaPollerCache.build(kafkaConfig, consumerFactory)
           val flightReceived = FlightReceived(
             DefaultIataNumber,
@@ -57,9 +66,8 @@ class FlightListKafkaPollerCacheSpec extends BaseTestKit {
               flightReceived.copy(updated = DefaultUpdated.plus(3, ChronoUnit.HOURS).toEpochMilli)
             )
           )
-          pollProbe expectMsg PollingTriggered
+
           messageProcessor ! flightListMessage
-          pollProbe expectMsg PollingTriggered
 
           val testProbe = new TestProbe(system)
 

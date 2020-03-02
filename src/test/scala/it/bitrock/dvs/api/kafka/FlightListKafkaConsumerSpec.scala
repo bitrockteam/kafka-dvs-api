@@ -4,9 +4,9 @@ import java.net.URI
 
 import akka.actor.ActorSystem
 import akka.testkit.{TestKit, TestProbe}
+import it.bitrock.dvs.api.TestProbeExtensions._
 import it.bitrock.dvs.api.config.{AppConfig, KafkaConfig}
 import it.bitrock.dvs.api.kafka.FlightListKafkaConsumerSpec.Resource
-import it.bitrock.dvs.api.kafka.KafkaConsumerWrapper.NoMessage
 import it.bitrock.dvs.api.model._
 import it.bitrock.dvs.api.{BaseSpec, TestValues}
 import it.bitrock.dvs.model.avro.{
@@ -35,6 +35,7 @@ class FlightListKafkaConsumerSpec
     with TestValues {
 
   implicit override val patienceConfig: PatienceConfig = PatienceConfig(6.seconds)
+  implicit private val akkaTimeout: FiniteDuration     = 250.millis
 
   "Kafka Consumer" should {
     "forward any record it reads from its subscribed topics to the configured processor, in order" in ResourceLoaner.withFixture {
@@ -174,7 +175,7 @@ class FlightListKafkaConsumerSpec
             publishToKafka(kafkaConfig.flightInterpolatedListTopic, "key", flightInterpolatedList)
             pollMessages()
 
-            processorProbe.expectMsg(expectedFlightReceivedList)
+            processorProbe.expectMessage(expectedFlightReceivedList)
           }
         }
     }
@@ -223,7 +224,7 @@ class FlightListKafkaConsumerSpec
 
           eventually {
             pollMessages()
-            processorProbe.expectMsg(NoMessage)
+            processorProbe.expectNoMessage()
           }
 
           val (_, response) =

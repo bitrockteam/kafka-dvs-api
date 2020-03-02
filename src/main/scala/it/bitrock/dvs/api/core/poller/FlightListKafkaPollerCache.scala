@@ -2,7 +2,7 @@ package it.bitrock.dvs.api.core.poller
 
 import akka.actor.{ActorRef, ActorRefFactory, PoisonPill, Props, Terminated}
 import it.bitrock.dvs.api.config.KafkaConfig
-import it.bitrock.dvs.api.kafka.KafkaConsumerWrapper.{FlightListUpdate, NoMessage}
+import it.bitrock.dvs.api.kafka.KafkaConsumerWrapper.FlightListUpdate
 import it.bitrock.dvs.api.kafka.{KafkaConsumerWrapper, KafkaConsumerWrapperFactory}
 import it.bitrock.dvs.api.model._
 
@@ -25,14 +25,9 @@ class FlightListKafkaPollerCache(
   override def receive: Receive = active(FlightReceivedList(Seq()))
 
   def active(cache: FlightReceivedList): Receive = {
-    case NoMessage =>
-      logger.debug("Got no-message notice from Kafka Consumer, going to poll again")
-      schedulePoll()
-
     case flights: FlightReceivedList =>
       logger.debug(s"Got a $flights from Kafka Consumer")
       if (flights.elements.nonEmpty) context.become(active(flights))
-      schedulePoll()
 
     case FlightListUpdate => sender ! cache
 
