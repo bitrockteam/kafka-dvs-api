@@ -18,6 +18,7 @@ object KafkaConsumerWrapper {
   final case object TopDepartureAirportUpdate extends MessageUpdate
   final case object TopSpeedUpdate            extends MessageUpdate
   final case object TopAirlineUpdate          extends MessageUpdate
+  final case object AirportListUpdate         extends MessageUpdate
 }
 
 trait KafkaConsumerWrapper {

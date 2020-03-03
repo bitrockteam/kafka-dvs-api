@@ -13,6 +13,7 @@ final case class RestConfig(healthPath: String)
 
 final case class WebSocketConfig(
     maxNumberFlights: Int,
+    maxNumberAirports: Int,
     throttleDuration: FiniteDuration,
     pathPrefix: String,
     dvsPath: String

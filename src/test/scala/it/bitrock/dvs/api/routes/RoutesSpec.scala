@@ -79,6 +79,7 @@ class RoutesSpec extends BaseAsyncSpec with ScalatestRouteTest {
       val wsProbe = WSProbe()
       val webSocketConfig = WebSocketConfig(
         maxNumberFlights = 1000,
+        maxNumberAirports = 150,
         throttleDuration = 1.second,
         pathPrefix = "path",
         dvsPath = "dvs"

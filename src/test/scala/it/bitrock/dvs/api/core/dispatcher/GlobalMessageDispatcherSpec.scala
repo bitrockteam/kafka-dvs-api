@@ -30,7 +30,7 @@ class GlobalMessageDispatcherSpec extends BaseTestKit {
               .globalMessageDispatcherFactory(kafkaPollerHub, webSocketConfig)
               .build(sourceProbe.ref)
           val flightReceivedList = FlightReceivedList(
-            Seq(
+            List(
               FlightReceived(
                 DefaultIataNumber,
                 DefaultIcaoNumber,
@@ -92,7 +92,7 @@ class GlobalMessageDispatcherSpec extends BaseTestKit {
               .globalMessageDispatcherFactory(kafkaPollerHub, webSocketConfig)
               .build(sourceProbe.ref)
           val flightReceivedList = FlightReceivedList(
-            Seq(
+            List(
               FlightReceived(
                 DefaultIataNumber,
                 DefaultIcaoNumber,
@@ -151,7 +151,7 @@ class GlobalMessageDispatcherSpec extends BaseTestKit {
               .globalMessageDispatcherFactory(kafkaPollerHub, webSocketConfig)
               .build(sourceProbe.ref)
           val flightReceivedList = FlightReceivedList(
-            Seq(
+            List(
               FlightReceived(
                 DefaultIataNumber,
                 DefaultIcaoNumber,
@@ -213,7 +213,7 @@ class GlobalMessageDispatcherSpec extends BaseTestKit {
               .globalMessageDispatcherFactory(kafkaPollerHub, webSocketConfig)
               .build(sourceProbe.ref)
           val flightReceivedList = FlightReceivedList(
-            Seq(
+            List(
               FlightReceived(
                 DefaultIataNumber,
                 DefaultIcaoNumber,
@@ -255,13 +255,218 @@ class GlobalMessageDispatcherSpec extends BaseTestKit {
 
           messageProcessor ! CoordinatesBox(49.8, -3.7, 39.7, 23.6, None)
 
-          val expectedMessage = ApiEvent("FlightList", FlightReceivedList(Seq())).toJson.toString
+          val expectedMessage = ApiEvent("FlightList", FlightReceivedList(List())).toJson.toString
           sourceProbe.fishForMessage(timeout) {
             case m: String => m === expectedMessage
           }
           sourceProbe.fishForMessage(timeout) {
             case m: String => m === expectedMessage
           }
+      }
+    }
+
+    "forward a JSON to source actor" when {
+      "a correct AirportList message is received, just once per CoordinateBox received message" in ResourceLoanerDispatcher.withFixture {
+        case ResourceDispatcher(webSocketConfig, kafkaConfig, consumerFactory, sourceProbe) =>
+          val flightListKafkaPollerCacheTestProbe = TestProbe()
+          val topsKafkaPollerCache                = TopsKafkaPollerCache.build(kafkaConfig, consumerFactory)
+          val totalsKafkaPollerCache              = TotalsKafkaPollerCache.build(kafkaConfig, consumerFactory)
+          val kafkaPollerHub =
+            KafkaPollerHub(flightListKafkaPollerCacheTestProbe.ref, topsKafkaPollerCache, totalsKafkaPollerCache)
+          val messageProcessor =
+            MessageDispatcherFactory
+              .globalMessageDispatcherFactory(kafkaPollerHub, webSocketConfig)
+              .build(sourceProbe.ref)
+          val airportList = AirportList(
+            List(
+              Airport(
+                DefaultCodeAirport1,
+                DefaultNameAirport1,
+                DefaultNameCountry1,
+                DefaultCodeIso2Country1,
+                DefaultTimezone1,
+                DefaultInBoxLatitude,
+                DefaultInBoxLongitude,
+                DefaultGmt1
+              ),
+              Airport(
+                DefaultCodeAirport2,
+                DefaultNameAirport2,
+                DefaultNameCountry2,
+                DefaultCodeIso2Country2,
+                DefaultTimezone2,
+                DefaultInBoxLatitude,
+                DefaultInBoxLongitude,
+                DefaultGmt2
+              )
+            )
+          )
+          flightListKafkaPollerCacheTestProbe.setAutoPilot { (sender: ActorRef, msg: Any) =>
+            if (AirportListUpdate == msg) {
+              sender ! airportList
+            }
+            TestActor.KeepRunning
+          }
+
+          messageProcessor ! CoordinatesBox(49.8, -3.7, 39.7, 23.6, None)
+
+          val expectedMessage = ApiEvent("AirportList", airportList).toJson.toString
+          sourceProbe.fishForMessage(timeout) {
+            case m: String => m === expectedMessage
+          }
+          sourceProbe.expectNoMessage(timeout)
+      }
+      "the airports in the list are inside the box after its change, just once per CoordinateBox received message" in ResourceLoanerDispatcher.withFixture {
+        case ResourceDispatcher(webSocketConfig, kafkaConfig, consumerFactory, sourceProbe) =>
+          val flightListKafkaPollerCacheTestProbe = TestProbe()
+          val topsKafkaPollerCache                = TopsKafkaPollerCache.build(kafkaConfig, consumerFactory)
+          val totalsKafkaPollerCache              = TotalsKafkaPollerCache.build(kafkaConfig, consumerFactory)
+          val kafkaPollerHub =
+            KafkaPollerHub(flightListKafkaPollerCacheTestProbe.ref, topsKafkaPollerCache, totalsKafkaPollerCache)
+          val messageProcessor =
+            MessageDispatcherFactory
+              .globalMessageDispatcherFactory(kafkaPollerHub, webSocketConfig)
+              .build(sourceProbe.ref)
+          val airportList = AirportList(
+            List(
+              Airport(
+                DefaultCodeAirport1,
+                DefaultNameAirport1,
+                DefaultNameCountry1,
+                DefaultCodeIso2Country1,
+                DefaultTimezone1,
+                DefaultChangedInBoxLatitude,
+                DefaultChangedInBoxLongitude,
+                DefaultGmt1
+              ),
+              Airport(
+                DefaultCodeAirport2,
+                DefaultNameAirport2,
+                DefaultNameCountry2,
+                DefaultCodeIso2Country2,
+                DefaultTimezone2,
+                DefaultChangedInBoxLatitude,
+                DefaultChangedInBoxLongitude,
+                DefaultGmt2
+              )
+            )
+          )
+          flightListKafkaPollerCacheTestProbe.setAutoPilot { (sender: ActorRef, msg: Any) =>
+            if (AirportListUpdate == msg) {
+              sender ! airportList
+            }
+            TestActor.KeepRunning
+          }
+
+          messageProcessor ! changedBox
+
+          sourceProbe.fishForMessage(timeout) {
+            case m: String => m === ApiEvent("AirportList", airportList).toJson.toString
+          }
+          sourceProbe.expectNoMessage(timeout)
+      }
+
+      "the airports in the list are inside the box after its change with update rate, just once per CoordinateBox received message" in ResourceLoanerDispatcher.withFixture {
+        case ResourceDispatcher(webSocketConfig, kafkaConfig, consumerFactory, sourceProbe) =>
+          val flightListKafkaPollerCacheTestProbe = TestProbe()
+          val topsKafkaPollerCache                = TopsKafkaPollerCache.build(kafkaConfig, consumerFactory)
+          val totalsKafkaPollerCache              = TotalsKafkaPollerCache.build(kafkaConfig, consumerFactory)
+          val kafkaPollerHub =
+            KafkaPollerHub(flightListKafkaPollerCacheTestProbe.ref, topsKafkaPollerCache, totalsKafkaPollerCache)
+          val messageProcessor =
+            MessageDispatcherFactory
+              .globalMessageDispatcherFactory(kafkaPollerHub, webSocketConfig)
+              .build(sourceProbe.ref)
+          val airportList = AirportList(
+            List(
+              Airport(
+                DefaultCodeAirport1,
+                DefaultNameAirport1,
+                DefaultNameCountry1,
+                DefaultCodeIso2Country1,
+                DefaultTimezone1,
+                DefaultChangedInBoxLatitude,
+                DefaultChangedInBoxLongitude,
+                DefaultGmt1
+              ),
+              Airport(
+                DefaultCodeAirport2,
+                DefaultNameAirport2,
+                DefaultNameCountry2,
+                DefaultCodeIso2Country2,
+                DefaultTimezone2,
+                DefaultChangedInBoxLatitude,
+                DefaultChangedInBoxLongitude,
+                DefaultGmt2
+              )
+            )
+          )
+          flightListKafkaPollerCacheTestProbe.setAutoPilot { (sender: ActorRef, msg: Any) =>
+            if (AirportListUpdate == msg) {
+              sender ! airportList
+            }
+            TestActor.KeepRunning
+          }
+
+          messageProcessor ! changedBox1Minute
+
+          sourceProbe.fishForMessage(timeout) {
+            case m: String => m === ApiEvent("AirportList", airportList).toJson.toString
+          }
+          sourceProbe.expectNoMessage(timeout)
+      }
+    }
+
+    "forward an empty message to source actor" when {
+      "the airports in the list are out of the box, just once per CoordinateBox received message" in ResourceLoanerDispatcher.withFixture {
+        case ResourceDispatcher(webSocketConfig, kafkaConfig, consumerFactory, sourceProbe) =>
+          val flightListKafkaPollerCacheTestProbe = TestProbe()
+          val topsKafkaPollerCache                = TopsKafkaPollerCache.build(kafkaConfig, consumerFactory)
+          val totalsKafkaPollerCache              = TotalsKafkaPollerCache.build(kafkaConfig, consumerFactory)
+          val kafkaPollerHub =
+            KafkaPollerHub(flightListKafkaPollerCacheTestProbe.ref, topsKafkaPollerCache, totalsKafkaPollerCache)
+          val messageProcessor =
+            MessageDispatcherFactory
+              .globalMessageDispatcherFactory(kafkaPollerHub, webSocketConfig)
+              .build(sourceProbe.ref)
+          val airportList = AirportList(
+            List(
+              Airport(
+                DefaultCodeAirport1,
+                DefaultNameAirport1,
+                DefaultNameCountry1,
+                DefaultCodeIso2Country1,
+                DefaultTimezone1,
+                DefaultOutBoxLatitude,
+                DefaultOutBoxLongitude,
+                DefaultGmt1
+              ),
+              Airport(
+                DefaultCodeAirport2,
+                DefaultNameAirport2,
+                DefaultNameCountry2,
+                DefaultCodeIso2Country2,
+                DefaultTimezone2,
+                DefaultOutBoxLatitude,
+                DefaultOutBoxLongitude,
+                DefaultGmt2
+              )
+            )
+          )
+          flightListKafkaPollerCacheTestProbe.setAutoPilot { (sender: ActorRef, msg: Any) =>
+            if (AirportListUpdate == msg) {
+              sender ! airportList
+            }
+            TestActor.KeepRunning
+          }
+
+          messageProcessor ! CoordinatesBox(49.8, -3.7, 39.7, 23.6, None)
+
+          val expectedMessage = ApiEvent("AirportList", AirportList(List())).toJson.toString
+          sourceProbe.fishForMessage(timeout) {
+            case m: String => m === expectedMessage
+          }
+          sourceProbe.expectNoMessage(timeout)
       }
     }
 
