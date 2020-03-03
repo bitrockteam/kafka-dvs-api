@@ -24,9 +24,9 @@ class GlobalMessageDispatcher(val sourceActorRef: ActorRef, kafkaPollerHub: Kafk
     case flights: FlightReceivedList =>
       logger.debug(s"Got a $flights from Kafka Consumer")
       forwardMessage(ApiEvent(EventType.from(flights), getBoxedFlights(flights, box)).toJson.toString)
-    case airport: AirportList =>
-      logger.debug(s"Got a $airport from Kafka Consumer")
-      forwardMessage(ApiEvent(EventType.from(airport), getBoxedAirport(airport, box)).toJson.toString)
+    case airports: AirportList =>
+      logger.debug(s"Got a $airports from Kafka Consumer")
+      forwardMessage(ApiEvent(EventType.from(airports), getBoxedAirports(airports, box)).toJson.toString)
   }
 
   private def behaviorForTops: Receive = {
@@ -83,7 +83,7 @@ class GlobalMessageDispatcher(val sourceActorRef: ActorRef, kafkaPollerHub: Kafk
     FlightReceivedList(filteredList)
   }
 
-  private def getBoxedAirport(airports: AirportList, box: CoordinatesBox): AirportList = {
+  private def getBoxedAirports(airports: AirportList, box: CoordinatesBox): AirportList = {
     val filteredList = airports.elements.view.filter { airport =>
       coordinateBoxContainsCoordinates(box, airport.latitude, airport.longitude)
     }.take(webSocketConfig.maxNumberAirports).force
