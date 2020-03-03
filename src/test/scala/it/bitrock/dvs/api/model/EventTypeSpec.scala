@@ -41,6 +41,11 @@ class EventTypeSpec extends AnyWordSpec with Matchers {
         EventType.from(TotalAirlinesCount("startTime", 123)) shouldBe "TotalAirlinesCount"
 
       }
+
+      "event payload is AirportList" in {
+        EventType.from(AirportList(List.empty)) shouldBe "AirportList"
+
+      }
     }
   }
 }

@@ -54,7 +54,14 @@ final case class FlightReceived(
 )
 sealed trait EventPayload
 
-final case class FlightReceivedList(elements: Seq[FlightReceived]) extends EventPayload
+final case class FlightReceivedList(elements: List[FlightReceived]) extends EventPayload
+final case class AirportList(elements: List[Airport])               extends EventPayload
+object AirportList {
+
+  def from(flightReceivedList: FlightReceivedList): AirportList =
+    AirportList(flightReceivedList.elements.flatMap(flight => List(flight.airportDeparture, flight.airportArrival)).distinct)
+
+}
 
 final case class AirportCount(airportCode: String, eventCount: Long)
 
@@ -85,5 +92,6 @@ object EventType {
       case _: TopAirlineList          => "TopAirlineList"
       case _: TotalFlightsCount       => "TotalFlightsCount"
       case _: TotalAirlinesCount      => "TotalAirlinesCount"
+      case _: AirportList             => "AirportList"
     }
 }

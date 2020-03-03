@@ -24,6 +24,9 @@ class GlobalMessageDispatcher(val sourceActorRef: ActorRef, kafkaPollerHub: Kafk
     case flights: FlightReceivedList =>
       logger.debug(s"Got a $flights from Kafka Consumer")
       forwardMessage(ApiEvent(EventType.from(flights), getBoxedFlights(flights, box)).toJson.toString)
+    case airport: AirportList =>
+      logger.debug(s"Got a $airport from Kafka Consumer")
+      forwardMessage(ApiEvent(EventType.from(airport), getBoxedAirport(airport, box)).toJson.toString)
   }
 
   private def behaviorForTops: Receive = {
@@ -44,6 +47,7 @@ class GlobalMessageDispatcher(val sourceActorRef: ActorRef, kafkaPollerHub: Kafk
       val s = context.system.scheduleEvery(box.updateRate.getOrElse(webSocketConfig.throttleDuration))(
         kafkaPollerHub.flightListPoller ! FlightListUpdate
       )
+      kafkaPollerHub.flightListPoller ! AirportListUpdate
       context.become(behaviorFor(currentBehaviors + (FlightsBehavior -> BehaviorState(behaviorForFlights(box), s))))
     case StopFlightList =>
       currentBehaviors.get(FlightsBehavior).foreach(_.scheduler.cancel())
@@ -74,14 +78,21 @@ class GlobalMessageDispatcher(val sourceActorRef: ActorRef, kafkaPollerHub: Kafk
 
   private def getBoxedFlights(flights: FlightReceivedList, box: CoordinatesBox): FlightReceivedList = {
     val filteredList = flights.elements.view.filter { flight =>
-      val coordinate = flight.geography
-      coordinate.latitude < box.leftHighLat &&
-      coordinate.latitude > box.rightLowLat &&
-      coordinate.longitude > box.leftHighLon &&
-      coordinate.longitude < box.rightLowLon
+      coordinateBoxContainsCoordinates(box, flight.geography.latitude, flight.geography.longitude)
     }.take(webSocketConfig.maxNumberFlights).force
     FlightReceivedList(filteredList)
   }
+
+  private def getBoxedAirport(airports: AirportList, box: CoordinatesBox): AirportList = {
+    val filteredList = airports.elements.view.filter { airport =>
+      coordinateBoxContainsCoordinates(box, airport.latitude, airport.longitude)
+    }.take(webSocketConfig.maxNumberAirports).force
+    AirportList(filteredList)
+  }
+
+  private def coordinateBoxContainsCoordinates(box: CoordinatesBox, lat: Double, lng: Double): Boolean =
+    lat < box.leftHighLat && lat > box.rightLowLat && lng > box.leftHighLon && lng < box.rightLowLon
+
 }
 
 object GlobalMessageDispatcher {
