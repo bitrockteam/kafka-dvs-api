@@ -22,6 +22,10 @@ class JsonSupportSpec extends BaseSpec with ParallelTestExecution {
       writeReadEquals[FlightReceivedList]
     }
 
+    "parse AirportList" in {
+      writeReadEquals[AirportList]
+    }
+
     "parse TopArrivalAirportList" in {
       writeReadEquals[TopArrivalAirportList]
     }
