@@ -12,7 +12,6 @@ import spray.json._
 
 import scala.concurrent.duration._
 import scala.language.postfixOps
-import scala.reflect.ClassTag
 
 class JsonSupportSpec extends BaseSpec with ParallelTestExecution {
 
@@ -99,7 +98,7 @@ class JsonSupportSpec extends BaseSpec with ParallelTestExecution {
   private def read[A <: WebSocketIncomeMessage](message: String)(test: A => Any): Any =
     test(WebSocketIncomeMessageFormat.read(message.parseJson).asInstanceOf[A])
 
-  private def writeReadEquals[A <: EventPayload: ClassTag](implicit value: Arbitrary[A], rf: RootJsonFormat[A]): Assertion =
+  private def writeReadEquals[A](implicit value: Arbitrary[A], rf: RootJsonFormat[A]): Assertion =
     value.arbitrary
       .flatMap(v => rf.read(rf.write(v)) should not be a[Exception])
       .sample
