@@ -44,7 +44,8 @@ class GlobalMessageDispatcherSpec extends BaseTestKit {
                   DefaultTimezone1,
                   DefaultLatitude1,
                   DefaultLongitude1,
-                  DefaultGmt1
+                  DefaultGmt1,
+                  defaultCityName1
                 ),
                 Airport(
                   DefaultCodeAirport2,
@@ -54,7 +55,8 @@ class GlobalMessageDispatcherSpec extends BaseTestKit {
                   DefaultTimezone2,
                   DefaultLatitude2,
                   DefaultLongitude2,
-                  DefaultGmt2
+                  DefaultGmt2,
+                  defaultCityName2
                 ),
                 Airline(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
                 Airplane(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
@@ -106,7 +108,8 @@ class GlobalMessageDispatcherSpec extends BaseTestKit {
                   DefaultTimezone1,
                   DefaultLatitude1,
                   DefaultLongitude1,
-                  DefaultGmt1
+                  DefaultGmt1,
+                  defaultCityName1
                 ),
                 Airport(
                   DefaultCodeAirport2,
@@ -116,7 +119,8 @@ class GlobalMessageDispatcherSpec extends BaseTestKit {
                   DefaultTimezone2,
                   DefaultLatitude2,
                   DefaultLongitude2,
-                  DefaultGmt2
+                  DefaultGmt2,
+                  defaultCityName2
                 ),
                 Airline(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
                 Airplane(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
@@ -165,7 +169,8 @@ class GlobalMessageDispatcherSpec extends BaseTestKit {
                   DefaultTimezone1,
                   DefaultLatitude1,
                   DefaultLongitude1,
-                  DefaultGmt1
+                  DefaultGmt1,
+                  defaultCityName1
                 ),
                 Airport(
                   DefaultCodeAirport2,
@@ -175,7 +180,8 @@ class GlobalMessageDispatcherSpec extends BaseTestKit {
                   DefaultTimezone2,
                   DefaultLatitude2,
                   DefaultLongitude2,
-                  DefaultGmt2
+                  DefaultGmt2,
+                  defaultCityName2
                 ),
                 Airline(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
                 Airplane(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
@@ -227,7 +233,8 @@ class GlobalMessageDispatcherSpec extends BaseTestKit {
                   DefaultTimezone1,
                   DefaultLatitude1,
                   DefaultLongitude1,
-                  DefaultGmt1
+                  DefaultGmt1,
+                  defaultCityName1
                 ),
                 Airport(
                   DefaultCodeAirport2,
@@ -237,7 +244,8 @@ class GlobalMessageDispatcherSpec extends BaseTestKit {
                   DefaultTimezone2,
                   DefaultLatitude2,
                   DefaultLongitude2,
-                  DefaultGmt2
+                  DefaultGmt2,
+                  defaultCityName2
                 ),
                 Airline(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
                 Airplane(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
@@ -287,7 +295,8 @@ class GlobalMessageDispatcherSpec extends BaseTestKit {
                 DefaultTimezone1,
                 DefaultInBoxLatitude,
                 DefaultInBoxLongitude,
-                DefaultGmt1
+                DefaultGmt1,
+                defaultCityName1
               ),
               Airport(
                 DefaultCodeAirport2,
@@ -297,7 +306,8 @@ class GlobalMessageDispatcherSpec extends BaseTestKit {
                 DefaultTimezone2,
                 DefaultInBoxLatitude,
                 DefaultInBoxLongitude,
-                DefaultGmt2
+                DefaultGmt2,
+                defaultCityName2
               )
             )
           )
@@ -337,7 +347,8 @@ class GlobalMessageDispatcherSpec extends BaseTestKit {
                 DefaultTimezone1,
                 DefaultChangedInBoxLatitude,
                 DefaultChangedInBoxLongitude,
-                DefaultGmt1
+                DefaultGmt1,
+                defaultCityName1
               ),
               Airport(
                 DefaultCodeAirport2,
@@ -347,7 +358,8 @@ class GlobalMessageDispatcherSpec extends BaseTestKit {
                 DefaultTimezone2,
                 DefaultChangedInBoxLatitude,
                 DefaultChangedInBoxLongitude,
-                DefaultGmt2
+                DefaultGmt2,
+                defaultCityName2
               )
             )
           )
@@ -387,7 +399,8 @@ class GlobalMessageDispatcherSpec extends BaseTestKit {
                 DefaultTimezone1,
                 DefaultChangedInBoxLatitude,
                 DefaultChangedInBoxLongitude,
-                DefaultGmt1
+                DefaultGmt1,
+                defaultCityName1
               ),
               Airport(
                 DefaultCodeAirport2,
@@ -397,7 +410,8 @@ class GlobalMessageDispatcherSpec extends BaseTestKit {
                 DefaultTimezone2,
                 DefaultChangedInBoxLatitude,
                 DefaultChangedInBoxLongitude,
-                DefaultGmt2
+                DefaultGmt2,
+                defaultCityName2
               )
             )
           )
@@ -439,7 +453,8 @@ class GlobalMessageDispatcherSpec extends BaseTestKit {
                 DefaultTimezone1,
                 DefaultOutBoxLatitude,
                 DefaultOutBoxLongitude,
-                DefaultGmt1
+                DefaultGmt1,
+                defaultCityName1
               ),
               Airport(
                 DefaultCodeAirport2,
@@ -449,7 +464,8 @@ class GlobalMessageDispatcherSpec extends BaseTestKit {
                 DefaultTimezone2,
                 DefaultOutBoxLatitude,
                 DefaultOutBoxLongitude,
-                DefaultGmt2
+                DefaultGmt2,
+                defaultCityName2
               )
             )
           )
