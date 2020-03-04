@@ -32,13 +32,13 @@ class GlobalMessageDispatcher(val sourceActorRef: ActorRef, kafkaPollerHub: Kafk
   private def behaviorForTops: Receive = {
     case e: TopEventPayload =>
       logger.debug(s"Got a $e from Kafka Consumer")
-      forwardMessage(ApiEvent(EventType.from(e), e.asInstanceOf[EventPayload]).toJson.toString)
+      forwardMessage(ApiEvent(EventType.from(e), e).toJson.toString)
   }
 
   private def behaviorForTotals: Receive = {
     case e: TotalEventPayload =>
       logger.debug(s"Got a $e from Kafka Consumer")
-      forwardMessage(ApiEvent(EventType.from(e), e.asInstanceOf[EventPayload]).toJson.toString)
+      forwardMessage(ApiEvent(EventType.from(e), e).toJson.toString)
   }
 
   private def commands(currentBehaviors: Map[BehaviorType, BehaviorState]): Receive = {

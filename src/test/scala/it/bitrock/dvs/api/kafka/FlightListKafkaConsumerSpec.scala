@@ -34,7 +34,7 @@ class FlightListKafkaConsumerSpec
     with BeforeAndAfterAll
     with TestValues {
 
-  implicit override val patienceConfig: PatienceConfig = PatienceConfig(6.seconds)
+  implicit override val patienceConfig: PatienceConfig = PatienceConfig(12.seconds)
   implicit private val akkaTimeout: FiniteDuration     = 250.millis
 
   "Kafka Consumer" should {
