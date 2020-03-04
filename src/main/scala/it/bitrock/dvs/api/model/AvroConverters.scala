@@ -50,7 +50,7 @@ object AvroConverters {
 
   implicit class FlightReceivedListOps(x: FlightInterpolatedList) {
     def toFlightReceivedList: FlightReceivedList =
-      FlightReceivedList(x.elements.map(_.toFlightReceived))
+      FlightReceivedList(x.elements.map(_.toFlightReceived).toList)
   }
 
   implicit class TopArrivalAirportListOps(x: KTopArrivalAirportList) {

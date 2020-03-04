@@ -2,7 +2,7 @@ package it.bitrock.dvs.api.core.poller
 
 import akka.actor.{ActorRef, ActorRefFactory, PoisonPill, Props, Terminated}
 import it.bitrock.dvs.api.config.KafkaConfig
-import it.bitrock.dvs.api.kafka.KafkaConsumerWrapper.FlightListUpdate
+import it.bitrock.dvs.api.kafka.KafkaConsumerWrapper.{AirportListUpdate, FlightListUpdate}
 import it.bitrock.dvs.api.kafka.{KafkaConsumerWrapper, KafkaConsumerWrapperFactory}
 import it.bitrock.dvs.api.model._
 
@@ -22,7 +22,7 @@ class FlightListKafkaPollerCache(
   override val kafkaConsumerWrapper: KafkaConsumerWrapper =
     kafkaConsumerWrapperFactory.build(self, List(kafkaConfig.flightInterpolatedListTopic))
 
-  override def receive: Receive = active(FlightReceivedList(Seq()))
+  override def receive: Receive = active(FlightReceivedList(List()))
 
   def active(cache: FlightReceivedList): Receive = {
     case flights: FlightReceivedList =>
@@ -31,6 +31,9 @@ class FlightListKafkaPollerCache(
 
     case FlightListUpdate => sender ! cache
 
+    case AirportListUpdate => sender ! AirportList.from(cache)
+
     case Terminated => self ! PoisonPill
   }
+
 }

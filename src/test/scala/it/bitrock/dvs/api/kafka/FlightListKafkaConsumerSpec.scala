@@ -166,7 +166,7 @@ class FlightListKafkaConsumerSpec
           DefaultStatus,
           DefaultInterpolatedUntil.plusSeconds(10).toEpochMilli
         )
-        val expectedFlightReceivedList = FlightReceivedList(Seq(expectedFlightReceived2, expectedFlightReceived1))
+        val expectedFlightReceivedList = FlightReceivedList(List(expectedFlightReceived2, expectedFlightReceived1))
 
         withRunningKafka {
 
