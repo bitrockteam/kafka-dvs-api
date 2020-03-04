@@ -44,28 +44,31 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
   )
   implicit val totalAirlinesCountJsonFormat: RootJsonFormat[TotalAirlinesCount] = jsonFormat2(TotalAirlinesCount.apply)
 
-  implicit val eventPayloadWriter: RootJsonFormat[EventPayload] = new RootJsonFormat[EventPayload] {
-    override def write(eventPayload: EventPayload): JsValue =
+  implicit val topEventPayloadFormat: RootJsonFormat[TopEventPayload] = new RootJsonFormat[TopEventPayload] {
+    override def write(eventPayload: TopEventPayload): JsValue =
       eventPayload match {
-        case e: FlightReceivedList      => e.toJson
-        case e: AirportList             => e.toJson
         case e: TopArrivalAirportList   => e.toJson
         case e: TopDepartureAirportList => e.toJson
         case e: TopSpeedList            => e.toJson
         case e: TopAirlineList          => e.toJson
-        case e: TotalFlightsCount       => e.toJson
-        case e: TotalAirlinesCount      => e.toJson
       }
 
-    override def read(json: JsValue): EventPayload =
-      Try[EventPayload](json.convertTo[TopArrivalAirportList])
-        .recover[EventPayload] { case _ => json.convertTo[TopDepartureAirportList] }
-        .recover[EventPayload] { case _ => json.convertTo[TopSpeedList] }
-        .recover[EventPayload] { case _ => json.convertTo[TopAirlineList] }
-        .recover[EventPayload] { case _ => json.convertTo[TotalFlightsCount] }
-        .recover[EventPayload] { case _ => json.convertTo[TotalAirlinesCount] }
-        .recover[EventPayload] { case _ => json.convertTo[FlightReceivedList] }
-        .recover[EventPayload] { case _ => json.convertTo[AirportList] }
+    override def read(json: JsValue): TopEventPayload =
+      Try(json.convertTo[TopArrivalAirportList]).recover { case _ => json.convertTo[TopDepartureAirportList] }.recover {
+        case _ => json.convertTo[TopSpeedList]
+      }.recover { case _ => json.convertTo[TopAirlineList] }
+        .getOrElse(serializationError(s"json serialization error $json"))
+  }
+
+  implicit val totalEventPayloadFormat: RootJsonFormat[TotalEventPayload] = new RootJsonFormat[TotalEventPayload] {
+    override def write(eventPayload: TotalEventPayload): JsValue =
+      eventPayload match {
+        case e: TotalFlightsCount  => e.toJson
+        case e: TotalAirlinesCount => e.toJson
+      }
+
+    override def read(json: JsValue): TotalEventPayload =
+      Try(json.convertTo[TotalFlightsCount]).recover { case _ => json.convertTo[TotalAirlinesCount] }
         .getOrElse(serializationError(s"json serialization error $json"))
   }
 
