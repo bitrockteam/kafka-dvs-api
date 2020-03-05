@@ -43,6 +43,9 @@ trait TestValues {
   final val DefaultLongitude2       = Random.nextDouble
   final val DefaultGmt2             = randomString(10)
 
+  final val defaultCityName1 = "Milan"
+  final val defaultCityName2 = "London"
+
   final val DefaultCodeAirline = randomString(10)
   final val DefaultNameAirline = randomString(10)
   final val DefaultSizeAirline = Random.nextLong

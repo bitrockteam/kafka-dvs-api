@@ -20,7 +20,7 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
   implicit val startTotalsJsonFormat: RootJsonFormat[StartTotals]       = jsonFormat1(StartTotals.apply)
 
   implicit val geographyJsonFormat: RootJsonFormat[Geography]                   = jsonFormat4(Geography.apply)
-  implicit val airportJsonFormat: RootJsonFormat[Airport]                       = jsonFormat8(Airport.apply)
+  implicit val airportJsonFormat: RootJsonFormat[Airport]                       = jsonFormat9(Airport.apply)
   implicit val airlineJsonFormat: RootJsonFormat[Airline]                       = jsonFormat3(Airline.apply)
   implicit val airplaneJsonFormat: RootJsonFormat[Airplane]                     = jsonFormat3(Airplane.apply)
   implicit val flightReceivedJsonFormat: RootJsonFormat[FlightReceived]         = jsonFormat10(FlightReceived.apply)

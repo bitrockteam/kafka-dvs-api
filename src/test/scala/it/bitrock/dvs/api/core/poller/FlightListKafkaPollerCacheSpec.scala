@@ -42,7 +42,8 @@ class FlightListKafkaPollerCacheSpec extends BaseTestKit {
               DefaultTimezone1,
               DefaultLatitude1,
               DefaultLongitude1,
-              DefaultGmt1
+              DefaultGmt1,
+              defaultCityName1
             ),
             Airport(
               DefaultCodeAirport2,
@@ -52,7 +53,8 @@ class FlightListKafkaPollerCacheSpec extends BaseTestKit {
               DefaultTimezone2,
               DefaultLatitude2,
               DefaultLongitude2,
-              DefaultGmt2
+              DefaultGmt2,
+              defaultCityName2
             ),
             Airline(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
             Airplane(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
@@ -94,7 +96,8 @@ class FlightListKafkaPollerCacheSpec extends BaseTestKit {
               DefaultTimezone1,
               DefaultLatitude1,
               DefaultLongitude1,
-              DefaultGmt1
+              DefaultGmt1,
+              defaultCityName1
             ),
             Airport(
               DefaultCodeAirport2,
@@ -104,7 +107,8 @@ class FlightListKafkaPollerCacheSpec extends BaseTestKit {
               DefaultTimezone2,
               DefaultLatitude2,
               DefaultLongitude2,
-              DefaultGmt2
+              DefaultGmt2,
+              defaultCityName2
             ),
             Airline(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
             Airplane(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
@@ -131,7 +135,8 @@ class FlightListKafkaPollerCacheSpec extends BaseTestKit {
                 DefaultTimezone1,
                 DefaultLatitude1,
                 DefaultLongitude1,
-                DefaultGmt1
+                DefaultGmt1,
+                defaultCityName1
               ),
               Airport(
                 DefaultCodeAirport2,
@@ -141,7 +146,8 @@ class FlightListKafkaPollerCacheSpec extends BaseTestKit {
                 DefaultTimezone2,
                 DefaultLatitude2,
                 DefaultLongitude2,
-                DefaultGmt2
+                DefaultGmt2,
+                defaultCityName2
               )
             )
           )

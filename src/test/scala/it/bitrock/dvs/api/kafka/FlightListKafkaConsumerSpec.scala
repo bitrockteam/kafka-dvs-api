@@ -56,7 +56,8 @@ class FlightListKafkaConsumerSpec
             DefaultNameCountry1,
             DefaultCodeIso2Country1,
             DefaultTimezone1,
-            DefaultGmt1
+            DefaultGmt1,
+            defaultCityName1
           ),
           KAirportInfo(
             DefaultCodeAirport2,
@@ -66,7 +67,8 @@ class FlightListKafkaConsumerSpec
             DefaultNameCountry2,
             DefaultCodeIso2Country2,
             DefaultTimezone2,
-            DefaultGmt2
+            DefaultGmt2,
+            defaultCityName2
           ),
           KAirlineInfo(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
           KAirplaneInfo(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
@@ -87,7 +89,8 @@ class FlightListKafkaConsumerSpec
             DefaultNameCountry1,
             DefaultCodeIso2Country1,
             DefaultTimezone1,
-            DefaultGmt1
+            DefaultGmt1,
+            defaultCityName1
           ),
           KAirportInfo(
             DefaultCodeAirport2,
@@ -97,7 +100,8 @@ class FlightListKafkaConsumerSpec
             DefaultNameCountry2,
             DefaultCodeIso2Country2,
             DefaultTimezone2,
-            DefaultGmt2
+            DefaultGmt2,
+            defaultCityName2
           ),
           KAirlineInfo(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
           KAirplaneInfo(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
@@ -119,7 +123,8 @@ class FlightListKafkaConsumerSpec
             DefaultTimezone1,
             DefaultLatitude1,
             DefaultLongitude1,
-            DefaultGmt1
+            DefaultGmt1,
+            defaultCityName1
           ),
           Airport(
             DefaultCodeAirport2,
@@ -129,7 +134,8 @@ class FlightListKafkaConsumerSpec
             DefaultTimezone2,
             DefaultLatitude2,
             DefaultLongitude2,
-            DefaultGmt2
+            DefaultGmt2,
+            defaultCityName2
           ),
           Airline(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
           Airplane(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
@@ -149,7 +155,8 @@ class FlightListKafkaConsumerSpec
             DefaultTimezone1,
             DefaultLatitude1,
             DefaultLongitude1,
-            DefaultGmt1
+            DefaultGmt1,
+            defaultCityName1
           ),
           Airport(
             DefaultCodeAirport2,
@@ -159,7 +166,8 @@ class FlightListKafkaConsumerSpec
             DefaultTimezone2,
             DefaultLatitude2,
             DefaultLongitude2,
-            DefaultGmt2
+            DefaultGmt2,
+            defaultCityName2
           ),
           Airline(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
           Airplane(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
@@ -198,7 +206,8 @@ class FlightListKafkaConsumerSpec
             DefaultNameCountry1,
             DefaultCodeIso2Country1,
             DefaultTimezone1,
-            DefaultGmt1
+            DefaultGmt1,
+            defaultCityName1
           ),
           KAirportInfo(
             DefaultCodeAirport2,
@@ -208,7 +217,8 @@ class FlightListKafkaConsumerSpec
             DefaultNameCountry2,
             DefaultCodeIso2Country2,
             DefaultTimezone2,
-            DefaultGmt2
+            DefaultGmt2,
+            defaultCityName2
           ),
           KAirlineInfo(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
           KAirplaneInfo(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
