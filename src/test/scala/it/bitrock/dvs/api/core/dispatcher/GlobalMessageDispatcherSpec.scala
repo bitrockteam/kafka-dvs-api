@@ -4,6 +4,7 @@ import akka.actor.ActorRef
 import akka.testkit.{TestActor, TestProbe}
 import it.bitrock.dvs.api.BaseTestKit
 import it.bitrock.dvs.api.BaseTestKit.ResourceDispatcher
+import it.bitrock.dvs.api.TestValues._
 import it.bitrock.dvs.api.core.factory.MessageDispatcherFactory
 import it.bitrock.dvs.api.core.poller.{FlightListKafkaPollerCache, TopsKafkaPollerCache, TotalsKafkaPollerCache}
 import it.bitrock.dvs.api.kafka.KafkaConsumerWrapper._

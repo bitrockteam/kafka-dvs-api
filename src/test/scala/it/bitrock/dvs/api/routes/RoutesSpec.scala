@@ -1,5 +1,6 @@
 package it.bitrock.dvs.api.routes
 
+import RoutesSpec._
 import akka.NotUsed
 import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 import akka.http.scaladsl.model.ws.{Message, TextMessage}
@@ -17,14 +18,13 @@ import it.bitrock.testcommons.AsyncFixtureLoaner
 import org.scalacheck.Arbitrary
 import org.scalacheck.ScalacheckShapeless._
 import org.scalatest.Assertion
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import spray.json._
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
-class RoutesSpec extends BaseAsyncSpec with ScalatestRouteTest {
-
-  import RoutesSpec._
+class RoutesSpec extends BaseAsyncSpec with ScalatestRouteTest with ScalaCheckPropertyChecks {
 
   "Routes" should {
 
@@ -37,29 +37,11 @@ class RoutesSpec extends BaseAsyncSpec with ScalatestRouteTest {
 
     "send a message" when {
 
-      val flightExpectedMessage = implicitly[Arbitrary[FlightReceivedList]].arbitrary.sample.get
-      "a flight is requested" in ResourceLoaner.withFlowFactory(new FlowFactoryFixture(flightExpectedMessage).flowFactory) {
-        case Resource(routes, wsProbe, webSocketConfig) =>
-          WS(Uri(path = Uri.Path / webSocketConfig.pathPrefix / webSocketConfig.dvsPath), wsProbe.flow) ~> routes ~> check {
-            webSocketExchange(wsProbe, coordinatesBox, flightExpectedMessage.toJson.toString)
-          }
-      }
+      "a flight is requested" in ResourceLoaner.respondTo[FlightReceivedList](coordinatesBox)
 
-      val topExpectedMsg = implicitly[Arbitrary[TopDepartureAirportList]].arbitrary.sample.get
-      "a top is requested" in ResourceLoaner.withFlowFactory(new FlowFactoryFixture(topExpectedMsg).flowFactory) {
-        case Resource(routes, wsProbe, webSocketConfig) =>
-          WS(Uri(path = Uri.Path / webSocketConfig.pathPrefix / webSocketConfig.dvsPath), wsProbe.flow) ~> routes ~> check {
-            webSocketExchange(wsProbe, startTop, topExpectedMsg.toJson.toString)
-          }
-      }
+      "a top is requested" in ResourceLoaner.respondTo[TopDepartureAirportList](startTop)
 
-      val totalExpectedMsg = implicitly[Arbitrary[TotalAirlinesCount]].arbitrary.sample.get
-      "a total is requested" in ResourceLoaner.withFlowFactory(new FlowFactoryFixture(totalExpectedMsg).flowFactory) {
-        case Resource(routes, wsProbe, webSocketConfig) =>
-          WS(Uri(path = Uri.Path / webSocketConfig.pathPrefix / webSocketConfig.dvsPath), wsProbe.flow) ~> routes ~> check {
-            webSocketExchange(wsProbe, startTotal, totalExpectedMsg.toJson.toString)
-          }
-      }
+      "a total is requested" in ResourceLoaner.respondTo[TotalAirlinesCount](startTotal)
     }
 
     "respond to the health check" in {
@@ -75,7 +57,17 @@ class RoutesSpec extends BaseAsyncSpec with ScalatestRouteTest {
     override def withFixture(body: RoutesSpec.Resource => Future[Assertion]): Future[Assertion] =
       withFlowFactory(new TestFlowFactory)(body)
 
-    def withFlowFactory(flowFactory: FlowFactory)(body: RoutesSpec.Resource => Future[Assertion]): Future[Assertion] = {
+    def respondTo[A: Arbitrary: JsonWriter](command: String): Future[Assertion] =
+      implicitly[Arbitrary[A]].arbitrary.sample.map { expectedMsg =>
+        withFlowFactory(new FlowFactoryFixture(expectedMsg).flowFactory) {
+          case Resource(routes, wsProbe, webSocketConfig) =>
+            WS(Uri(path = Uri.Path / webSocketConfig.pathPrefix / webSocketConfig.dvsPath), wsProbe.flow) ~> routes ~> check {
+              webSocketExchange(wsProbe, command, expectedMsg.toJson.toString)
+            }
+        }
+      }.getOrElse(fail())
+
+    private def withFlowFactory(flowFactory: FlowFactory)(body: RoutesSpec.Resource => Future[Assertion]): Future[Assertion] = {
       val wsProbe = WSProbe()
       val webSocketConfig = WebSocketConfig(
         maxNumberFlights = 1000,

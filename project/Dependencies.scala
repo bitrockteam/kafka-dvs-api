@@ -71,6 +71,7 @@ object Dependencies {
     "jakarta.ws.rs"              % "jakarta.ws.rs-api"               % Versions.JakartaWsRs, // mandatory when javax.ws.rs-api gets excluded
     "org.mockito"                % "mockito-core"                    % Versions.Mockito,
     "org.scalatestplus"          %% "mockito-1-10"                   % Versions.ScalaTestAutofix,
+    "org.scalatestplus"          %% "scalacheck-1-14"                % Versions.ScalaTestPlus,
     "com.github.alexarchambault" %% "scalacheck-shapeless_1.14"      % Versions.ScalacheckShapeless
   ).map(_ % s"$Test,$IntegrationTest")
 

@@ -4,11 +4,12 @@ import java.net.URI
 
 import akka.actor.ActorSystem
 import akka.testkit.{TestKit, TestProbe}
+import it.bitrock.dvs.api.BaseSpec
 import it.bitrock.dvs.api.TestProbeExtensions._
+import it.bitrock.dvs.api.TestValues._
 import it.bitrock.dvs.api.config.{AppConfig, KafkaConfig}
 import it.bitrock.dvs.api.kafka.TopsKafkaConsumerSpec.Resource
 import it.bitrock.dvs.api.model._
-import it.bitrock.dvs.api.{BaseSpec, TestValues}
 import it.bitrock.dvs.model.avro.{
   TopAirline => KTopAirline,
   TopAirlineList => KTopAirlineList,
@@ -31,7 +32,6 @@ class TopsKafkaConsumerSpec
     extends TestKit(ActorSystem("TopsKafkaConsumerSpec"))
     with EmbeddedKafka
     with BaseSpec
-    with TestValues
     with Eventually
     with BeforeAndAfterAll {
 
