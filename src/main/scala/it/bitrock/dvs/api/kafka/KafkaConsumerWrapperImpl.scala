@@ -27,15 +27,11 @@ class KafkaConsumerWrapperImpl[K: Deserializer, V: Deserializer](
 
   override def pollMessages(): Unit = {
     logger.debug("Going to poll for records")
-    kafkaConsumer.poll(duration2JavaDuration(conf.consumer.pollInterval)).asScala match {
-      case results =>
-        logger.debug(s"Got ${results.size} records")
-
-        results
-          .map(_.value)
-          .map(transformer)
-          .foreach(processor ! _)
-    }
+    val results = kafkaConsumer.poll(duration2JavaDuration(conf.consumer.pollInterval)).asScala
+    logger.debug(s"Got ${results.size} records")
+    results
+      .map(record => transformer(record.value))
+      .foreach(processor ! _)
   }
 
   @SuppressWarnings(Array("scalafix:DisableSyntax.null"))
@@ -43,13 +39,13 @@ class KafkaConsumerWrapperImpl[K: Deserializer, V: Deserializer](
     @tailrec
     def waitForAssignment(retries: Int): Map[TopicPartition, Long] = {
       kafkaConsumer.poll(duration2JavaDuration(conf.consumer.pollInterval))
-      val queryForTimestamp = kafkaConsumer.assignment.asScala.map((_, epoch)).toMap
-
-      if (queryForTimestamp.nonEmpty) queryForTimestamp
-      else if (retries == 0) {
-        logger.warn(s"Unable to retrieve partition assignment for Kafka Consumer on topics $topics: retries exhausted")
-        Map.empty
-      } else waitForAssignment(retries - 1)
+      kafkaConsumer.assignment.asScala.map((_, epoch)).toMap match {
+        case queryForTimestamp if queryForTimestamp.nonEmpty => queryForTimestamp
+        case _ if retries == 0 =>
+          logger.warn(s"Unable to retrieve partition assignment for Kafka Consumer on topics $topics: retries exhausted")
+          Map.empty
+        case _ => waitForAssignment(retries - 1)
+      }
     }
 
     val queryForTimestamp = waitForAssignment(50)
