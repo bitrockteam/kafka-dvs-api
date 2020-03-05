@@ -17,7 +17,7 @@ object Dependencies {
     lazy val Akka                = "2.6.3"
     lazy val AkkaHttp            = "10.1.11"
     lazy val AkkaHttpCors        = "0.4.2"
-    lazy val ConfluentPlatform   = "5.4.0"
+    lazy val ConfluentPlatform   = "5.4.1"
     lazy val JakartaWsRs         = "2.1.6"
     lazy val Kafka               = "2.4.0"
     lazy val KafkaDVS            = "1.0.18"
