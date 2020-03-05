@@ -1,6 +1,5 @@
 package it.bitrock.dvs.api.routes
 
-import RoutesSpec._
 import akka.NotUsed
 import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 import akka.http.scaladsl.model.ws.{Message, TextMessage}
@@ -14,6 +13,7 @@ import it.bitrock.dvs.api.TestValues._
 import it.bitrock.dvs.api.config.{RestConfig, WebSocketConfig}
 import it.bitrock.dvs.api.core.factory.MessageDispatcherFactory
 import it.bitrock.dvs.api.model.{FlightReceivedList, TopDepartureAirportList, TotalAirlinesCount}
+import it.bitrock.dvs.api.routes.RoutesSpec._
 import it.bitrock.testcommons.AsyncFixtureLoaner
 import org.scalacheck.Arbitrary
 import org.scalacheck.ScalacheckShapeless._
