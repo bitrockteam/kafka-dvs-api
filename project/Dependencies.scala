@@ -31,7 +31,7 @@ object Dependencies {
     lazy val ScalafixSortImports = "0.3.2"
     lazy val ScalacheckShapeless = "1.2.5"
     lazy val ScalaTestAutofix    = "3.1.0.0"
-    lazy val ScalaTestPlus       = "3.1.0.0"
+    lazy val ScalaTestPlus       = "3.1.0.1"
 
   }
 
