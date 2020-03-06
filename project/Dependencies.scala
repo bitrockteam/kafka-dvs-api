@@ -20,7 +20,7 @@ object Dependencies {
     lazy val ConfluentPlatform   = "5.4.0"
     lazy val JakartaWsRs         = "2.1.6"
     lazy val Kafka               = "2.4.0"
-    lazy val KafkaDVS            = "1.0.18"
+    lazy val KafkaDVS            = "1.0.20"
     lazy val TestCommons         = "0.0.8"
     lazy val KafkaCommons        = "0.0.8"
     lazy val LogbackClassic      = "1.2.3"
@@ -71,6 +71,7 @@ object Dependencies {
     "jakarta.ws.rs"              % "jakarta.ws.rs-api"               % Versions.JakartaWsRs, // mandatory when javax.ws.rs-api gets excluded
     "org.mockito"                % "mockito-core"                    % Versions.Mockito,
     "org.scalatestplus"          %% "mockito-1-10"                   % Versions.ScalaTestAutofix,
+    "org.scalatestplus"          %% "scalacheck-1-14"                % Versions.ScalaTestPlus,
     "com.github.alexarchambault" %% "scalacheck-shapeless_1.14"      % Versions.ScalacheckShapeless
   ).map(_ % s"$Test,$IntegrationTest")
 

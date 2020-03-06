@@ -5,6 +5,7 @@ import java.time.temporal.ChronoUnit
 import akka.testkit.TestProbe
 import it.bitrock.dvs.api.BaseTestKit
 import it.bitrock.dvs.api.BaseTestKit._
+import it.bitrock.dvs.api.TestValues._
 import it.bitrock.dvs.api.kafka.KafkaConsumerWrapper.{AirportListUpdate, FlightListUpdate}
 import it.bitrock.dvs.api.model._
 
@@ -42,7 +43,8 @@ class FlightListKafkaPollerCacheSpec extends BaseTestKit {
               DefaultTimezone1,
               DefaultLatitude1,
               DefaultLongitude1,
-              DefaultGmt1
+              DefaultGmt1,
+              defaultCityName1
             ),
             Airport(
               DefaultCodeAirport2,
@@ -52,7 +54,8 @@ class FlightListKafkaPollerCacheSpec extends BaseTestKit {
               DefaultTimezone2,
               DefaultLatitude2,
               DefaultLongitude2,
-              DefaultGmt2
+              DefaultGmt2,
+              defaultCityName2
             ),
             Airline(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
             Airplane(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
@@ -94,7 +97,8 @@ class FlightListKafkaPollerCacheSpec extends BaseTestKit {
               DefaultTimezone1,
               DefaultLatitude1,
               DefaultLongitude1,
-              DefaultGmt1
+              DefaultGmt1,
+              defaultCityName1
             ),
             Airport(
               DefaultCodeAirport2,
@@ -104,7 +108,8 @@ class FlightListKafkaPollerCacheSpec extends BaseTestKit {
               DefaultTimezone2,
               DefaultLatitude2,
               DefaultLongitude2,
-              DefaultGmt2
+              DefaultGmt2,
+              defaultCityName2
             ),
             Airline(DefaultCodeAirline, DefaultNameAirline, DefaultSizeAirline),
             Airplane(DefaultNumberRegistration, DefaultProductionLine, DefaultModelCode),
@@ -131,7 +136,8 @@ class FlightListKafkaPollerCacheSpec extends BaseTestKit {
                 DefaultTimezone1,
                 DefaultLatitude1,
                 DefaultLongitude1,
-                DefaultGmt1
+                DefaultGmt1,
+                defaultCityName1
               ),
               Airport(
                 DefaultCodeAirport2,
@@ -141,7 +147,8 @@ class FlightListKafkaPollerCacheSpec extends BaseTestKit {
                 DefaultTimezone2,
                 DefaultLatitude2,
                 DefaultLongitude2,
-                DefaultGmt2
+                DefaultGmt2,
+                defaultCityName2
               )
             )
           )

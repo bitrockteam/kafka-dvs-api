@@ -29,8 +29,7 @@ abstract class BaseTestKit
     with BaseSpec
     with ImplicitSender
     with BeforeAndAfterAll
-    with JsonSupport
-    with TestValues {
+    with JsonSupport {
 
   object ResourceLoanerPoller extends FixtureLoanerAnyResult[ResourcePoller] {
     override def withFixture(body: ResourcePoller => Any): Any = {

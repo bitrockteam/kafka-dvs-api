@@ -8,7 +8,7 @@ import scala.concurrent.duration._
 import scala.language.postfixOps
 import scala.util.Random
 
-trait TestValues {
+object TestValues {
 
   final val DefaultLatitude  = Random.nextDouble
   final val DefaultLongitude = Random.nextDouble
@@ -42,6 +42,9 @@ trait TestValues {
   final val DefaultLatitude2        = Random.nextDouble
   final val DefaultLongitude2       = Random.nextDouble
   final val DefaultGmt2             = randomString(10)
+
+  final val defaultCityName1 = "Milan"
+  final val defaultCityName2 = "London"
 
   final val DefaultCodeAirline = randomString(10)
   final val DefaultNameAirline = randomString(10)
@@ -174,5 +177,3 @@ trait TestValues {
 
   private def randomString(size: Int) = Random.alphanumeric.take(size).mkString
 }
-
-object TestValues extends TestValues
