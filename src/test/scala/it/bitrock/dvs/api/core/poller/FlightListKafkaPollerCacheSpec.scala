@@ -5,6 +5,7 @@ import java.time.temporal.ChronoUnit
 import akka.testkit.TestProbe
 import it.bitrock.dvs.api.BaseTestKit
 import it.bitrock.dvs.api.BaseTestKit._
+import it.bitrock.dvs.api.TestValues._
 import it.bitrock.dvs.api.kafka.KafkaConsumerWrapper.{AirportListUpdate, FlightListUpdate}
 import it.bitrock.dvs.api.model._
 

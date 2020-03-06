@@ -3,6 +3,7 @@ package it.bitrock.dvs.api.core.poller
 import akka.testkit.TestProbe
 import it.bitrock.dvs.api.BaseTestKit
 import it.bitrock.dvs.api.BaseTestKit._
+import it.bitrock.dvs.api.TestValues._
 import it.bitrock.dvs.api.kafka.KafkaConsumerWrapper.{TotalAirlineUpdate, TotalFlightUpdate}
 import it.bitrock.dvs.api.model.{TotalAirlinesCount, TotalFlightsCount}
 

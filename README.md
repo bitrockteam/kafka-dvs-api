@@ -11,12 +11,12 @@ Scala application with ReST and web-socket APIs serving aggregated flight events
 
 The application references the following environment variables:
 
-- `HOST`: server host
-- `PORT`: server port
-- `KAFKA.BOOTSTRAP.SERVERS`: valid `bootstrap.servers` value (see [Confluent docs](https://docs.confluent.io/current/clients/consumer.html#configuration))
-- `SCHEMAREGISTRY.URL`: valid `schema.registry.url` value (see [Confluent docs](https://docs.confluent.io/current/schema-registry/docs/schema_registry_tutorial.html#java-consumers))
-- `SERVER.WEBSOCKET.MAX.NUMBER.FLIGHTS`: max number of elements returned by API
-- `SERVER.WEBSOCKET.THROTTLE.DURATION`: time interval between each update
+  - `HOST`: server host
+  - `PORT`: server port
+  - `KAFKA.BOOTSTRAP.SERVERS`: valid `bootstrap.servers` value (see [Confluent docs](https://docs.confluent.io/current/clients/consumer.html#configuration))
+  - `SCHEMAREGISTRY.URL`: valid `schema.registry.url` value (see [Confluent docs](https://docs.confluent.io/current/schema-registry/docs/schema_registry_tutorial.html#java-consumers))
+  - `SERVER.WEBSOCKET.MAX.NUMBER.FLIGHTS`: max number of elements returned by API
+  - `SERVER.WEBSOCKET.THROTTLE.DURATION`: time interval between each update
 
 ## API documentation
 
