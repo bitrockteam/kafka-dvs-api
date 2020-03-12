@@ -7,12 +7,15 @@ sealed trait FrequencyCommand {
   val updateRate: Option[FiniteDuration]
 }
 
+final case class Precedence(departureAirport: Option[String], arrivalAirport: Option[String], airline: Option[String])
+
 final case class CoordinatesBox(
     leftHighLat: Double,
     leftHighLon: Double,
     rightLowLat: Double,
     rightLowLon: Double,
-    override val updateRate: Option[FiniteDuration]
+    override val updateRate: Option[FiniteDuration],
+    precedence: Option[Precedence]
 ) extends WebSocketIncomeMessage("startFlightList")
     with FrequencyCommand
 case object StopFlightList extends WebSocketIncomeMessage("stopFlightList")

@@ -12,7 +12,6 @@ object Dependencies {
   }
 
   object Versions {
-
     lazy val Scala               = "2.12.10"
     lazy val Akka                = "2.6.3"
     lazy val AkkaHttp            = "10.1.11"
@@ -32,7 +31,7 @@ object Dependencies {
     lazy val ScalacheckShapeless = "1.2.5"
     lazy val ScalaTestAutofix    = "3.1.0.0"
     lazy val ScalaTestPlus       = "3.1.1.1"
-
+    lazy val Cats                = "2.0.0"
   }
 
   object Logging {
@@ -60,7 +59,8 @@ object Dependencies {
     "it.bitrock.dvs"        %% "kafka-dvs-avro-schemas" % Versions.KafkaDVS,
     "it.bitrock"            %% "kafka-commons"          % Versions.KafkaCommons,
     "org.apache.kafka"      % "kafka-clients"           % Versions.Kafka,
-    "io.confluent"          % "monitoring-interceptors" % Versions.ConfluentPlatform exclude ("org.apache.kafka", "kafka-clients")
+    "io.confluent"          % "monitoring-interceptors" % Versions.ConfluentPlatform exclude ("org.apache.kafka", "kafka-clients"),
+    "org.typelevel"         %% "cats-core"              % Versions.Cats
   ) ++ Logging.prodDeps
 
   lazy val testDeps: Seq[ModuleID] = Seq(
