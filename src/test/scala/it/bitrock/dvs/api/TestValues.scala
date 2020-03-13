@@ -20,8 +20,8 @@ object TestValues {
   final val DefaultOutBoxLatitude  = 0
   final val DefaultOutBoxLongitude = 0
 
-  final val changedBox                   = CoordinatesBox(101, 99, 99, 101, None)
-  final val changedBox1Minute            = CoordinatesBox(101, 99, 99, 101, Some(1 minute))
+  final val changedBox                   = CoordinatesBox(101, 99, 99, 101, None, None)
+  final val changedBox1Minute            = CoordinatesBox(101, 99, 99, 101, Some(1 minute), None)
   final val DefaultChangedInBoxLatitude  = 100
   final val DefaultChangedInBoxLongitude = 100
 
@@ -128,6 +128,21 @@ object TestValues {
       |   "rightLowLon": 43.45,
       |   "rightLowLon": 43.45,
       |   "updateRate": 60
+      | }
+      |""".stripMargin
+  final val coordinatesBoxWithPrecedence: String =
+    """
+      | {
+      |   "@type": "startFlightList",
+      |   "leftHighLat": 23.6,
+      |   "leftHighLon": 67.9,
+      |   "rightLowLat": 37.98,
+      |   "rightLowLon": 43.45,
+      |   "rightLowLon": 43.45,
+      |   "precedence": {
+      |     "arrivalAirport": "Malpensa",
+      |     "departureAirport": "Fiumicino"
+      |   }
       | }
       |""".stripMargin
   final val stopFlightList =

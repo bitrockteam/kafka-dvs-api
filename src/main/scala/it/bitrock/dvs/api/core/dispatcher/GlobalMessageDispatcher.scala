@@ -77,9 +77,14 @@ class GlobalMessageDispatcher(val sourceActorRef: ActorRef, kafkaPollerHub: Kafk
   }
 
   private def boxedFlights(flights: FlightReceivedList, box: CoordinatesBox): FlightReceivedList = {
-    val filteredList = flights.elements.view.filter { flight =>
+    val filteredFlights = flights.elements.view.filter { flight =>
       coordinateBoxContainsCoordinates(box, flight.geography.latitude, flight.geography.longitude)
-    }.take(webSocketConfig.maxNumberFlights).force
+    }
+    val filteredList = box.precedence
+      .fold(filteredFlights)(p => filteredFlights.sortWith((fr, fr2) => fr.hasPrecedence(p) & !fr2.hasPrecedence(p)))
+      .take(webSocketConfig.maxNumberFlights)
+      .force
+
     FlightReceivedList(filteredList)
   }
 

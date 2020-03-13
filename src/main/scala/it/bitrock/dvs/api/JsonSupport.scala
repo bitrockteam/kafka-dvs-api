@@ -15,7 +15,8 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
 
     override def read(json: JsValue): FiniteDuration = json.convertTo[Int] seconds
   }
-  implicit val coordinatesBoxJsonFormat: RootJsonFormat[CoordinatesBox] = jsonFormat5(CoordinatesBox.apply)
+  implicit val precedenceJsonFormat: RootJsonFormat[Precedence]         = jsonFormat3(Precedence.apply)
+  implicit val coordinatesBoxJsonFormat: RootJsonFormat[CoordinatesBox] = jsonFormat6(CoordinatesBox.apply)
   implicit val startTopsJsonFormat: RootJsonFormat[StartTops]           = jsonFormat1(StartTops.apply)
   implicit val startTotalsJsonFormat: RootJsonFormat[StartTotals]       = jsonFormat1(StartTotals.apply)
 
