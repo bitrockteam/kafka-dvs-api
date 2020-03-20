@@ -73,7 +73,7 @@ class GlobalMessageDispatcherSpec extends BaseTestKit {
             TestActor.KeepRunning
           }
 
-          messageProcessor ! CoordinatesBox(49.8, -3.7, 39.7, 23.6, None, None)
+          messageProcessor ! CoordinatesBox(49.8, -3.7, 39.7, 23.6, None, List.empty)
 
           val expectedMessage = ApiEvent("FlightList", flightReceivedList).toJson.toString
           sourceProbe.fishForMessage(timeout) {
@@ -251,7 +251,7 @@ class GlobalMessageDispatcherSpec extends BaseTestKit {
             TestActor.KeepRunning
           }
 
-          messageProcessor ! CoordinatesBox(49.8, -3.7, 39.7, 23.6, None, None)
+          messageProcessor ! CoordinatesBox(49.8, -3.7, 39.7, 23.6, None, List.empty)
 
           val expectedMessage = ApiEvent("AirportList", airportList).toJson.toString
           sourceProbe.fishForMessage(timeout) {
@@ -639,7 +639,7 @@ class GlobalMessageDispatcherSpec extends BaseTestKit {
             TestActor.KeepRunning
           }
 
-          messageProcessor ! CoordinatesBox(49.8, -3.7, 39.7, 23.6, None, None)
+          messageProcessor ! CoordinatesBox(49.8, -3.7, 39.7, 23.6, None, List.empty)
 
           val expectedMessage = ApiEvent("FlightList", FlightReceivedList(List())).toJson.toString
           sourceProbe.fishForMessage(timeout) {
@@ -696,7 +696,7 @@ class GlobalMessageDispatcherSpec extends BaseTestKit {
             TestActor.KeepRunning
           }
 
-          messageProcessor ! CoordinatesBox(49.8, -3.7, 39.7, 23.6, None, None)
+          messageProcessor ! CoordinatesBox(49.8, -3.7, 39.7, 23.6, None, List.empty)
 
           val expectedMessage = ApiEvent("AirportList", AirportList(List())).toJson.toString
           sourceProbe.fishForMessage(timeout) {

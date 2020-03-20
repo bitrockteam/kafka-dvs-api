@@ -40,7 +40,7 @@ class FlowFactorySpec extends BaseSpec with ScalatestRouteTest with ScalaFutures
         .via(flow)
         .take(1)
         .runWith(Sink.head)
-      whenReady(result)(messages => messages shouldBe TextMessage("received CoordinatesBox(23.6,67.9,37.98,43.45,None,None)"))
+      whenReady(result)(messages => messages shouldBe TextMessage("received CoordinatesBox(23.6,67.9,37.98,43.45,None,List())"))
     }
 
     "parse StopFlightList messages" in {
