@@ -2,7 +2,7 @@ package it.bitrock.dvs
 
 import akka.actor.{ActorSystem, Cancellable}
 import cats.Semigroup
-import cats.implicits._
+import cats.syntax.all._
 import it.bitrock.dvs.api.model.{FlightReceived, Precedence}
 
 import scala.concurrent.ExecutionContext
