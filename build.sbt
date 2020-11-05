@@ -73,8 +73,7 @@ lazy val root = (project in file("."))
   .settings(testSettings: _*)
   .configs(IntegrationTest)
 
-/**
-  * sbt-native-packager plugin
+/** sbt-native-packager plugin
   */
 enablePlugins(JavaAppPackaging, DockerPlugin, AshScriptPlugin)
 

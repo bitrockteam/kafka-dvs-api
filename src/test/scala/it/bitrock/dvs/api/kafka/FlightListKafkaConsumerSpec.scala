@@ -266,19 +266,16 @@ class FlightListKafkaConsumerSpec
           .flightListKafkaConsumerFactory(kafkaConfig)
           .build(processor.ref, List(kafkaConfig.flightInterpolatedListTopic))
 
-      try {
-        body(
-          Resource(
-            embKafkaConfig,
-            kafkaConfig,
-            flightListReceivedKeySerde,
-            processor,
-            () => kafkaConsumerWrapper.pollMessages()
-          )
+      try body(
+        Resource(
+          embKafkaConfig,
+          kafkaConfig,
+          flightListReceivedKeySerde,
+          processor,
+          () => kafkaConsumerWrapper.pollMessages()
         )
-      } finally {
-        kafkaConsumerWrapper.close()
-      }
+      )
+      finally kafkaConsumerWrapper.close()
     }
   }
 

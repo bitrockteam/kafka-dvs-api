@@ -94,19 +94,16 @@ class TotalsKafkaConsumerSpec
         .totalsKafkaConsumerFactory(kafkaConfig)
         .build(processor.ref, List(kafkaConfig.totalFlightTopic, kafkaConfig.totalAirlineTopic))
 
-      try {
-        body(
-          Resource(
-            embKafkaConfig,
-            kafkaConfig,
-            totalKeySerde,
-            processor,
-            () => kafkaConsumerWrapper.pollMessages()
-          )
+      try body(
+        Resource(
+          embKafkaConfig,
+          kafkaConfig,
+          totalKeySerde,
+          processor,
+          () => kafkaConsumerWrapper.pollMessages()
         )
-      } finally {
-        kafkaConsumerWrapper.close()
-      }
+      )
+      finally kafkaConsumerWrapper.close()
     }
   }
 
