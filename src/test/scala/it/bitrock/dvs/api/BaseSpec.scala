@@ -14,13 +14,11 @@ import org.scalatest.wordspec.{AnyWordSpecLike, AsyncWordSpecLike}
 import scala.concurrent.duration._
 import scala.util.Random
 
-/**
-  * Base trait to test classes.
+/** Base trait to test classes.
   */
 trait BaseSpec extends Suite with AnyWordSpecLike
 
-/**
-  * Base trait to test asynchronous assertions.
+/** Base trait to test asynchronous assertions.
   */
 trait BaseAsyncSpec extends AsyncSuite with AsyncWordSpecLike
 

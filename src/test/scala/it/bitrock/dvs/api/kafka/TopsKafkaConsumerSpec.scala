@@ -240,19 +240,16 @@ class TopsKafkaConsumerSpec
           )
         )
 
-      try {
-        body(
-          Resource(
-            embKafkaConfig,
-            kafkaConfig,
-            topKeySerde,
-            processor,
-            () => kafkaConsumerWrapper.pollMessages()
-          )
+      try body(
+        Resource(
+          embKafkaConfig,
+          kafkaConfig,
+          topKeySerde,
+          processor,
+          () => kafkaConsumerWrapper.pollMessages()
         )
-      } finally {
-        kafkaConsumerWrapper.close()
-      }
+      )
+      finally kafkaConsumerWrapper.close()
     }
   }
 
