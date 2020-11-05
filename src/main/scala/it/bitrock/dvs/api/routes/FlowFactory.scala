@@ -83,10 +83,13 @@ object FlowFactory extends LazyLogging {
     case TextMessage.Strict(txt) =>
       logger.debug(s"Got message: $txt")
       Try(txt.parseJson.convertTo[WebSocketIncomeMessage])
-        .fold(e => {
-          logger.warn(s"Failed to parse JSON message $txt", e)
-          None
-        }, Option(_))
+        .fold(
+          e => {
+            logger.warn(s"Failed to parse JSON message $txt", e)
+            None
+          },
+          Option(_)
+        )
     case m =>
       logger.trace(s"Got non-TextMessage, ignoring it: $m")
       None
