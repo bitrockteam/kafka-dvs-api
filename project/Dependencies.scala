@@ -19,7 +19,7 @@ object Dependencies {
     lazy val ConfluentPlatform   = "5.4.3"
     lazy val EmbeddedKafka       = "5.4.1.2"
     lazy val JakartaWsRs         = "2.1.6"
-    lazy val Kafka               = "2.4.1"
+    lazy val Kafka               = "2.6.0"
     lazy val KafkaDVS            = "1.0.20"
     lazy val TestCommons         = "0.0.8"
     lazy val KafkaCommons        = "0.0.8"
