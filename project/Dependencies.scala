@@ -14,8 +14,8 @@ object Dependencies {
   object Versions {
     lazy val Scala               = "2.12.10"
     lazy val Akka                = "2.6.10"
-    lazy val AkkaHttp            = "10.1.12"
-    lazy val AkkaHttpCors        = "0.4.3"
+    lazy val AkkaHttp            = "10.2.1"
+    lazy val AkkaHttpCors        = "1.1.0"
     lazy val ConfluentPlatform   = "5.4.3"
     lazy val EmbeddedKafka       = "5.4.1.2"
     lazy val JakartaWsRs         = "2.1.6"
@@ -27,10 +27,10 @@ object Dependencies {
     lazy val PureConfig          = "0.12.3"
     lazy val ScalaLogging        = "3.9.2"
     lazy val Slf4j               = "1.7.30"
-    lazy val Mockito             = "3.3.3"
+    lazy val Mockito             = "3.6.0"
     lazy val ScalafixSortImports = "0.5.5"
     lazy val ScalacheckShapeless = "1.2.5"
-    lazy val ScalaTestAutofix    = "3.1.0.0"
+    lazy val ScalaTestAutofix    = "3.1.0.1"
     lazy val ScalaTestPlus       = "3.1.4.0"
     lazy val Cats                = "2.2.0"
   }
