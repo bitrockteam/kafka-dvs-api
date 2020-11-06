@@ -1,10 +1,11 @@
 package it.bitrock.dvs.api.kafka
 
 import akka.actor.ActorRef
+import io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig
 import it.bitrock.dvs.api.config.KafkaConfig
 import it.bitrock.dvs.api.model.AvroConverters._
 import it.bitrock.dvs.model.avro._
-import it.bitrock.kafkacommons.serialization.AvroSerdes.serdeFrom
+import it.bitrock.kafkacommons.serialization.AvroSerdes
 import org.apache.avro.specific.SpecificRecord
 import org.apache.kafka.common.serialization.{Deserializer, Serdes}
 
@@ -25,7 +26,15 @@ object KafkaConsumerWrapperFactory {
           FlightInterpolatedList(
             record.elements.sorted(Ordering.by[FlightInterpolated, Long](_.updated.toEpochMilli).reverse)
           ).toFlightReceivedList
-      )(byteArrayDeserializer, serdeFrom[FlightInterpolatedList](kafkaConfig.schemaRegistryUrl).deserializer)
+      )(
+        byteArrayDeserializer,
+        AvroSerdes(
+          Map(
+            AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG ->
+              kafkaConfig.schemaRegistryUrl.toString
+          )
+        ).valueDeserializerFor[FlightInterpolatedList]
+      )
 
   def topsKafkaConsumerFactory(kafkaConfig: KafkaConfig): KafkaConsumerWrapperFactory =
     (processor: ActorRef, topics: Seq[String]) =>
@@ -40,7 +49,15 @@ object KafkaConsumerWrapperFactory {
             case speed: TopSpeedList                       => speed.toTopSpeedList
             case airline: TopAirlineList                   => airline.toTopAirlineList
           }
-      )(byteArrayDeserializer, serdeFrom[SpecificRecord](kafkaConfig.schemaRegistryUrl).deserializer)
+      )(
+        byteArrayDeserializer,
+        AvroSerdes(
+          Map(
+            AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG ->
+              kafkaConfig.schemaRegistryUrl.toString
+          )
+        ).valueDeserializerFor[SpecificRecord]
+      )
 
   def totalsKafkaConsumerFactory(kafkaConfig: KafkaConfig): KafkaConsumerWrapperFactory =
     (processor: ActorRef, topics: Seq[String]) =>
@@ -53,6 +70,14 @@ object KafkaConsumerWrapperFactory {
             case countFlight: CountFlight   => countFlight.toCountFlight
             case countAirline: CountAirline => countAirline.toCountAirline
           }
-      )(byteArrayDeserializer, serdeFrom[SpecificRecord](kafkaConfig.schemaRegistryUrl).deserializer)
+      )(
+        byteArrayDeserializer,
+        AvroSerdes(
+          Map(
+            AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG ->
+              kafkaConfig.schemaRegistryUrl.toString
+          )
+        ).valueDeserializerFor[SpecificRecord]
+      )
 
 }

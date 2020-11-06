@@ -21,8 +21,8 @@ object Dependencies {
     lazy val JakartaWsRs         = "2.1.6"
     lazy val Kafka               = "2.4.1"
     lazy val KafkaDVS            = "1.0.20"
-    lazy val TestCommons         = "0.0.8"
-    lazy val KafkaCommons        = "0.0.8"
+    lazy val TestCommons         = "0.0.13"
+    lazy val KafkaCommons        = "0.0.13"
     lazy val LogbackClassic      = "1.2.3"
     lazy val PureConfig          = "0.12.3"
     lazy val ScalaLogging        = "3.9.2"
@@ -31,6 +31,7 @@ object Dependencies {
     lazy val ScalafixSortImports = "0.5.5"
     lazy val ScalacheckShapeless = "1.2.5"
     lazy val ScalaTestAutofix    = "3.1.0.1"
+    lazy val ScalaTestMockito    = "3.1.0.0"
     lazy val ScalaTestPlus       = "3.1.4.0"
     lazy val Cats                = "2.2.0"
   }
@@ -71,7 +72,7 @@ object Dependencies {
     "it.bitrock"                 %% "test-commons"                   % Versions.TestCommons,
     "jakarta.ws.rs"               % "jakarta.ws.rs-api"              % Versions.JakartaWsRs, // mandatory when javax.ws.rs-api gets excluded
     "org.mockito"                 % "mockito-core"                   % Versions.Mockito,
-    "org.scalatestplus"          %% "mockito-1-10"                   % Versions.ScalaTestAutofix,
+    "org.scalatestplus"          %% "mockito-1-10"                   % Versions.ScalaTestMockito,
     "org.scalatestplus"          %% "scalacheck-1-14"                % Versions.ScalaTestPlus,
     "com.github.alexarchambault" %% "scalacheck-shapeless_1.14"      % Versions.ScalacheckShapeless
   ).map(_ % s"$Test,$IntegrationTest")

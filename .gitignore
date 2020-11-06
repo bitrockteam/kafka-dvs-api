@@ -107,5 +107,6 @@ project/plugins/project/
 .ivy2/
 .sbt/
 .DS_Store
+.bsp
 ### End custom section ###
 
