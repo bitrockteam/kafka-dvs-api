@@ -12,7 +12,7 @@ object Dependencies {
   }
 
   object Versions {
-    lazy val Scala               = "2.12.10"
+    lazy val Scala               = "2.12.13"
     lazy val Akka                = "2.6.13"
     lazy val AkkaHttp            = "10.2.3"
     lazy val AkkaHttpCors        = "1.1.1"
