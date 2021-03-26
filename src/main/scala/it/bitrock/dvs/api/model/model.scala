@@ -15,7 +15,7 @@ final case class CoordinatesBox(
     rightLowLat: Double,
     rightLowLon: Double,
     override val updateRate: Option[FiniteDuration],
-    precedence: Option[Precedence]
+    precedences: List[Precedence]
 ) extends WebSocketIncomeMessage("startFlightList")
     with FrequencyCommand
 case object StopFlightList extends WebSocketIncomeMessage("stopFlightList")

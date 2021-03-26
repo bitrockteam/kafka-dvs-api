@@ -80,8 +80,8 @@ class GlobalMessageDispatcher(val sourceActorRef: ActorRef, kafkaPollerHub: Kafk
     val filteredFlights = flights.elements.view.filter { flight =>
       coordinateBoxContainsCoordinates(box, flight.geography.latitude, flight.geography.longitude)
     }
-    val filteredList = box.precedence
-      .fold(filteredFlights)(p => filteredFlights.sortWith((fr, fr2) => fr.hasPrecedence(p) & !fr2.hasPrecedence(p)))
+    val filteredList = filteredFlights
+      .sortWith((fr, fr2) => fr.hasPrecedence(box.precedences) & !fr2.hasPrecedence(box.precedences))
       .take(webSocketConfig.maxNumberFlights)
       .force
 

@@ -59,7 +59,7 @@ class JsonSupportSpec extends BaseSpec with ParallelTestExecution {
         result.rightLowLat shouldBe 37.98
         result.rightLowLon shouldBe 43.45
         result.updateRate shouldBe None
-        result.precedence shouldBe None
+        result.precedences shouldBe List.empty
       }
     }
 
@@ -69,7 +69,7 @@ class JsonSupportSpec extends BaseSpec with ParallelTestExecution {
 
     "parse CoordinatesBox precedence" in {
       read(coordinatesBoxWithPrecedence) { result: CoordinatesBox =>
-        result.precedence shouldBe Some(Precedence(Some("Fiumicino"), Some("Malpensa"), None))
+        result.precedences shouldBe List(Precedence(Some("Fiumicino"), Some("Malpensa"), None))
       }
     }
 

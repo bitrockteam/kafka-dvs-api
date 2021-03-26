@@ -63,7 +63,7 @@ class GlobalMessageDispatcherPrecedenceSpec extends BaseTestKit {
 
           val messageProcessor: ActorRef = testSetup(webSocketConfig, sourceProbe, flightReceivedList)
 
-          messageProcessor ! CoordinatesBox(49.8, -3.7, 39.7, 23.6, None, None)
+          messageProcessor ! CoordinatesBox(49.8, -3.7, 39.7, 23.6, None, List.empty)
 
           val expectedMessage = ApiEvent("FlightList", flightReceivedList).toJson.toString
           sourceProbe.expectMsg(timeout, expectedMessage)
@@ -81,7 +81,7 @@ class GlobalMessageDispatcherPrecedenceSpec extends BaseTestKit {
 
           val messageProcessor: ActorRef = testSetup(webSocketConfig, sourceProbe, flightReceivedList)
 
-          messageProcessor ! CoordinatesBox(49.8, -3.7, 39.7, 23.6, None, Some(Precedence(None, None, None)))
+          messageProcessor ! CoordinatesBox(49.8, -3.7, 39.7, 23.6, None, List(Precedence(None, None, None)))
 
           val expectedMessage = ApiEvent("FlightList", flightReceivedList).toJson.toString
           sourceProbe.expectMsg(timeout, expectedMessage)
@@ -106,7 +106,7 @@ class GlobalMessageDispatcherPrecedenceSpec extends BaseTestKit {
             39.7,
             23.6,
             None,
-            Some(Precedence(Some("codeAirportDeparture"), Some("codeAirportArrival"), Some("codeAirline")))
+            List(Precedence(Some("codeAirportDeparture"), Some("codeAirportArrival"), Some("codeAirline")))
           )
 
           val expectedMessage =
@@ -133,7 +133,7 @@ class GlobalMessageDispatcherPrecedenceSpec extends BaseTestKit {
 
           val messageProcessor: ActorRef = testSetup(webSocketConfig, sourceProbe, flightReceivedList)
 
-          messageProcessor ! CoordinatesBox(49.8, -3.7, 39.7, 23.6, None, Some(Precedence(None, Some("code1"), None)))
+          messageProcessor ! CoordinatesBox(49.8, -3.7, 39.7, 23.6, None, List(Precedence(None, Some("code1"), None)))
 
           val expectedMessage =
             ApiEvent("FlightList", FlightReceivedList(List(withPrecedence, flightReceived, flightReceived))).toJson.toString
@@ -155,7 +155,7 @@ class GlobalMessageDispatcherPrecedenceSpec extends BaseTestKit {
 
           val messageProcessor: ActorRef = testSetup(webSocketConfig, sourceProbe, flightReceivedList)
 
-          messageProcessor ! CoordinatesBox(49.8, -3.7, 39.7, 23.6, None, Some(Precedence(Some("code1"), None, None)))
+          messageProcessor ! CoordinatesBox(49.8, -3.7, 39.7, 23.6, None, List(Precedence(Some("code1"), None, None)))
 
           val expectedMessage =
             ApiEvent("FlightList", FlightReceivedList(List(withPrecedence, flightReceived, flightReceived))).toJson.toString
@@ -177,7 +177,7 @@ class GlobalMessageDispatcherPrecedenceSpec extends BaseTestKit {
 
           val messageProcessor: ActorRef = testSetup(webSocketConfig, sourceProbe, flightReceivedList)
 
-          messageProcessor ! CoordinatesBox(49.8, -3.7, 39.7, 23.6, None, Some(Precedence(None, None, Some("code1"))))
+          messageProcessor ! CoordinatesBox(49.8, -3.7, 39.7, 23.6, None, List(Precedence(None, None, Some("code1"))))
 
           val expectedMessage =
             ApiEvent("FlightList", FlightReceivedList(List(withPrecedence, flightReceived, flightReceived))).toJson.toString
@@ -209,7 +209,7 @@ class GlobalMessageDispatcherPrecedenceSpec extends BaseTestKit {
             39.7,
             23.6,
             None,
-            Some(Precedence(Some("codeAirportDeparture"), Some("codeAirportArrival"), Some("codeAirline")))
+            List(Precedence(Some("codeAirportDeparture"), Some("codeAirportArrival"), Some("codeAirline")))
           )
 
           val expectedMessage =
@@ -246,7 +246,90 @@ class GlobalMessageDispatcherPrecedenceSpec extends BaseTestKit {
             39.7,
             23.6,
             None,
-            Some(Precedence(Some("codeAirportDeparture"), Some("codeAirportArrival"), Some("codeAirline")))
+            List(Precedence(Some("codeAirportDeparture"), Some("codeAirportArrival"), Some("codeAirline")))
+          )
+
+          val expectedMessage =
+            ApiEvent(
+              "FlightList",
+              FlightReceivedList(List(withPrecedence, secondWithPrecedence, thirdWithPrecedence, flightReceived, flightReceived))
+            ).toJson.toString
+
+          sourceProbe.expectMsg(timeout, expectedMessage)
+
+      }
+
+      "a correct FlightReceivedList message is received and two precedences: arrival airport and airline" in ResourceLoanerDispatcher.withFixture {
+        case ResourceDispatcher(webSocketConfig, _, _, sourceProbe) =>
+          val withPrecedence =
+            flightReceived.copy(airportArrival = flightReceived.airportArrival.copy(codeAirport = "airportArrival"))
+          val withPrecedence2 =
+            flightReceived.copy(airportDeparture = flightReceived.airportDeparture.copy(codeAirport = "airportDeparture"))
+          val withPrecedence3 =
+            withPrecedence.copy(airportDeparture = flightReceived.airportDeparture.copy(codeAirport = "airportDeparture"))
+          val flightReceivedList = FlightReceivedList(
+            List(
+              flightReceived,
+              withPrecedence,
+              flightReceived,
+              withPrecedence2,
+              withPrecedence3
+            )
+          )
+
+          val messageProcessor: ActorRef = testSetup(webSocketConfig, sourceProbe, flightReceivedList)
+
+          messageProcessor ! CoordinatesBox(
+            49.8,
+            -3.7,
+            39.7,
+            23.6,
+            None,
+            List(Precedence(None, Some("airportArrival"), None), Precedence(Some("airportDeparture"), None, None))
+          )
+
+          val expectedMessage =
+            ApiEvent(
+              "FlightList",
+              FlightReceivedList(List(withPrecedence, withPrecedence2, withPrecedence3, flightReceived, flightReceived))
+            ).toJson.toString
+
+          sourceProbe.expectMsg(timeout, expectedMessage)
+
+      }
+
+      "a correct FlightReceivedList message is received and multiple precedences with multiple fields and many matches" in ResourceLoanerDispatcher.withFixture {
+        case ResourceDispatcher(webSocketConfig, _, _, sourceProbe) =>
+          val withPrecedence = flightReceived.copy(
+            airportArrival = flightReceived.airportArrival.copy(codeAirport = "codeAirportArrival"),
+            airportDeparture = flightReceived.airportDeparture.copy(codeAirport = "codeAirportDeparture"),
+            airline = flightReceived.airline.copy(codeAirline = "codeAirline")
+          )
+          val secondWithPrecedence = withPrecedence.copy(icaoNumber = "newicao")
+          val thirdWithPrecedence  = withPrecedence.copy(iataNumber = "newiata")
+          val flightReceivedList = FlightReceivedList(
+            List(
+              flightReceived,
+              withPrecedence,
+              secondWithPrecedence,
+              flightReceived,
+              thirdWithPrecedence
+            )
+          )
+
+          val messageProcessor: ActorRef = testSetup(webSocketConfig, sourceProbe, flightReceivedList)
+
+          messageProcessor ! CoordinatesBox(
+            49.8,
+            -3.7,
+            39.7,
+            23.6,
+            None,
+            List(
+              Precedence(Some("codeAirportDeparture"), Some("codeAirportArrival"), None),
+              Precedence(None, None, Some("codeAirline")),
+              Precedence(Some("NotMatching"), Some("NotMatching"), Some("NotMatching"))
+            )
           )
 
           val expectedMessage =

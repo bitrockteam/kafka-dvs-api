@@ -25,6 +25,8 @@ package object api {
   }
 
   implicit class FlightFieldToPrecedence(f: FlightReceived) {
+    def hasPrecedence(precedences: List[Precedence]): Boolean = precedences.exists(hasPrecedence)
+
     def hasPrecedence(precedence: Precedence): Boolean = {
       val arrivalAirport: Option[Boolean]   = precedence.arrivalAirport.map(_ == f.airportArrival.codeAirport)
       val departureAirport: Option[Boolean] = precedence.departureAirport.map(_ == f.airportDeparture.codeAirport)

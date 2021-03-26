@@ -20,8 +20,8 @@ object TestValues {
   final val DefaultOutBoxLatitude  = 0
   final val DefaultOutBoxLongitude = 0
 
-  final val changedBox                   = CoordinatesBox(101, 99, 99, 101, None, None)
-  final val changedBox1Minute            = CoordinatesBox(101, 99, 99, 101, Some(1 minute), None)
+  final val changedBox                   = CoordinatesBox(101, 99, 99, 101, None, List.empty)
+  final val changedBox1Minute            = CoordinatesBox(101, 99, 99, 101, Some(1 minute), List.empty)
   final val DefaultChangedInBoxLatitude  = 100
   final val DefaultChangedInBoxLongitude = 100
 
@@ -115,7 +115,8 @@ object TestValues {
       |   "leftHighLat": 23.6,
       |   "leftHighLon": 67.9,
       |   "rightLowLat": 37.98,
-      |   "rightLowLon": 43.45
+      |   "rightLowLon": 43.45,
+      |   "precedences": []
       | }
       |""".stripMargin
   final val coordinatesBoxWithRate: String =
@@ -127,7 +128,8 @@ object TestValues {
       |   "rightLowLat": 37.98,
       |   "rightLowLon": 43.45,
       |   "rightLowLon": 43.45,
-      |   "updateRate": 60
+      |   "updateRate": 60,
+      |   "precedences": []
       | }
       |""".stripMargin
   final val coordinatesBoxWithPrecedence: String =
@@ -139,10 +141,10 @@ object TestValues {
       |   "rightLowLat": 37.98,
       |   "rightLowLon": 43.45,
       |   "rightLowLon": 43.45,
-      |   "precedence": {
+      |   "precedences": [{
       |     "arrivalAirport": "Malpensa",
       |     "departureAirport": "Fiumicino"
-      |   }
+      |   }]
       | }
       |""".stripMargin
   final val stopFlightList =
