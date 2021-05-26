@@ -29,7 +29,7 @@ object Dependencies {
     lazy val Slf4j               = "1.7.30"
     lazy val Mockito             = "3.8.0"
     lazy val ScalafixSortImports = "0.5.5"
-    lazy val ScalacheckShapeless = "1.2.5"
+    lazy val ScalacheckShapeless = "1.3.0"
     lazy val ScalaTestAutofix    = "3.1.0.1"
     lazy val ScalaTestMockito    = "3.1.0.0"
     lazy val ScalaTestPlus       = "3.1.4.0"
@@ -74,7 +74,7 @@ object Dependencies {
     "org.mockito"                 % "mockito-core"                   % Versions.Mockito,
     "org.scalatestplus"          %% "mockito-1-10"                   % Versions.ScalaTestMockito,
     "org.scalatestplus"          %% "scalacheck-1-14"                % Versions.ScalaTestPlus,
-    "com.github.alexarchambault" %% "scalacheck-shapeless_1.14"      % Versions.ScalacheckShapeless
+    "com.github.alexarchambault" %% "scalacheck-shapeless_1.15"      % Versions.ScalacheckShapeless
   ).map(_ % s"$Test,$IntegrationTest")
 
   lazy val excludeDeps: Seq[ExclusionRule] = Seq(
