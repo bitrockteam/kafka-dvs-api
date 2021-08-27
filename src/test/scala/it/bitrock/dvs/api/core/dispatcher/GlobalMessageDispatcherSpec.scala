@@ -712,7 +712,7 @@ class GlobalMessageDispatcherSpec extends BaseTestKit {
           val flightListKafkaPollerCache = FlightListKafkaPollerCache.build(kafkaConfig, consumerFactory)
           val topsKafkaPollerCache       = TopsKafkaPollerCache.build(kafkaConfig, consumerFactory)
           val totalsKafkaPollerCache     = TotalsKafkaPollerCache.build(kafkaConfig, consumerFactory)
-          val kafkaPollerHub             = KafkaPollerHub(flightListKafkaPollerCache, topsKafkaPollerCache, totalsKafkaPollerCache)
+          val kafkaPollerHub = KafkaPollerHub(flightListKafkaPollerCache, topsKafkaPollerCache, totalsKafkaPollerCache)
           val messageProcessor =
             MessageDispatcherFactory
               .globalMessageDispatcherFactory(kafkaPollerHub, webSocketConfig)
