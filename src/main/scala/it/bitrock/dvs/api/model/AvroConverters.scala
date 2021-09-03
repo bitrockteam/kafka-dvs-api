@@ -1,13 +1,13 @@
 package it.bitrock.dvs.api.model
 
 import it.bitrock.dvs.model.avro.{
-  FlightInterpolated,
-  FlightInterpolatedList,
   AirlineInfo => KAirlineInfo,
   AirplaneInfo => KAirplaneInfo,
   AirportInfo => KAirportInfo,
   CountAirline => KCountAirline,
   CountFlight => KCountFlight,
+  FlightInterpolated,
+  FlightInterpolatedList,
   GeographyInfo => KGeographyInfo,
   TopAirline => KTopAirline,
   TopAirlineList => KTopAirlineList,
