@@ -11,11 +11,11 @@ import it.bitrock.dvs.api.config.{AppConfig, KafkaConfig}
 import it.bitrock.dvs.api.kafka.FlightListKafkaConsumerSpec.Resource
 import it.bitrock.dvs.api.model._
 import it.bitrock.dvs.model.avro.{
-  FlightInterpolated,
-  FlightInterpolatedList,
   AirlineInfo => KAirlineInfo,
   AirplaneInfo => KAirplaneInfo,
   AirportInfo => KAirportInfo,
+  FlightInterpolated,
+  FlightInterpolatedList,
   GeographyInfo => KGeographyInfo
 }
 import it.bitrock.kafkacommons.serialization.ImplicitConversions._
