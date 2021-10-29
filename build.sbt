@@ -58,7 +58,7 @@ lazy val publishSettings = Seq(
 )
 
 lazy val testSettings = Seq(
-  Test / logBuffered := false,
+  Test / logBuffered       := false,
   Test / parallelExecution := false
 )
 
@@ -77,13 +77,13 @@ lazy val root = (project in file("."))
   */
 enablePlugins(JavaAppPackaging, DockerPlugin, AshScriptPlugin)
 
-dockerBaseImage := "openjdk:8-jre-alpine"
-dockerRepository := Option(sys.env.getOrElse("DOCKER_REPOSITORY", "local"))
+dockerBaseImage      := "openjdk:8-jre-alpine"
+dockerRepository     := Option(sys.env.getOrElse("DOCKER_REPOSITORY", "local"))
 maintainer in Docker := "Bitrock DVS team dvs@bitrock.it"
 
 // Fix for sbt-native-packager 1.3.19
 daemonUserUid in Docker := None
-daemonUser in Docker := "root"
+daemonUser in Docker    := "root"
 
 // Remove the top level directory for universal package
 topLevelDirectory := None
