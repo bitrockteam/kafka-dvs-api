@@ -26,7 +26,7 @@ object Dependencies {
     lazy val LogbackClassic      = "1.2.3"
     lazy val PureConfig          = "0.12.3"
     lazy val ScalaLogging        = "3.9.4"
-    lazy val Slf4j               = "1.7.30"
+    lazy val Slf4j               = "1.7.32"
     lazy val Mockito             = "3.8.0"
     lazy val ScalafixSortImports = "0.5.5"
     lazy val ScalacheckShapeless = "1.2.5"
