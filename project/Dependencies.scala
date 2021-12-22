@@ -28,7 +28,7 @@ object Dependencies {
     lazy val ScalaLogging        = "3.9.4"
     lazy val Slf4j               = "1.7.32"
     lazy val Mockito             = "3.12.4"
-    lazy val ScalafixSortImports = "0.5.5"
+    lazy val ScalafixSortImports = "0.6.0"
     lazy val ScalacheckShapeless = "1.2.5"
     lazy val ScalaTestAutofix    = "3.1.0.1"
     lazy val ScalaTestMockito    = "3.1.0.0"
