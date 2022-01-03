@@ -74,7 +74,7 @@ object Dependencies {
     "org.mockito"                 % "mockito-core"                   % Versions.Mockito,
     "org.scalatestplus"          %% "mockito-1-10"                   % Versions.ScalaTestMockito,
     "org.scalatestplus"          %% "scalacheck-1-14"                % Versions.ScalaTestPlus,
-    "com.github.alexarchambault" %% "scalacheck-shapeless_1.14"      % Versions.ScalacheckShapeless
+    "com.github.alexarchambault" %% "scalacheck-shapeless_1.15"      % Versions.ScalacheckShapeless
   ).map(_ % s"$Test,$IntegrationTest")
 
   lazy val excludeDeps: Seq[ExclusionRule] = Seq(
