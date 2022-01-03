@@ -29,11 +29,11 @@ object Dependencies {
     lazy val Slf4j               = "1.7.32"
     lazy val Mockito             = "3.12.4"
     lazy val ScalafixSortImports = "0.6.1"
-    lazy val ScalacheckShapeless = "1.2.5"
+    lazy val ScalacheckShapeless = "1.3.0"
     lazy val ScalaTestAutofix    = "3.1.0.1"
     lazy val ScalaTestMockito    = "3.1.0.0"
-    lazy val ScalaTestPlus       = "3.2.2.0"
-    lazy val Cats                = "2.3.1"
+    lazy val ScalaTestPlus       = "3.2.10.0"
+    lazy val Cats                = "2.7.0"
   }
 
   object Logging {
@@ -73,7 +73,7 @@ object Dependencies {
     "jakarta.ws.rs"               % "jakarta.ws.rs-api"              % Versions.JakartaWsRs, // mandatory when javax.ws.rs-api gets excluded
     "org.mockito"                 % "mockito-core"                   % Versions.Mockito,
     "org.scalatestplus"          %% "mockito-1-10"                   % Versions.ScalaTestMockito,
-    "org.scalatestplus"          %% "scalacheck-1-14"                % Versions.ScalaTestPlus,
+    "org.scalatestplus"          %% "scalacheck-1-15"                % Versions.ScalaTestPlus,
     "com.github.alexarchambault" %% "scalacheck-shapeless_1.15"      % Versions.ScalacheckShapeless
   ).map(_ % s"$Test,$IntegrationTest")
 
