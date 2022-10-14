@@ -31,7 +31,7 @@ object Dependencies {
     lazy val ScalaTestAutofix    = "3.1.0.1"
     lazy val ScalaTestMockito    = "3.1.0.0"
     lazy val ScalaTestPlus       = "3.2.10.0"
-    lazy val Cats                = "2.7.0"
+    lazy val Cats                = "2.8.0"
   }
 
   object Logging {
