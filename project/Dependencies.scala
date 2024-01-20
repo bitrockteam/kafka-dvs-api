@@ -22,7 +22,7 @@ object Dependencies {
     lazy val TestCommons         = "0.0.13"
     lazy val KafkaCommons        = "0.0.13"
     lazy val LogbackClassic      = "1.2.10"
-    lazy val PureConfig          = "0.17.1"
+    lazy val PureConfig          = "0.17.5"
     lazy val ScalaLogging        = "3.9.4"
     lazy val Slf4j               = "1.7.32"
     lazy val Mockito             = "4.2.0"
